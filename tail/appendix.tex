@@ -1,5 +1,557 @@
 \appendix
-\chapter{An appendix}
-\lipsum[1]
-\newpage
-\lipsum[1]
+\chapter{Appendix for COINs}
+
+\section{Theory}
+\label{sec:appendix_proofs}
+
+\begin{proof}[Proposition~\ref{proposition:complexity}]
+    The time complexity of the first node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of embeddings required. On the other hand, the second step requires as many model evaluations as the number of nodes in the group, $|C_k|$. For each sample, the total is thus $K+|C_k|$, while each node group is represented by $N_k^{\text{test}}$ samples in the test data. By summing over all groups $k$ one obtains the provided exact complexity.
+
+    Regarding the expression $\sum_{k=1}^{K}{(K+|C_k|)N_k^{\text{test}}}$, let us first assume that we have fixed the number of groups $K$ to some value in $\{1,\dots,|V|\}$ and we are aiming to optimize the distribution of nodes and evaluation samples across groups for this fixed $K$. Using the KKT theorem, one can prove that extremal configurations only occur when all groups are of equal size and/or all groups are represented with an equal amount of samples in the evaluation set. Lemma~\ref{lemma:kkt_evaluation_cost} gives the details. It is easier to strive towards $|C_k| \approx \frac{|V|}{K}$, however, in any case, the number of node embedding computations will then equal $N\left(K + \frac{|V|}{K}\right)$. 
+    
+    To conclude, we prove that the value of $K$ is what decides whether the lower or upper bound stated above is achieved: $K=\sqrt{V}$ gives the motivating lower bound, while $K \in \{1, |V|\}$ produces the worst performance, which is in the same order as the baseline $N |V|$. Lemma~\ref{lemma:min_max_evaluation_cost} gives the details.
+    % \textbf{Upper bound}: Note first that since $c$ induces a disjoint partitioning of $V$, we have that $\sum_{k=1}^{K}{|C_k|} = |V|$ and $\sum_{k=1}^{K}{N_k^{\text{test}}} = N$. Now, by the distributive rule and $K \leq |V|$:
+    % \begin{align*}
+    % \sum_{k=1}^{K}{(K+|C_k|)N_k^{\text{test}}} 
+    % &= K \left(\sum_{k=1}^{K}{N_k^{\text{test}}}\right) + \sum_{k=1}^{K}{|C_k|N_k^{\text{test}}} 
+    % \leq K N + \sum_{k=1}^{K}{\sum_{l=1}^{K}{|C_k||E_l^{\text{test}}|}} \\
+    % &\leq K N + \left(\sum_{k=1}^{K}{|C_k|} \right)\left(\sum_{l=1}^{K}{|E_l^{\text{test}}|}\right)
+    % \leq K N + |V| N 
+    % \leq 2 N |V|
+    % \end{align*}
+    % As all $|C_k|$ are positive and all $N_k^{\text{test}}$ non-negative, equality with the upper bound is achieved only when $K = |V|$, i.e. when all $|C_k| = 1$. 
+    % \textbf{Lower bound}: A sum of products of two non-negative terms can have the lowest value when the partition is such that the smallest groups are the most represented in the test data. Formally, if $|C_{(k)}|$ and $|E_{(k)}^{\text{test}}|$ denote the order statistics of the two sequences, then: $$ \sum_{k=1}^{K}{(K+|C_k|)N_k^{\text{test}}} \geq \sum_{k=1}^{K}{(K+|C_{(k)}|)|E_{(K - k + 1)}^{\text{test}}|}.$$
+    % The lower bound is achievable if one of the sequences is constant and one can strive towards all $|C_k|=\frac{|V|}{K}$. In this scenario, the complexity is $N \left(K + \frac{|V|}{K}\right)$. But, if one is able to control $K$ as well, then one can prove that $K = \sqrt{|V|}$ is the minimizer that yields $2 N \sqrt{|V|}$ (Proposition~\ref{proposition:min_evaluation_cost}).
+\end{proof}
+
+\begin{lemma}
+    \label{lemma:kkt_evaluation_cost}
+    Let $\{a_k\}_{k=1}^{K}=\{|C_k|\}_{k=1}^{K}$ and $\{b_k\}_{k=1}^{K}=\{N_k^{\text{test}}\}_{k=1}^{K}$ denote the learnable parameters. Then with the constraints $$\sum_{k=1}^{K}{a_k}=|V|, \sum_{k=1}^{K}{b_k}=N, \forall k, a_k > 0, b_k \geq 0,$$ the only extremal points of $g(\{a_k\},\{b_k\})=\sum_{k=1}^{K}{(K + a_k)b_k}$ are $\forall k, a^*_k = \frac{|V|}{K}$ and/or $\forall k, b^*_k = \frac{N}{K}$, with the extreme value of $g(\{a^*_k\},\{b^*_k\})=N\left(K + \frac{|V|}{K}\right)$.
+\end{lemma}
+    \begin{proof}
+        The Lagrangian of the optimization problem is the following:
+        \begin{align*}
+             L(\{a_k\},\{b_k\}) &= \sum_{k=1}^{K}{(K + a_k)b_k} + \lambda_1 \left(\sum_{k=1}^{K}{a_k} - |V|\right) + \lambda_2 \left(\sum_{k=1}^{K}{b_k} - N\right) \\
+             &- \sum_{k=1}^{K}{\mu_k a_k} - \sum_{k=1}^{K}{\nu_k b_k}
+        \end{align*}
+        $$$$
+    From the stationarity KKT conditions:
+    \begin{align*}
+        \forall k, \frac{\partial L}{\partial a_k} &= 0 \Leftrightarrow \forall k, b_k + \lambda_1 - \mu_k = 0 \Leftrightarrow  \forall k, b_k = \mu_k - \lambda_1 \\
+        \forall k, \frac{\partial L}{\partial b_k} &= 0 \Leftrightarrow \forall k, a_k + K + \lambda_2 - \nu_k = 0, \Leftrightarrow \forall k, a_k = \nu_k - \lambda_2 - K
+    \end{align*}
+    Now, by the primal equality constraints:
+    \begin{align*}
+        \sum_{k=1}^{K}{a_k} &= |V| \Leftrightarrow \sum_{k=1}^{K}{(\nu_k - \lambda_2 - K)} = |V| \Leftrightarrow \lambda_2 = \frac{1}{K} \sum_{k=1}^{K}{\nu_k} - \frac{|V|}{K} - K \\
+        \Rightarrow \forall k, a_k &= \nu_k - \frac{1}{K} \sum_{j=1}^{K}{\nu_j} + \frac{|V|}{K} \\
+        \sum_{k=1}^{K}{b_k} &= N \Leftrightarrow \sum_{k=1}^{K}{(\mu_k - \lambda_1)} = N \Leftrightarrow \lambda_1 = \frac{1}{K} \sum_{k=1}^{K}{\mu_k} - \frac{N}{K} \\
+        \Rightarrow \forall k, b_k &= \mu_k - \frac{1}{K} \sum_{j=1}^{K}{\mu_j} + \frac{N}{K}
+    \end{align*}
+    Finally, by the complementary slackness KKT conditions, primal inequality constraints, and dual feasibility KKT conditions:
+    \begin{align*}
+        \sum_{k=1}^{K}{\mu_k a_k} &= 0 \Leftrightarrow \forall k, \mu_k = 0 \Rightarrow \forall k, b^*_k=\frac{N}{K} & \text{ as $\forall k, a_k>0,\mu_k \geq 0$}\\
+        \sum_{k=1}^{K}{\nu_k b_k} &= 0 \Leftarrow \forall k, \nu_k = 0 \Rightarrow \forall k, a^*_k = \frac{|V|}{K} & \text{ as $\forall k, b_k \geq 0,\nu_k \geq 0$}
+    \end{align*}
+    \end{proof}
+
+\begin{lemma}
+    \label{lemma:min_max_evaluation_cost}
+    By choosing $K=\sqrt{|V|}$, one achieves the minimal evaluation cost $2 N \sqrt{|V|}$, while with $K \in \{1, |V|\}$ one achieves the maximum $N(|V| + 1)$.
+\end{lemma}
+\begin{proof}
+    Let $f(K) = N(K + \frac{|V|}{K})$. Then note that $f'(K) = N - \frac{N |V|}{K^2}$. From this, we find the only critical point of $f$ in $(1, |V|)$: 
+    
+    $N - \frac{N |V|}{K^2} = 0 \Leftrightarrow K^2 = \frac{N |V|}{N} \Leftrightarrow K = \sqrt{|V|}$. 
+    
+    Now $f''(K)=\frac{2 N |V|}{K^3}$. As $\forall K \in [1, |V|], f''(K) > 0$, $f$ is a convex function for all values of $K$. Thus, $\sqrt{|V|}$ will be both a local and global minimum, while the endpoints of the interval will be global maxima, as $\forall K \neq \sqrt{|V|}, f'(K) > 0$, i.e., $f$ increases away from the minimum in both directions.
+\end{proof}
+
+
+\begin{proposition}
+    \label{proposition:condition_applicability}
+    Let $C \in \{1,\dots,K\}$ be a r.v. storing from which community a sample belongs. Let $\forall k \in \{1,\dots,K\}, H'_k \in \{1,\dots\,|C_k|\}$ be the r.v. counting how many samples need to be evaluated before a correct hit in community $k$ is achieved by COINs, with $\forall k, H_k$ counting the same for the baseline model. 
+    
+    Let $\forall k, T'_k=K+|C_k|$ denote the number of embedding computations required for evaluating a sample in community $k$ (recall Proposition~\ref{proposition:complexity}), with $T_k=|V|$ counting the same for the baseline model. 
+    
+    Let $\forall k, \bar{\rho}'_k$ be the evaluated mean rank for samples from community $k$ for COINs, with $\bar{\rho}$ denoting the baseline mean rank. 
+    
+    Finally, let $\forall k, \varepsilon_k = \frac{\bar{\rho}'_k - \bar{\rho}}{\bar{\rho}}$ denote the per-community relative error in mean rank incurred to the baseline after training and evaluating the model with COINs, while let $\forall k, A_k=\frac{T_k}{T'_k}=\frac{|V|}{K+|C_k|}$ denote the per-community acceleration achieved. 
+    
+    Then, if we assume that:
+    \begin{itemize}
+        \item $\forall k, \mathbb{P}(C=k)=\frac{N_k^{\text{test}}}{N}$, and
+        \item $\forall j \in \{1,\dots\,|C_k|\}, \mathbb{P}(H_k \leq j)=(\text{Hits@j})_k$,
+    \end{itemize}
+     the application of COINs is justified if:
+    \begin{equation}
+        \label{eq:condition_applicability}
+        \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1 + \varepsilon_k}{A_k}} < 1
+    \end{equation}
+\end{proposition}
+\begin{proof}
+The better model is deemed the one with lower overall expected cost up until a correct hit:
+    \begin{align*}
+        \mathbb{E}[T' H'] &< \mathbb{E}[T H] \\
+        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T'_k \bar{\rho}'_k} &< T \bar{\rho}, & \text{ by Lemma~\ref{lemma:expected_evaluations}} \\
+        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1 + \varepsilon_k}{A_k}} &< 1, & \text{ after dividing by RHS}
+    \end{align*}
+\end{proof}%
+
+\begin{lemma}
+    \label{lemma:expected_evaluations}
+    Let $C \in \{1,\dots,K\}$ be a r.v. storing from which community a sample belongs. Let $H$ be the r.v. counting how many queries were evaluated before a correct hit is achieved and let $F$ denote the r.v. counting the number of embedding computations required for evaluating a sample. Then:
+    $$\mathbb{E}[T H] = \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \bar{\rho}_k}$$
+\end{lemma}
+\begin{proof}
+    \begin{align*}
+        &\mathbb{E}[T H] = \mathbb{E}_{C}[\mathbb{E}[T H | C]]%, & \text{ by the Law of Total Expectation} 
+        %\\
+        %&
+        = \sum_{k=1}^{K}{\mathbb{E}[T H | C=k] \mathbb{P}(C=k)}%, & \text{ by definition and the LOTUS} 
+        \\
+        &= \sum_{k=1}^{K}{T_k \mathbb{E}[H_k] \mathbb{P}(C=k)}%, & \text{ by definition and linearity of exp.} 
+        %\\
+        %&
+        = \sum_{k=1}^{K}{\mathbb{P}(C=k) T_k \sum_{j=1}^{|C_k|}{j \mathbb{P}(H_k=j)}}%, & \text{ by definition} 
+        \\
+        &= \sum_{k=1}^{K}{\mathbb{P}(C=k) T_k \sum_{j=1}^{|C_k|}{j [\mathbb{P}(H_k \leq j) - \mathbb{P}(H_k \leq j-1)]}}%, & \text{ since $H_k$'s are discrete r.v.s} 
+        \\
+        &= \sum_{k=1}^{K}{\mathbb{P}(C=k) T_k \left[|C_k|- \sum_{j=1}^{|C_k|-1}{\mathbb{P}(H_k \leq j)}\right]}%, & \text{ after cancelling out the telescoping} 
+        \\
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- \sum_{j=1}^{|C_k|-1}{(\text{Hits@j})_k}\right]}%, & \text{ by the assumptions} 
+        \\
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- \sum_{j=1}^{|C_k|-1}{\frac{1}{N_k^{\text{test}}}\sum_{i | c(a_i)=k}{\mathbb{I}(\rho^{(i)} \leq j)}}\right]}%, & \text{ by definition} 
+        \\
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- \frac{1}{N_k^{\text{test}}}\sum_{i | c(a_i)=k}{(|C_k|- \rho^{(i)})}\right]}%, & \text{ after switching sum order} 
+        \\
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- |C_k| + \frac{1}{N_k^{\text{test}}}\sum_{i | c(a_i)=k}{\rho^{(i)}}\right]}%, & \text{ after distributing} 
+        \\
+        % &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- |C_k| + \bar{\rho}_k \right]}, & \text{ by definition} \\
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \bar{\rho}_k}%, & \text{ by definition}
+    \end{align*}
+    If $\forall k, T_k = T$ like for the baseline models, then:
+    \begin{align*}
+        \mathbb{E}[T H] &= T \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \bar{\rho}_k}%, & \text{ by linearity of expectation and everything before} 
+        %\\ 
+        %&
+        = T \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1}{N_k^{\text{test}}}\sum_{i | c(a_i)=k}{\rho^{(i)}}}%, & \text{ by definition} 
+        \\
+        &= T \frac{1}{N} \sum_{i=1}^{N}{\rho^{(i)}}%, & \text{ after cancelling and combining the sums} 
+        %\\
+        %&
+        = T \bar{\rho}%, & \text{ by definition}
+    \end{align*}
+\end{proof}
+
+\section{Hyperparameters}
+\label{sec:appendix_hpars}
+
+Table~\ref{tab:hyperparameters} lists the chosen values of the main hyperparameters influencing community detection, model architecture and optimization.
+
+\begin{table}[ht!]
+  \caption[COINs hyperparameter configurations.]{COINs hyperparameter configurations. Left to right: Leiden resolution, embedding dimension, contrastive loss margin, COINs loss weight, mini-batch size, number of negative samples per positive, total number of training epochs, learning rate, and regularization weight.}
+  \label{tab:hyperparameters}
+  \centering
+  \begin{tabular}{llccccccccc}
+    \toprule
+    Dataset & Model & resolution & $D$ & $\gamma$ & $\alpha$ & $B$ & $m$ & ep. & l.r. & $\lambda$ \\
+    \midrule
+\multirow{6}{*}{FB15k-237} & TransE & $5 \cdot 10^{-3}$ & 100 & 1.0 & 0.5 & 256 & 128 & 5 & $10^{-3}$ & $10^{-6}$ \\
+ & DistMult & $5 \cdot 10^{-3}$ & 100 & \textemdash & 0.5 & 256 & 128 & 50 & $10^{-3}$ & $10^{-6}$ \\
+ & ComplEx & $5 \cdot 10^{-3}$ & 100 & \textemdash & 0.5 & 256 & 128 & 50 & $10^{-3}$ & $10^{-6}$ \\
+ & RotatE & $5 \cdot 10^{-3}$ & 100 & 9.0 & 0.5 & 256 & 128 & 5 & $10^{-3}$ & $10^{-6}$ \\
+ & KBGAT & $5 \cdot 10^{-3}$ & 100 & 9.0 & 0.5 & 256 & 128 & 50 & $10^{-3}$ & $10^{-6}$ \\
+  & Query2Box & $5 \cdot 10^{-3}$ & 400 & 24.0 & 0.5 & 256 & 128 & 35 & $10^{-4}$ & $10^{-6}$ \\
+\midrule
+\multirow{6}{*}{WN18RR} & TransE & $2.4 \cdot 10^{-5}$ & 100 & 1.0 & 0.5 & 256 & 128 & 20 & $10^{-3}$ & $10^{-6}$ \\
+ & DistMult & $2.4 \cdot 10^{-5}$ & 100 & \textemdash & 0.5 & 256 & 128 & 200 & $10^{-3}$ & $10^{-6}$ \\
+ & ComplEx & $2.4 \cdot 10^{-5}$ & 100 & \textemdash & 0.5 & 256 & 128 & 200 & $10^{-3}$ & $10^{-6}$ \\
+ & RotatE & $2.4 \cdot 10^{-5}$ & 100 & 6.0 & 0.5 & 256 & 128 & 20 & $10^{-3}$ & $10^{-6}$ \\
+ & KBGAT & $2.4 \cdot 10^{-5}$ & 100 & 6.0 & 0.5 & 256 & 128 & 200 & $10^{-3}$ & $10^{-6}$ \\
+& Query2Box & $2.4 \cdot 10^{-5}$ & 400 & 24.0 & 0.5 & 256 & 128 & 140 & $10^{-4}$ & $10^{-6}$ \\
+\midrule
+\multirow{6}{*}{NELL-995} & TransE & $2 \cdot 10^{-5}$ & 100 & 1.0 & 0.5 & 256 & 128 & 10 & $10^{-3}$ & $10^{-6}$ \\
+ & DistMult & $2 \cdot 10^{-5}$ & 100 & \textemdash & 0.5 & 256 & 128 & 100 & $10^{-3}$ & $10^{-6}$ \\
+ & ComplEx & $2 \cdot 10^{-5}$ & 100 & \textemdash & 0.5 & 256 & 128 & 100 & $10^{-3}$ & $10^{-6}$ \\
+ & RotatE & $2 \cdot 10^{-5}$ & 100 & 6.0 & 0.5 & 256 & 128 & 10 & $10^{-3}$ & $10^{-6}$ \\
+  & KBGAT & $2 \cdot 10^{-5}$ & 100 & 6.0 & 0.5 & 256 & 128 & 100 & $10^{-3}$ & $10^{-6}$ \\
+ & Query2Box & $2 \cdot 10^{-5}$ & 400 & 24.0 & 0.5 & 256 & 128 & 70 & $10^{-4}$ & $10^{-6}$ \\ 
+\bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Additional results}
+\label{sec:appendix_results}
+
+\subsection{Communities \& Scalability}
+
+Figure~\ref{fig:scalability_cut_size} illustrates an alternative method to optimize the scalability factors, through optimization of the cut size (number of inter-community edges) heuristic utilized by the METIS algorithm.
+
+For Leiden, one observes smooth curves with similar properties as in Figure~\ref{fig:scalability_resolution}, where we had the resolution parameter as the independent variable. For optimal acceleration, there seems to be a critical cut size, while having more inter-community edges implied more parameters for $g^{*}_V$. 
+
+Curiously, we observed the METIS algorithm to yield a non-minimal cut size, and there are a lot of Leiden resolution values that achieve lower cut sizes. METIS clearly favors too large of an increase in parameter number. The distribution of the metrics over a batch of 100 random uniform community assignments yielded extremal values: the best acceleration, however the largest cut size and most parameters.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\textwidth]{figures/coins/scalability_leiden_cut_size}
+\end{center}
+\caption[Dependence of time and memory scalability on the cut size of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the cut size (number of inter-community edges) of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Cut values that yielded optimal balance between scalability and performance for each dataset annotated via black vertical lines. Gray vertical lines denote the cut size values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
+\label{fig:scalability_cut_size}
+\end{figure}
+
+Figure~\ref{fig:scalability_modularity} illustrates yet another alternative method to optimize the scalability factors, through optimization of the modularity heuristic utilized by the Leiden algorithm. 
+
+In general, for Leiden, one observes both more acceleration and less overparametrization as modularity increases, however, as the plots display, we found this method to be more unstable than simply traversing the resolution hyperparameter space as before in Figure~\ref{fig:scalability_resolution}. We also note that the METIS algorithm produced slightly higher modularity only for the WN18RR dataset. Random community assignments again, naturally, yield extremal values.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\textwidth]{figures/coins/scalability_leiden_modularity}
+\end{center}
+\caption[Dependence of time and memory scalability on the value of the modularity heuristic of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the value of the modularity heuristic of the Leiden community detection algorithm. Left to right: different datasets. Modularity values that yielded optimal balance between scalability and performance for each dataset annotated via black vertical lines. Gray vertical lines denote the modularity values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
+\label{fig:scalability_modularity}
+\end{figure}
+
+\subsection{Performance \& Feasibility}
+
+Table~\ref{tab:performance_query_answering} contains our full query answering metric comparison with the baselines, while Table~\ref{tab:performance_query_answering_2} provides further insight into our query answering performance, after analyzing separately the metrics for each of the two prediction steps. We can observe how well the community Hits@1 score captures the influence of the accuracy in the community prediction on the overall performance. 
+
+Namely, with some quick calculations, one can interestingly note that the overall COINs metric values can be closely approximated as the product of the community Hits@1 and respective scores for the within-community node prediction.
+
+\begin{table}[!ht]
+  \caption[All computed query answering metrics.]{All computed query answering metrics (higher is better): comparison of our results with COINs training and evaluation to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}
+  \label{tab:performance_query_answering}
+  \centering
+  \begin{adjustbox}{width=\textwidth}   
+\begin{tabular}{llllllll}
+\toprule
+         &           &       &                ComHits@1 &                             Hits@1 &                             Hits@3 &                            Hits@10 &                                MRR \\
+Dataset & Algorithm & Value &                          &                                    &                                    &                                    &                                    \\
+\midrule
+FB15k-237 & TransE & Baseline &                          &                        ${{0.142}}$ &                         ${{0.24}}$ &                        ${{0.369}}$ &                        ${{0.218}}$ \\
+         &           & COINs &    ${{0.676}_{\pm 0.0}}$ &            ${{0.078}_{\pm 0.003}}$ &            ${{0.136}_{\pm 0.005}}$ &            ${{0.245}_{\pm 0.007}}$ &            ${{0.132}_{\pm 0.004}}$ \\
+         & DistMult & Baseline &                          &                        ${{0.254}}$ &                        ${{0.377}}$ &                        ${{0.527}}$ &                        ${{0.344}}$ \\
+         &           & COINs &  ${{0.291}_{\pm 0.045}}$ &            ${{0.038}_{\pm 0.007}}$ &            ${{0.074}_{\pm 0.012}}$ &            ${{0.132}_{\pm 0.012}}$ &            ${{0.068}_{\pm 0.009}}$ \\
+         & ComplEx & Baseline &                          &                        ${{0.278}}$ &                        ${{0.404}}$ &                        ${{0.552}}$ &                        ${{0.369}}$ \\
+         &           & COINs &  ${{0.975}_{\pm 0.007}}$ &     $\mathbf{{0.333}_{\pm 0.007}}$ &     $\mathbf{{0.477}_{\pm 0.007}}$ &     $\mathbf{{0.626}_{\pm 0.007}}$ &     $\mathbf{{0.431}_{\pm 0.006}}$ \\
+         & RotatE & Baseline &                          &                        ${{0.282}}$ &                         ${{0.43}}$ &                        ${{0.584}}$ &                        ${{0.383}}$ \\
+         &           & COINs &  ${{0.944}_{\pm 0.001}}$ &     $\mathbf{{0.295}_{\pm 0.003}}$ &  $\underline{{0.416}_{\pm 0.004}}$ &  $\underline{{0.552}_{\pm 0.004}}$ &  $\underline{{0.381}_{\pm 0.003}}$ \\
+         & KBGAT & Baseline &                          &                         ${{0.46}}$ &                         ${{0.54}}$ &                        ${{0.626}}$ &                        ${{0.518}}$ \\
+         &           & COINs &  ${{0.954}_{\pm 0.005}}$ &            ${{0.163}_{\pm 0.013}}$ &              ${{0.27}_{\pm 0.02}}$ &            ${{0.412}_{\pm 0.024}}$ &            ${{0.245}_{\pm 0.015}}$ \\
+         & Query2Box & Baseline &                          &            ${{0.129}_{\pm 0.005}}$ &            ${{0.168}_{\pm 0.002}}$ &              ${{0.2}_{\pm 0.002}}$ &            ${{0.154}_{\pm 0.004}}$ \\
+         &           & COINs &  ${{0.721}_{\pm 0.006}}$ &     $\mathbf{{0.186}_{\pm 0.002}}$ &     $\mathbf{{0.289}_{\pm 0.003}}$ &     $\mathbf{{0.402}_{\pm 0.005}}$ &     $\mathbf{{0.261}_{\pm 0.002}}$ \\
+\midrule
+WN18RR & TransE & Baseline &                          &                        ${{0.019}}$ &                        ${{0.241}}$ &                        ${{0.416}}$ &                         ${{0.16}}$ \\
+         &           & COINs &  ${{0.941}_{\pm 0.007}}$ &     $\mathbf{{0.199}_{\pm 0.006}}$ &     $\mathbf{{0.311}_{\pm 0.008}}$ &     $\mathbf{{0.436}_{\pm 0.012}}$ &     $\mathbf{{0.278}_{\pm 0.008}}$ \\
+         & DistMult & Baseline &                          &                        ${{0.399}}$ &                        ${{0.452}}$ &                        ${{0.489}}$ &                        ${{0.433}}$ \\
+         &           & COINs &  ${{0.997}_{\pm 0.001}}$ &            ${{0.176}_{\pm 0.063}}$ &            ${{0.305}_{\pm 0.086}}$ &            ${{0.423}_{\pm 0.077}}$ &            ${{0.261}_{\pm 0.071}}$ \\
+         & ComplEx & Baseline &                          &                        ${{0.426}}$ &                        ${{0.479}}$ &                        ${{0.526}}$ &                        ${{0.462}}$ \\
+         &           & COINs &    ${{0.999}_{\pm 0.0}}$ &             ${{0.297}_{\pm 0.02}}$ &            ${{0.394}_{\pm 0.017}}$ &             ${{0.466}_{\pm 0.01}}$ &            ${{0.358}_{\pm 0.018}}$ \\
+         & RotatE & Baseline &                          &                        ${{0.442}}$ &                        ${{0.491}}$ &                        ${{0.538}}$ &                        ${{0.476}}$ \\
+         &           & COINs &    ${{0.998}_{\pm 0.0}}$ &  $\underline{{0.436}_{\pm 0.001}}$ &      $\mathbf{{0.51}_{\pm 0.003}}$ &     $\mathbf{{0.586}_{\pm 0.004}}$ &     $\mathbf{{0.487}_{\pm 0.001}}$ \\
+         & KBGAT & Baseline &                          &                        ${{0.361}}$ &                        ${{0.483}}$ &                        ${{0.581}}$ &                         ${{0.44}}$ \\
+         &           & COINs &    ${{0.998}_{\pm 0.0}}$ &            ${{0.274}_{\pm 0.005}}$ &            ${{0.404}_{\pm 0.006}}$ &             ${{0.52}_{\pm 0.006}}$ &            ${{0.359}_{\pm 0.003}}$ \\
+         & Query2Box & Baseline &                          &            ${{0.187}_{\pm 0.004}}$ &            ${{0.308}_{\pm 0.001}}$ &            ${{0.385}_{\pm 0.001}}$ &             ${{0.26}_{\pm 0.001}}$ \\
+         &           & COINs &  ${{0.958}_{\pm 0.018}}$ &     $\mathbf{{0.218}_{\pm 0.008}}$ &     $\mathbf{{0.382}_{\pm 0.007}}$ &     $\mathbf{{0.524}_{\pm 0.005}}$ &     $\mathbf{{0.323}_{\pm 0.007}}$ \\
+\midrule
+NELL-995 & TransE & Baseline &                          &                         ${{0.23}}$ &                        ${{0.368}}$ &                        ${{0.448}}$ &                        ${{0.312}}$ \\
+         &           & COINs &    ${{0.971}_{\pm 0.0}}$ &             ${{0.15}_{\pm 0.011}}$ &            ${{0.244}_{\pm 0.012}}$ &            ${{0.356}_{\pm 0.019}}$ &            ${{0.218}_{\pm 0.009}}$ \\
+         & DistMult & Baseline &                          &                        ${{0.315}}$ &                        ${{0.434}}$ &                        ${{0.555}}$ &                        ${{0.395}}$ \\
+         &           & COINs &  ${{0.906}_{\pm 0.033}}$ &            ${{0.062}_{\pm 0.018}}$ &            ${{0.129}_{\pm 0.025}}$ &            ${{0.333}_{\pm 0.013}}$ &            ${{0.127}_{\pm 0.022}}$ \\
+         & ComplEx & Baseline &                          &                        ${{0.362}}$ &                        ${{0.538}}$ &                        ${{0.635}}$ &                        ${{0.466}}$ \\
+         &           & COINs &  ${{0.996}_{\pm 0.001}}$ &     $\mathbf{{0.364}_{\pm 0.004}}$ &     $\mathbf{{0.548}_{\pm 0.009}}$ &      $\mathbf{{0.66}_{\pm 0.006}}$ &     $\mathbf{{0.472}_{\pm 0.005}}$ \\
+         & RotatE & Baseline &                          &                        ${{0.433}}$ &                         ${{0.52}}$ &                        ${{0.562}}$ &                        ${{0.482}}$ \\
+         &           & COINs &    ${{0.996}_{\pm 0.0}}$ &            ${{0.304}_{\pm 0.015}}$ &  $\underline{{0.491}_{\pm 0.023}}$ &     $\mathbf{{0.604}_{\pm 0.016}}$ &            ${{0.412}_{\pm 0.018}}$ \\
+         & KBGAT & Baseline &                          &                        ${{0.447}}$ &                        ${{0.564}}$ &                        ${{0.695}}$ &                         ${{0.53}}$ \\
+         &           & COINs &    ${{0.997}_{\pm 0.0}}$ &  $\underline{{0.436}_{\pm 0.009}}$ &     $\mathbf{{0.617}_{\pm 0.011}}$ &      $\mathbf{{0.73}_{\pm 0.009}}$ &     $\mathbf{{0.543}_{\pm 0.009}}$ \\
+         & Query2Box & Baseline &                          &            ${{0.317}_{\pm 0.006}}$ &            ${{0.432}_{\pm 0.002}}$ &             ${{0.49}_{\pm 0.005}}$ &            ${{0.382}_{\pm 0.004}}$ \\
+         &           & COINs &  ${{0.967}_{\pm 0.005}}$ &     $\mathbf{{0.348}_{\pm 0.007}}$ &     $\mathbf{{0.499}_{\pm 0.002}}$ &     $\mathbf{{0.602}_{\pm 0.004}}$ &     $\mathbf{{0.443}_{\pm 0.004}}$ \\
+\bottomrule
+\end{tabular}
+  \end{adjustbox}
+\end{table}
+
+% \setlength{\LTcapwidth}{\textwidth}
+% \begin{longtable}[ht!]{c|c|c||c|c|c|c|c}
+\begin{table}[!ht]
+  \caption[Decomposition of COINs metrics into the overall values and metrics for the second prediction step separately.]{Decomposition of COINs metrics into the overall values shown before and metrics for the second prediction step separately. Values in bold indicate the superiority of COINs compared to the baselines, while underlined values have a relative error lower than 10\%.}
+  \label{tab:performance_query_answering_2}%\tabularnewline
+  \centering
+  \begin{adjustbox}{width=\textwidth}%{totalheight=\textheight-2.6\baselineskip}
+\begin{tabular}{llllllll}
+\toprule
+         &           &      &                ComHits@1 &                             Hits@1 &                             Hits@3 &                            Hits@10 &                                MRR \\
+Dataset & Algorithm & Value &                          &                                    &                                    &                                    &                                    \\
+\midrule
+FB15k-237 & TransE & Overall &    ${{0.676}_{\pm 0.0}}$ &            ${{0.078}_{\pm 0.003}}$ &            ${{0.136}_{\pm 0.005}}$ &            ${{0.245}_{\pm 0.007}}$ &            ${{0.132}_{\pm 0.004}}$ \\
+         &           & Node &                          &     $\mathbf{{0.202}_{\pm 0.002}}$ &     $\mathbf{{0.321}_{\pm 0.003}}$ &      $\mathbf{{0.49}_{\pm 0.005}}$ &     $\mathbf{{0.296}_{\pm 0.002}}$ \\
+         & DistMult & Overall &  ${{0.291}_{\pm 0.045}}$ &            ${{0.038}_{\pm 0.007}}$ &            ${{0.074}_{\pm 0.012}}$ &            ${{0.132}_{\pm 0.012}}$ &            ${{0.068}_{\pm 0.009}}$ \\
+         &           & Node &                          &            ${{0.162}_{\pm 0.009}}$ &            ${{0.301}_{\pm 0.011}}$ &  $\underline{{0.518}_{\pm 0.011}}$ &            ${{0.272}_{\pm 0.009}}$ \\
+         & ComplEx & Overall &  ${{0.975}_{\pm 0.007}}$ &     $\mathbf{{0.333}_{\pm 0.007}}$ &     $\mathbf{{0.477}_{\pm 0.007}}$ &     $\mathbf{{0.626}_{\pm 0.007}}$ &     $\mathbf{{0.431}_{\pm 0.006}}$ \\
+         &           & Node &                          &     $\mathbf{{0.344}_{\pm 0.008}}$ &     $\mathbf{{0.493}_{\pm 0.009}}$ &      $\mathbf{{0.645}_{\pm 0.01}}$ &     $\mathbf{{0.445}_{\pm 0.008}}$ \\
+         & RotatE & Overall &  ${{0.944}_{\pm 0.001}}$ &     $\mathbf{{0.295}_{\pm 0.003}}$ &  $\underline{{0.416}_{\pm 0.004}}$ &  $\underline{{0.552}_{\pm 0.004}}$ &  $\underline{{0.381}_{\pm 0.003}}$ \\
+         &           & Node &                          &     $\mathbf{{0.323}_{\pm 0.001}}$ &     $\mathbf{{0.453}_{\pm 0.003}}$ &     $\mathbf{{0.593}_{\pm 0.004}}$ &     $\mathbf{{0.414}_{\pm 0.002}}$ \\
+         & KBGAT & Overall &  ${{0.954}_{\pm 0.005}}$ &            ${{0.163}_{\pm 0.013}}$ &              ${{0.27}_{\pm 0.02}}$ &            ${{0.412}_{\pm 0.024}}$ &            ${{0.245}_{\pm 0.015}}$ \\
+         &           & Node &                          &            ${{0.173}_{\pm 0.013}}$ &            ${{0.286}_{\pm 0.021}}$ &            ${{0.437}_{\pm 0.024}}$ &             ${{0.26}_{\pm 0.016}}$ \\
+         & Query2Box & Overall &  ${{0.721}_{\pm 0.006}}$ &     $\mathbf{{0.186}_{\pm 0.002}}$ &     $\mathbf{{0.289}_{\pm 0.003}}$ &     $\mathbf{{0.402}_{\pm 0.005}}$ &     $\mathbf{{0.261}_{\pm 0.002}}$ \\
+         &           & Node &                          &     $\mathbf{{0.283}_{\pm 0.004}}$ &     $\mathbf{{0.411}_{\pm 0.003}}$ &     $\mathbf{{0.547}_{\pm 0.002}}$ &     $\mathbf{{0.373}_{\pm 0.003}}$ \\
+\midrule
+WN18RR & TransE & Overall &  ${{0.941}_{\pm 0.007}}$ &     $\mathbf{{0.199}_{\pm 0.006}}$ &     $\mathbf{{0.311}_{\pm 0.008}}$ &     $\mathbf{{0.436}_{\pm 0.012}}$ &     $\mathbf{{0.278}_{\pm 0.008}}$ \\
+         &           & Node &                          &     $\mathbf{{0.212}_{\pm 0.004}}$ &     $\mathbf{{0.336}_{\pm 0.003}}$ &     $\mathbf{{0.477}_{\pm 0.003}}$ &     $\mathbf{{0.299}_{\pm 0.002}}$ \\
+         & DistMult & Overall &  ${{0.997}_{\pm 0.001}}$ &            ${{0.176}_{\pm 0.063}}$ &            ${{0.305}_{\pm 0.086}}$ &            ${{0.423}_{\pm 0.077}}$ &            ${{0.261}_{\pm 0.071}}$ \\
+         &           & Node &                          &            ${{0.176}_{\pm 0.063}}$ &            ${{0.305}_{\pm 0.086}}$ &            ${{0.424}_{\pm 0.076}}$ &            ${{0.261}_{\pm 0.071}}$ \\
+         & ComplEx & Overall &    ${{0.999}_{\pm 0.0}}$ &             ${{0.297}_{\pm 0.02}}$ &            ${{0.394}_{\pm 0.017}}$ &             ${{0.466}_{\pm 0.01}}$ &            ${{0.358}_{\pm 0.018}}$ \\
+         &           & Node &                          &             ${{0.297}_{\pm 0.02}}$ &            ${{0.394}_{\pm 0.017}}$ &             ${{0.467}_{\pm 0.01}}$ &            ${{0.358}_{\pm 0.018}}$ \\
+         & RotatE & Overall &    ${{0.998}_{\pm 0.0}}$ &  $\underline{{0.436}_{\pm 0.001}}$ &      $\mathbf{{0.51}_{\pm 0.003}}$ &     $\mathbf{{0.586}_{\pm 0.004}}$ &     $\mathbf{{0.487}_{\pm 0.001}}$ \\
+         &           & Node &                          &  $\underline{{0.436}_{\pm 0.001}}$ &      $\mathbf{{0.51}_{\pm 0.003}}$ &     $\mathbf{{0.586}_{\pm 0.004}}$ &     $\mathbf{{0.487}_{\pm 0.001}}$ \\
+         & KBGAT & Overall &    ${{0.998}_{\pm 0.0}}$ &            ${{0.274}_{\pm 0.005}}$ &            ${{0.404}_{\pm 0.006}}$ &             ${{0.52}_{\pm 0.006}}$ &            ${{0.359}_{\pm 0.003}}$ \\
+         &           & Node &                          &            ${{0.274}_{\pm 0.005}}$ &            ${{0.405}_{\pm 0.006}}$ &             ${{0.52}_{\pm 0.006}}$ &            ${{0.359}_{\pm 0.003}}$ \\
+         & Query2Box & Overall &  ${{0.958}_{\pm 0.018}}$ &     $\mathbf{{0.218}_{\pm 0.008}}$ &     $\mathbf{{0.382}_{\pm 0.007}}$ &     $\mathbf{{0.524}_{\pm 0.005}}$ &     $\mathbf{{0.323}_{\pm 0.007}}$ \\
+         &           & Node &                          &     $\mathbf{{0.218}_{\pm 0.008}}$ &     $\mathbf{{0.382}_{\pm 0.007}}$ &     $\mathbf{{0.524}_{\pm 0.005}}$ &     $\mathbf{{0.323}_{\pm 0.007}}$ \\
+\midrule
+NELL-995 & TransE & Overall &    ${{0.971}_{\pm 0.0}}$ &             ${{0.15}_{\pm 0.011}}$ &            ${{0.244}_{\pm 0.012}}$ &            ${{0.356}_{\pm 0.019}}$ &            ${{0.218}_{\pm 0.009}}$ \\
+         &           & Node &                          &            ${{0.151}_{\pm 0.011}}$ &            ${{0.247}_{\pm 0.011}}$ &            ${{0.364}_{\pm 0.018}}$ &            ${{0.221}_{\pm 0.009}}$ \\
+         & DistMult & Overall &  ${{0.906}_{\pm 0.033}}$ &            ${{0.062}_{\pm 0.018}}$ &            ${{0.129}_{\pm 0.025}}$ &            ${{0.333}_{\pm 0.013}}$ &            ${{0.127}_{\pm 0.022}}$ \\
+         &           & Node &                          &            ${{0.077}_{\pm 0.023}}$ &            ${{0.169}_{\pm 0.029}}$ &            ${{0.387}_{\pm 0.008}}$ &            ${{0.159}_{\pm 0.021}}$ \\
+         & ComplEx & Overall &  ${{0.996}_{\pm 0.001}}$ &     $\mathbf{{0.364}_{\pm 0.004}}$ &     $\mathbf{{0.548}_{\pm 0.009}}$ &      $\mathbf{{0.66}_{\pm 0.006}}$ &     $\mathbf{{0.472}_{\pm 0.005}}$ \\
+         &           & Node &                          &     $\mathbf{{0.367}_{\pm 0.004}}$ &     $\mathbf{{0.551}_{\pm 0.009}}$ &     $\mathbf{{0.664}_{\pm 0.006}}$ &     $\mathbf{{0.475}_{\pm 0.005}}$ \\
+         & RotatE & Overall &    ${{0.996}_{\pm 0.0}}$ &            ${{0.304}_{\pm 0.015}}$ &  $\underline{{0.491}_{\pm 0.023}}$ &     $\mathbf{{0.604}_{\pm 0.016}}$ &            ${{0.412}_{\pm 0.018}}$ \\
+         &           & Node &                          &            ${{0.305}_{\pm 0.015}}$ &  $\underline{{0.493}_{\pm 0.023}}$ &     $\mathbf{{0.607}_{\pm 0.016}}$ &            ${{0.414}_{\pm 0.018}}$ \\
+         & KBGAT & Overall &    ${{0.997}_{\pm 0.0}}$ &  $\underline{{0.436}_{\pm 0.009}}$ &     $\mathbf{{0.617}_{\pm 0.011}}$ &      $\mathbf{{0.73}_{\pm 0.009}}$ &     $\mathbf{{0.543}_{\pm 0.009}}$ \\
+         &           & Node &                          &  $\underline{{0.436}_{\pm 0.009}}$ &     $\mathbf{{0.618}_{\pm 0.011}}$ &     $\mathbf{{0.731}_{\pm 0.009}}$ &     $\mathbf{{0.544}_{\pm 0.009}}$ \\
+         & Query2Box & Overall &  ${{0.967}_{\pm 0.005}}$ &     $\mathbf{{0.348}_{\pm 0.007}}$ &     $\mathbf{{0.499}_{\pm 0.002}}$ &     $\mathbf{{0.602}_{\pm 0.004}}$ &     $\mathbf{{0.443}_{\pm 0.004}}$ \\
+         &           & Node &                          &     $\mathbf{{0.351}_{\pm 0.006}}$ &       $\mathbf{{0.503}_{\pm 0.0}}$ &     $\mathbf{{0.607}_{\pm 0.004}}$ &     $\mathbf{{0.447}_{\pm 0.003}}$ \\
+\bottomrule
+\end{tabular}
+    \end{adjustbox}
+% \end{longtable}%
+\end{table}%
+
+Figure~\ref{fig:feasibility_statistic} proposes a manner for visually verifying the satisfaction of the condition from Proposition~\ref{proposition:condition_applicability}. In the left plot, we observe how the per-community acceleration and relative error in mean rank metrics influence different values across both algorithms and datasets. We observe that most values lie in the feasibility region, except for the weak performance of COINs-TransE and COINs-DistMult on the FB15k-237 graph. However, as shown in the right plot, where we remove the impact of the community prediction performance and only focus on node MR, we observe that the inequality is now satisfied even for these hardest scenarios.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\linewidth]{figures/coins/feasibility_statistic}
+\end{center}
+\caption[Plot of the values of the COINs feasibility statistic.]{Plot of values of the statistic from Proposition~\ref{proposition:condition_applicability} (lower is better). The feasible region is the one shaded. Left vs. right: statistic values computed from mean ranks after both steps vs. just the second step of COINs.}
+\label{fig:feasibility_statistic}
+\end{figure}
+
+% \newpage
+
+Figure~\ref{fig:feasibility_trajectories} aims to integrate community assignment validation with model feasibility analysis to explore the tradeoff between achieved community quality (measured by cut size, the count of inter-community edges affecting overparametrization), and the Proposition~\ref{proposition:condition_applicability} statistic (influenced by relative performance error and acceleration). 
+
+To facilitate this tradeoff analysis, we conducted end-to-end training and evaluation for the COINs-RotatE combination on each dataset using various sources of community assignments. Specifically, we varied the Leiden resolution hyperparameter value, considered METIS for another case, and finally, communities assigned uniformly at random.
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=\linewidth]{figures/coins/feasibility_extra}
+\end{center}
+\caption[Plot of trajectories in the performance-scalability space, for the RotatE algorithm trained and evaluated with different community assignments.]{Plot of trajectories in the performance-scalability space, for the RotatE algorithm trained and evaluated with different community assignments. It is better to have lower cut sizes and lower values of the statistic. The Leiden paths are obtained by varying the resolution hyperparameter, the direction of the arrows indicates an increase of resolution. The feasible region for the statistic from Proposition~\ref{proposition:condition_applicability} is the one shaded. Top vs. bottom: statistic values computed from mean ranks after both steps vs. just the second step of COINs. Left to right: different datasets.}
+\label{fig:feasibility_trajectories}
+\end{figure}
+
+Leiden trajectories for all datasets possess a critical point in the statistic, revealing the existence of an optimal trade-off between relative error and acceleration. Cut sizes, however, exhibit a simple increase as Leiden resolution increases. For FB15k-237, we cross the feasibility boundary of Proposition~\ref{proposition:condition_applicability} by adjusting the resolution. 
+
+When focusing solely on performance in the second prediction step, relative error improves more rapidly with Leiden resolution, resulting in lower values for the statistic. It is noteworthy that this is anticipated, as higher Leiden resolution implies smaller communities, leading to fewer possible query answers. 
+
+Finally, we affirm that although METIS and random communities may yield higher speed-ups, numerous Leiden community assignments achieve comparable performance with equally significant speed-ups but considerably smaller cut sizes, thereby reducing the number of model parameters.
+
+Table~\ref{tab:performance_link_prediction} contains all of our results on the link prediction task. We do not possess baselines for these results due to the limited scope of the related work, which focuses only on an evaluation of the query answering task. Thus, we cannot perform a similar comparison as before. Regardless, the relative ordering of the metric values across settings is consistent with the query answering performance discussed previously.
+
+\begin{table}[ht!]
+  \caption[All computed link prediction metrics.]{All computed link prediction metrics (higher is better), with community prediction metrics also given separately.}
+  \label{tab:performance_link_prediction}
+  \centering
+    \begin{adjustbox}{width=\textwidth}%{totalheight=\textheight-2.6\baselineskip}
+\begin{tabular}{lllllll}
+\toprule
+         &           &         &                 Accuracy &                       F1 &                  ROC-AUC &                       AP \\
+Dataset & Algorithm & Value &                          &                          &                          &                          \\
+\midrule
+FB15k-237 & TransE & Community &    ${{0.946}_{\pm 0.0}}$ &    ${{0.941}_{\pm 0.0}}$ &    ${{0.964}_{\pm 0.0}}$ &  ${{0.812}_{\pm 0.005}}$ \\
+         &           & Overall &  ${{0.895}_{\pm 0.001}}$ &  ${{0.896}_{\pm 0.001}}$ &     ${{0.94}_{\pm 0.0}}$ &  ${{0.727}_{\pm 0.003}}$ \\
+         & DistMult & Community &  ${{0.864}_{\pm 0.007}}$ &  ${{0.877}_{\pm 0.006}}$ &   ${{0.97}_{\pm 0.004}}$ &  ${{0.861}_{\pm 0.016}}$ \\
+         &           & Overall &  ${{0.908}_{\pm 0.002}}$ &  ${{0.912}_{\pm 0.001}}$ &   ${{0.95}_{\pm 0.001}}$ &  ${{0.841}_{\pm 0.005}}$ \\
+         & ComplEx & Community &    ${{0.997}_{\pm 0.0}}$ &    ${{0.997}_{\pm 0.0}}$ &    ${{0.998}_{\pm 0.0}}$ &    ${{0.996}_{\pm 0.0}}$ \\
+         &           & Overall &  ${{0.938}_{\pm 0.004}}$ &  ${{0.938}_{\pm 0.003}}$ &    ${{0.968}_{\pm 0.0}}$ &    ${{0.9}_{\pm 0.002}}$ \\
+         & RotatE & Community &  ${{0.988}_{\pm 0.001}}$ &  ${{0.989}_{\pm 0.001}}$ &    ${{0.998}_{\pm 0.0}}$ &    ${{0.995}_{\pm 0.0}}$ \\
+         &           & Overall &  ${{0.925}_{\pm 0.001}}$ &  ${{0.922}_{\pm 0.001}}$ &   ${{0.96}_{\pm 0.001}}$ &  ${{0.853}_{\pm 0.003}}$ \\
+         & KBGAT & Community &    ${{0.995}_{\pm 0.0}}$ &    ${{0.995}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ &    ${{0.998}_{\pm 0.0}}$ \\
+         &           & Overall &  ${{0.884}_{\pm 0.005}}$ &  ${{0.858}_{\pm 0.008}}$ &  ${{0.935}_{\pm 0.007}}$ &  ${{0.789}_{\pm 0.019}}$ \\
+         & Query2Box & Community &  ${{0.835}_{\pm 0.003}}$ &  ${{0.762}_{\pm 0.007}}$ &    ${{0.992}_{\pm 0.0}}$ &    ${{0.977}_{\pm 0.0}}$ \\
+         &           & Overall &    ${{0.833}_{\pm 0.0}}$ &    ${{0.758}_{\pm 0.0}}$ &  ${{0.918}_{\pm 0.001}}$ &  ${{0.747}_{\pm 0.004}}$ \\
+\midrule
+WN18RR & TransE & Community &    ${{0.989}_{\pm 0.0}}$ &    ${{0.989}_{\pm 0.0}}$ &    ${{0.986}_{\pm 0.0}}$ &  ${{0.963}_{\pm 0.006}}$ \\
+         &           & Overall &  ${{0.905}_{\pm 0.002}}$ &  ${{0.904}_{\pm 0.001}}$ &  ${{0.923}_{\pm 0.001}}$ &  ${{0.798}_{\pm 0.005}}$ \\
+         & DistMult & Community &  ${{0.882}_{\pm 0.003}}$ &  ${{0.893}_{\pm 0.002}}$ &    ${{0.999}_{\pm 0.0}}$ &    ${{0.998}_{\pm 0.0}}$ \\
+         &           & Overall &   ${{0.92}_{\pm 0.002}}$ &  ${{0.913}_{\pm 0.002}}$ &   ${{0.86}_{\pm 0.003}}$ &  ${{0.752}_{\pm 0.005}}$ \\
+         & ComplEx & Community &      ${{1.0}_{\pm 0.0}}$ &      ${{1.0}_{\pm 0.0}}$ &      ${{1.0}_{\pm 0.0}}$ &      ${{1.0}_{\pm 0.0}}$ \\
+         &           & Overall &  ${{0.925}_{\pm 0.001}}$ &  ${{0.917}_{\pm 0.001}}$ &  ${{0.912}_{\pm 0.001}}$ &  ${{0.814}_{\pm 0.001}}$ \\
+         & RotatE & Community &    ${{0.997}_{\pm 0.0}}$ &    ${{0.997}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ \\
+         &           & Overall &    ${{0.912}_{\pm 0.0}}$ &      ${{0.9}_{\pm 0.0}}$ &  ${{0.949}_{\pm 0.001}}$ &  ${{0.871}_{\pm 0.001}}$ \\
+         & KBGAT & Community &    ${{0.999}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ &      ${{1.0}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ \\
+         &           & Overall &  ${{0.917}_{\pm 0.002}}$ &  ${{0.906}_{\pm 0.003}}$ &  ${{0.936}_{\pm 0.003}}$ &   ${{0.86}_{\pm 0.003}}$ \\
+         & Query2Box & Community &  ${{0.837}_{\pm 0.003}}$ &  ${{0.766}_{\pm 0.007}}$ &    ${{0.999}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ \\
+         &           & Overall &    ${{0.833}_{\pm 0.0}}$ &    ${{0.758}_{\pm 0.0}}$ &  ${{0.888}_{\pm 0.003}}$ &   ${{0.68}_{\pm 0.008}}$ \\
+\midrule
+NELL-995 & TransE & Community &    ${{0.995}_{\pm 0.0}}$ &    ${{0.995}_{\pm 0.0}}$ &  ${{0.992}_{\pm 0.002}}$ &  ${{0.982}_{\pm 0.002}}$ \\
+         &           & Overall &  ${{0.932}_{\pm 0.001}}$ &  ${{0.933}_{\pm 0.001}}$ &  ${{0.963}_{\pm 0.001}}$ &  ${{0.818}_{\pm 0.009}}$ \\
+         & DistMult & Community &   ${{0.95}_{\pm 0.003}}$ &  ${{0.952}_{\pm 0.003}}$ &  ${{0.996}_{\pm 0.001}}$ &  ${{0.978}_{\pm 0.007}}$ \\
+         &           & Overall &  ${{0.943}_{\pm 0.002}}$ &  ${{0.943}_{\pm 0.002}}$ &  ${{0.931}_{\pm 0.002}}$ &  ${{0.836}_{\pm 0.006}}$ \\
+         & ComplEx & Community &    ${{0.999}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ \\
+         &           & Overall &  ${{0.968}_{\pm 0.001}}$ &  ${{0.968}_{\pm 0.001}}$ &     ${{0.99}_{\pm 0.0}}$ &  ${{0.961}_{\pm 0.002}}$ \\
+         & RotatE & Community &  ${{0.993}_{\pm 0.001}}$ &  ${{0.993}_{\pm 0.001}}$ &      ${{1.0}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ \\
+         &           & Overall &  ${{0.947}_{\pm 0.004}}$ &  ${{0.945}_{\pm 0.004}}$ &  ${{0.977}_{\pm 0.001}}$ &  ${{0.885}_{\pm 0.009}}$ \\
+         & KBGAT & Community &    ${{0.999}_{\pm 0.0}}$ &    ${{0.999}_{\pm 0.0}}$ &      ${{1.0}_{\pm 0.0}}$ &      ${{1.0}_{\pm 0.0}}$ \\
+         &           & Overall &  ${{0.944}_{\pm 0.005}}$ &  ${{0.939}_{\pm 0.006}}$ &  ${{0.985}_{\pm 0.001}}$ &  ${{0.957}_{\pm 0.002}}$ \\
+         & Query2Box & Community &  ${{0.834}_{\pm 0.001}}$ &  ${{0.759}_{\pm 0.002}}$ &    ${{0.999}_{\pm 0.0}}$ &  ${{0.998}_{\pm 0.001}}$ \\
+         &           & Overall &    ${{0.833}_{\pm 0.0}}$ &    ${{0.758}_{\pm 0.0}}$ &  ${{0.963}_{\pm 0.002}}$ &  ${{0.882}_{\pm 0.005}}$ \\
+\bottomrule
+\end{tabular}
+  \end{adjustbox}
+\end{table}%
+
+% Figure~\ref{fig:feasibility_trajectories} is our most detailed experiment, with the goal of merging together the validation of community assignments with the analysis of model feasibility, to investigate the tradeoff between achieved community quality, relative error in performance and acceleration/overparametrization. To facilitate this, for each dataset we end-to-end trained and evaluated the COINs-RotatE combination (as our most successful) with different sources of community assignments. Namely, we searched the region around the optimal value for the Leiden resolution hyperparameter to obtain worse communities, replaced Leiden with METIS for another case, and for a final run picked one random uniform community assignment.
+
+% As in Figures~\ref{fig:scalability_resolution} and~\ref{fig:scalability_cut_size}, we observe that the Leiden trajectories for all datasets have a critical point with an optimal trade-off between relative error and acceleration. We note that overall relative error, although unstable w.r.t. Leiden resolution, does not vary greatly and the main differences seem to lie in the acceleration values (although for FB15k-237 we manage to enter and exit the feasibility region by changing resolution). On the other hand, when considering only the performance in the second prediction step, relative error improves with Leiden resolution much faster. Note that, however, this is to be expected, as greater Leiden resolution implies smaller communities and thus, fewer possible answers to queries. We confirm again that overparametrization simply increases with greater resolution values and dominates the trajectory direction in the overall performance case. Thus, we confirm again that although the METIS and random communities might yield higher speed-ups, there are a lot of Leiden community assignments resulting in similar performance, and equally significant speed-ups but with significantly fewer parameters. 
+
+% \begin{figure}[ht!]
+% \begin{center}
+% \includegraphics[width=\textwidth]{figures/feasibility_rebuttals}
+% \includegraphics[width=\textwidth]{figures/feasibility_rebuttals_2}
+% \end{center}
+% \caption{Plot of trajectories in the performance-scalability space, for the RotatE algorithm trained and evaluated with different community assignments. The Leiden paths are obtained by varying the resolution hyperparameter, the direction of the arrows indicates an increase of resolution. The feasible region for acceleration (Proposition~\ref{proposition:condition_applicability}) is the one shaded. Odd vs. even rows: COINs metric values after both steps vs. just the second step. Top two vs. bottom two rows: acceleration vs. overparametrization space.}
+% \label{fig:feasibility_trajectories}
+% \end{figure}
+
+
+
+\subsection{Stability \& Convergence}
+
+The convergence plots in Figure~\ref{fig:convergence} support our decision to model the final aggregate COINs loss value as the linear combination of the community and node terms. From the convergence lines, one can observe that the community and node iterates seem to converge at equal rates in both training and validation data. As such, the aggregate COINs loss function can be a simple average of the two terms without affecting convergence.
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=\textwidth]{figures/coins/convergence}
+\end{center}
+\caption[Plots of contrastive loss convergence over time.]{Plots of contrastive loss convergence over time, with the decomposition of the final COINs loss into the two constituent community and node loss terms. Top vs. bottom: training vs. validation loss. Left to right: the different COINs-integrated algorithms. Error bands show standard deviation across datasets.}
+\label{fig:convergence}
+\end{figure}
+
+% \clearpage
+
+\section{Practical speed-ups}
+All of the discussion on the acceleration benefits of COINs so far only concerned the reduction in computational complexity, i.e. how much fewer embedding operations are performed during evaluation. For completeness, we also estimated the speed-up one would observe in practice, i.e. the reduction in total CPU seconds of the evaluation process compared to the baseline. 
+
+From the visualization of these results in Figure~\ref{fig:acceleration_wall} we can deduce that even w.r.t. wall time COINs always provides at least around 2 times speed-up, while the time-memory trade-off employed by NodePiece and EARL is also evident. The slow-down factors incurred by these methods are too great to justify the comparatively smaller memory-usage reduction factors. However, due to high variance in the experiment conditions during measurement, as well as differences in the practical complexity of the embedding algorithm implementations, these acceleration numerics are inconsistent across different settings and with large error bars. For such reasons, we relied mainly on the more reliable measurements of computation steps.
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=\textwidth]{figures/coins/acceleration_wall}
+\end{center}
+\caption[CPU time speed-up thanks to COINs.]{Per-algorithm evaluation CPU time speed-up thanks to COINs, averaged across multiple seeds. Left to right: different datasets.}
+\label{fig:acceleration_wall}
+\end{figure}
+
+\section{Implementation details}
+\label{sec:appendix_implementation}
+
+The entire implementation was performed in the Python 3.6 programming language. The Pandas library~\cite{mckinney_data_2010} was helpful with its efficient preprocessing operations on tabular data. The iGraph library~\cite{csardi_igraph_2005} was utilized for the implementation of most of the graph analysis and preprocessing steps, including executing the Leiden algorithm. For METIS, the official software implementation~\cite{karypis_metis_1997} was invoked through a Python wrapper. 
+
+The entire model architecture (along with integration code for the publicly available implementations of the external embedders), training, and evaluation, were implemented using the PyTorch deep learning framework~\cite{paszke_pytorch_2019} and the extension framework for graph neural network learning PyTorch Geometric~\cite{fey_fast_2019}. 
+
+All code was executed on a single machine with the following specifications:
+\begin{itemize}
+    % \item Intel\textsuperscript{\textregistered} Xeon\textsuperscript{\textregistered} Gold 5118 12-core CPU @ 2.30GHz;
+    % \item NVIDIA Tesla P100-PCIE-16GB GPU;
+    % \item 64GB RAM.
+    \item AMD EPYC\textsuperscript{\texttrademark} 7742 64-core CPU @ 2.25GHz;
+    \item NVIDIA A100-SXM4-40GB GPU;
+    \item 1.0TB RAM. 
+\end{itemize}
+
+% To facilitate reproducibility, our full code implementation is available at: \\
+% \url{https://github.com/LIONS-EPFL/coins-ict-innovations-2025}.
+
+% \section{Appendix}
+% Any possible appendices should be placed after bibliographies.
+% If your paper has appendices, please submit the appendices together with the main body of the paper.
+% There will be no separate supplementary material submission.
+% The main text should be self-contained; reviewers are not obliged to look at the appendices when writing their review comments.
+
+
+% \section{First Section}
+% \subsection{A Subsection Sample}
+% Please note that the first paragraph of a section or subsection is
+% not indented. The first paragraph that follows a table, figure,
+% equation etc. does not need an indent, either.
+
+% Subsequent paragraphs, however, are indented.
+
+% \subsubsection{Sample Heading (Third Level)} Only two levels of
+% headings should be numbered. Lower level headings remain unnumbered;
+% they are formatted as run-in headings.
+
+% \paragraph{Sample Heading (Fourth Level)}
+% The contribution should contain no more than four levels of
+% headings. Table~\ref{tab1} gives a summary of all heading levels.
+
+% \begin{table}
+% \caption{Table captions should be placed above the
+% tables.}\label{tab1}
+% \begin{tabular}{|l|l|l|}
+% \hline
+% Heading level &  Example & Font size and style\\
+% \hline
+% Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
+% 1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
+% 2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
+% 3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
+% 4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
+% \hline
+% \end{tabular}
+% \end{table}
+
+
+% \noindent Displayed equations are centered and set on a separate
+% line.
+% \begin{equation}
+% x + y = z
+% \end{equation}
+% Please try to avoid rasterized images for line-art diagrams and
+% schemas. Whenever possible, use vector graphics instead (see
+% Fig.~\ref{fig1}).
+
+% \begin{figure}
+% \includegraphics[width=\textwidth]{fig1.eps}
+% \caption{A figure caption is always placed below the illustration.
+% Please note that short captions are centered, while long ones are
+% justified by the macro package automatically.} \label{fig1}
+% \end{figure}
+
+% \begin{theorem}
+% This is a sample theorem. The run-in heading is set in bold, while
+% the following text appears in italics. Definitions, lemmas,
+% propositions, and corollaries are styled the same way.
+% \end{theorem}
+% %
+% % the environments 'definition', 'lemma', 'proposition', 'corollary',
+% % 'remark', and 'example' are defined in the LLNCS documentclass as well.
+% %
+% \begin{proof}
+% Proofs, examples, and remarks have the initial word in italics,
+% while the following text appears in normal font.
+% \end{proof}
+% For citations of references, we prefer the use of square brackets
+% and consecutive numbers. Citations using labels or the author/year
+% convention are also acceptable. The following bibliography provides
+% a sample reference list with entries for journal
+% articles~\cite{ref_article1}, an LNCS chapter~\cite{ref_lncs1}, a
+% book~\cite{ref_book1}, proceedings without editors~\cite{ref_proc1},
+% and a homepage~\cite{ref_url1}. Multiple citations are grouped
+% \cite{ref_article1,ref_lncs1,ref_book1},
+% \cite{ref_article1,ref_book1,ref_proc1,ref_url1}.
+
+
+
+

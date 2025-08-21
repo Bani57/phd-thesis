@@ -2,3 +2,561 @@
 \label{sec: coins}
 
 % \addcontentsline{toc}{section}{Community Informed Graph Embeddings}
+
+In this section we present a new method, called COINs for \textbf{CO}mmunity \textbf{IN}formed graph embedding\textbf{s}, to enhance the efficiency of knowledge graph models for link prediction and conjunctive query answering. COINs uses a community-detection-based graph data augmentation and a two-step prediction pipeline: we first achieve node localization through community prediction, and subsequently, we further localize within the predicted community. We establish theoretical criteria to evaluate our method in our specific context and establish a direct expression of the reduction in time complexity. We empirically demonstrate an important scalability-performance trade-off where for the median evaluation sample we preserve 97.18\% of the baseline accuracy in single-hop query answering, for only 7.52\% of the original computational cost on a single-CPU-GPU machine.
+
+\subsection{Motivation}
+%Knowledge graphs have recently attracted significant attention from both industry and academia in scenarios that require exploiting large-scale heterogeneous data collections. 
+Knowledge graphs are a type of database where the general structure is a \emph{network} of \emph{entities}, their semantic \emph{types}, \emph{properties}, and \emph{relationships}; relations are \emph{flexible} through the use of \emph{abstract classes} to represent real-world data from potentially multiple topical domains~\cite{ehrlinger_towards_2016,hogan_knowledge_2020}. Organizations often use knowledge graphs to catalog and analyze relational data. However, scalability becomes a challenge as the graphs can become very large and require significant computational resources. %This is particularly challenging for smaller organizations.
+% Knowledge graphs as a data structure have witnessed numerous applications in a diverse range: journalism, biomedicine, social networks, network security, and telecommunications.
+
+%\textbf{volkan: shorten the paragraph below and merge it with above.}
+% Many organizations have internal use for building and maintaining a knowledge graph. The purpose is to neatly organize valuable relational data, analyze it and infer novel information with which to enrich the database.
+% This process is referred to as \emph{knowledge graph completion} and it is comprised of solving the tasks of \emph{link prediction} and \emph{query answering} for the knowledge graph. These two tasks can be summarized together as the requirement of building a model that is able to score and rank a set of possible entities/relations (obtained according to the rules of a logical query over the knowledge graph) with regard to relevance. The most common approach in tackling these tasks is to compute suitable \emph{numeric} representations for each graph element, called \emph{graph embeddings}, to use well-understood computational models on them. 
+% However, even for smaller organizations, data unlike computational power is not scarce, and the graphs can contain more than hundreds of millions of entities. Therefore, the issue of scalability with respect to both performance and computational cost of knowledge graph inference models arises more frequently in application scenarios as an additional challenge.
+
+
+Almost all existing scaling approaches involve \emph{splitting the enormous graph into disjoint subsets}, followed by distributed training.
+For instance, PyTorch-BigGraph~\cite{lerer_pytorch-biggraph_2019}, and DGL-KE~\cite{zheng_dgl-ke_2020} are distributed-algorithm-system frameworks that can scale the implementation of graph neural networks with distributed execution over billion-scale graphs.
+On the other hand, SMORE~\cite{ren_smore_2021} focuses on model parallelization and employs an efficient algorithm for sampling data. CARL-G~\cite{shiao_carl-g_2023} provides similar speed-ups in data sampling to SMORE, but applies only to a non-contrastive setting, and both guarantee acceleration only during training. tf-GNN~\cite{ferludin_tf-gnn_2022} mainly focuses on accelerating the sampling of k-hop neighborhoods of nodes during distributed training.
+
+To this end, we present COINs ({\bf CO}mmunity {\bf IN}formed graph embedding{\bf s}) in a distinct, low resource setting for transductive knowledge graph reasoning model optimization, inference, and evaluation in the contrastive learning setting. We contend that this setting remains elusive to the scalable approaches above, which require a minimum (but still a formidable) level of computational power, and offers new insights to accelerate graph inference. 
+
+In stark contrast, we consider a setting, for instance, where even model evaluation is a major hurdle. Indeed, for the evaluation procedure the state-of-the-art approaches above either apply data parallelization over a large cluster of machines (as for GATNE~\cite{cen_representation_2019}) or use a random subset of the graph (as noted in~\cite{ren_smore_2021}). On the other hand, NodePiece~\cite{galkin_nodepiece_2022} and EARL~\cite{chen_entity-agnostic_2023} are works that, like ours, do not disregard resource efficiency and reduce the overall computational complexity, by admitting a degree of sacrifice in performance. We will argue that, nevertheless, when compared to COINs, they fail to retrieve as much of the baseline performance, only focus on reducing the model size and do not also consider acceleration in inference.
+
+Before explicitly stating our contributions below, we will first establish the background and introduce the preliminaries in the sequel. 
+
+
+%It is assumed that nevertheless, a minimal cluster size of machines is always available, and any graph partitioning rarely accounts for preserving graph properties. In a low resource availability scenario, even the model's evaluation is a hurdle with big data, which has not been considered in the literature. The evaluation procedure for top-performing knowledge graph representation models was either also sped up with data parallelization over a large cluster of machines (\citet{cen_representation_2019}) or the evaluation metrics are only approximated with a subset of the graph (\citet{ren_smore_2021}).
+
+
+
+%Before explicitly stating our contributions below, we will first establish the background and introduce the preliminaries.
+
+
+ 
+%all these methods for achieving better scalability are inapplicable to all application scenarios.
+%It is assumed that nevertheless, a minimal cluster size of machines is always available, and any graph partitioning rarely accounts for preserving graph properties. In a low resource availability scenario, even the model's evaluation is a hurdle with big data, which has not been considered in the literature. The evaluation procedure for top-performing knowledge graph representation models was either also sped up with data parallelization over a large cluster of machines (\citet{cen_representation_2019}) or the evaluation metrics are only approximated with a subset of the graph (\citet{ren_smore_2021}). 
+
+ 
+%Our method can be applied to graph embeddings obtained from any model, now used in two steps of query answering prediction, to guarantee the model suffers from much less evaluation cost and with minimal effects on training cost and prediction performance. 
+
+% In the following Section~\ref{sec:background} we give an overview of the relevant background for this text, then in Section~\ref{sec:methodology} we present our proposed method for scalable evaluation, Section~\ref{sec:results} presents and comments on our results, with then Section~\ref{sec:conclusion} briefly concluding.
+\vspace{-3mm}
+\subsection{Background}
+\label{sec:background}
+\subsubsection{Problem and Challenges}
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/coins/query\_structures.pdf}
+    \caption[Various possible computational graph structures of conjunctive knowledge graph queries.]{Various possible computational graph structures of conjunctive knowledge graph queries. Blue nodes indicate query anchors/inputs, green ones are their answers, while the rest are intermediate results. Solid edges represent relation projections, dashed edges represent intersection operations.}
+    \label{fig:query_structures}
+\end{figure}
+
+Performing knowledge graph inference requires solving link prediction and query answering. Given a dataset of entity-relation-entity triplets, labeled positive or negative according to whether they have originated from the knowledge graph or not, link prediction involves predicting these labels. 
+
+On the other hand, given a list of logical queries extracted from the knowledge graph, the query answering task requires ranking for \emph{each} query \emph{all} of the entities in the graph according to how likely they are to be its correct answer. Thus compared to link prediction, this task is much more computationally complex, as the largest contributor to the number of model inference calls is the size of the graph. Our work aims to reduce this factor significantly.
+
+%One can observe that the query answering task, even in the simplest, single-hop case, entails evaluating the link prediction model as many times as the size of the entire set of entities, for \emph{every} evaluation data sample. On a single machine, this computationally intensive task will incur time complexity proportional to $O(N |V|)$, the number of node embeddings required to be computed during evaluation, where $N$ is the number of evaluation samples. Other factors are model-dependent, but in all cases, the size of the node set $|V|$, i.e., the graph size, is the largest contributor. Thus, our work aims to reduce this factor significantly.
+
+% Given an evaluation knowledge graph triplet $(h, r, t) \in E_R$, the \emph{single-hop query answering task} entails scoring all possible answers $\hat{t} \in V$ to the query $(h, r)$ w.r.t. how probable they are as relations in the knowledge graph, then ranking the answers according to these scores, with the goal that for the best model the true triplet $(h, r, t)$ is scored the highest, i.e. has \emph{rank} equal to 1. For this work, we define the rank of a score as the index of the descending order statistic with a value equal to the score, consistent with previous work. 
+
+% With this classical evaluation procedure, we can easily deduce that on a single machine, this is a computationally intensive task with time complexity proportional to $O(N |V| D)$, where $N$ is the number of evaluation samples and $D$ is the embedding dimension. Other factors are model-dependent, but in all cases, the size of the node set $|V|$, i.e., the graph size, is the largest contributor. Thus, our work aims to reduce this factor significantly.
+
+\subsubsection{Preliminaries}
+% \begin{definition}
+% A \textbf{finite graph} $G$ is defined as the ordered pair of two finite sets, $G=(V, E)$ where:
+% \begin{itemize}
+% \item $V=\{v_1, \dots, v_N\}$ is a finite set of elements, which are referred to as \textbf{nodes};
+% \item $E$ is a finite set of elements referred to as \textbf{edges}, where an edge is defined as an ordered pair of nodes: $E=\{(v_i,v_j)|v_i,v_j \in V\}$.
+% \end{itemize}
+% For this text, we will accept the terms \textbf{graph} and \textbf{network} to be equivalent.
+% \end{definition}
+
+% \begin{definition}
+% Relevant computable graph properties include:
+%     \begin{itemize}
+%         \item The \textbf{neighbourhood} of a node $v$ is defined as the set of nodes $v$ is directly connected to with an edge: $N(v)=\{u|u\in V, (v,u) \in E \vee (u,v) \in E \}$, while $v$'s \textbf{degree} is the size of its neighbourhood: $deg(v)=|N(v)|$;
+%         \item A \textbf{path} in a graph $G=(V, E)$ is a sequence of nodes $v_1,\dots,v_M \in V$ in which every pair of consecutive nodes are connected by an edge: $\forall i \in \{1,\dots, M-1\},(v_i,v_{i+1})\in E$;
+%         \item Given a graph $G = (V, E)$, a \textbf{random walk} of length $L$ is a realisation of a discrete stochastic process $\{V_i\}_{i=1}^L$ where $V_1$ is a random variable with support $V$ and probability mass function $\lambda$, $\sum_{v \in V}{\lambda(v)}=1$, while $\forall t\in \{2,\dots,L\}$, $V_t$ is a random variable with support $N(V_{t-1})$ and probability mass function $\mu_t$, $\sum_{u \in N(V_{t-1})}{\mu_t(u)}=1$. Sampling random walks from a graph is a way of converting the graph into a set of path sequences, from which much richer information can be extracted, such as multi-hop connections and node-context pairs.
+%     \end{itemize}
+% \end{definition}
+
+Mathematically we can represent knowledge graphs with AMHENs:
+\begin{definition}
+An \emph{Attributed Multiplex HEterogeneous Network (AMHEN)} is a graph where each entity (node) in a set $V$ has attributes and each relation (edge) in a set $E$ has a type label~\cite{liu_ahng_2019,cen_representation_2019}. 
+
+Formally, first, a finite set of \emph{relation types} is defined $R = \{r_1,r_2,\dots\}$, and the edge labeling is represented through the mathematical relation $E_R \subseteq V \times R \times V$, called the \emph{set of relation triplets}:  $E_R = \{(h,r,t)|h,t \in V, (h,t) \in E, r \in R\}$. Entity/node attributes can be collected e.g. in a matrix $\mathbf{X} \in \mathbb{R}^{|V| \times F}$, with $F$ as the feature dimension. 
+
+Usually, the nodes $h$ and $t$ in the triplets are referred to as the \emph{head} and \emph{tail} of the relations, respectively. The attributed multiplex heterogeneous network is the new collection $\left(V, E_R, R, \mathbf{X}\right)$.
+\end{definition}
+
+\begin{definition}
+    A \emph{query} of the knowledge graph $G=(V, E_R, R, \mathbf{X})$ is the collection $q=(\mathcal{A}_q, G_q)$ of a set $\mathcal{A}_q \subseteq V$ of \emph{anchor} (input) entities and $G_q: \mathcal{A}_q \to \mathcal{P}(V)$, a mapping visualized via a \emph{computational graph} in the form of a DAG informing how to obtain \emph{answer} entities to the query starting from the anchors, where during this process all of the nodes in $q$ get labeled with sets of entities from $V$. 
+    
+    In the special case of \emph{conjunctive logical queries}, the edges in $q$ represent either \emph{relation projection} operations $P: \mathcal{P}(V) \times R \to \mathcal{P}(V)$ (map head to tail along a relation) or \emph{intersection} operations $I: \mathcal{P}(\mathcal{P}(V)) \to \mathcal{P}(V)$ (classical $\cap$), specializing the query mapping as $G_q(\mathcal{A}_q;P,I)$~\cite{ren_query2box_2020}.
+    \label{def:query}
+\end{definition}
+Figure~\ref{fig:query_structures} visualizes the computational structures of the conjunctive queries we considered. To give an example of the notation from Definition~\ref{def:query}, the general form of an ip-type conjunctive query $q$ has: $$\mathcal{A}_q=\{v_1,v_2\}, G_q(\{v_1,v_2\})=P(I(\{P(\{v_1\},r_1),P(\{v_2\},r_2)\}),r_3),$$
+where $v_1,v_2 \in V, r_1,r_2,r_3 \in R$ are any entities and relations from $G$.
+
+Graphs are discrete structures, while the majority of machine learning models work exclusively with real-valued continuous inputs. Therefore, we have to construct a mapping from the graph elements to a numeric vector space, such that the output vectors encode the graph structure in the form of algebraic constraints.
+\begin{definition}
+Given a knowledge graph $G = (V, E_R, R, \mathbf{X})$, in general one defines a \textit{knowledge graph embedding model}~\cite{ji_survey_2022,liang_survey_2024,ren_query2box_2020} as the collection of an entity embedding model $g_V: V \to \mathcal{E}$, relation embedding model $g_R: R \to \mathcal{R}$, relation projection embedding model $g_P: \mathcal{E} \times \mathcal{R} \to \mathcal{E}$, intersection embedding model $g_I: \mathcal{\mathcal{E}}^{\mathbb{N}} \to \mathcal{E}$ and a scoring function $f: \mathcal{E} \times \mathcal{E} \to \mathbb{R}$, all potentially parametrized. Outputs $\mathbf{v} = g_V(v), \mathbf{r} = g_R(r), \mathbf{q}, \mathbf{a}, \dots$ are referred to as \emph{embeddings}. Most often $\mathcal{E}, \mathcal{R} \subseteq \mathbb{R}^D$ or $\mathbb{C}^D$, where $D$ is the \emph{embedding dimension}. 
+\end{definition}
+
+Most embedding models are optimized using a contrastive modification of the scoring function:
+\begin{definition}
+\label{def:contrastive_loss}
+    Given the model's scoring function $f$ and the embedding representation of a single \emph{positive} query-answer pair $(q, a)$ and a set of $m$ \emph{negative examples} $\{a'_i\}_{i=1}^{m} \subseteq V \setminus \{a\}$ (wrong answers to the query), the \emph{contrastive learning loss} terms and final value take the common form ($\sigma$ denoting the sigmoid function):
+    \begin{align}
+    \begin{aligned}
+    \label{eq:contrastive_loss}
+        \tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, y)&=-\log{\sigma{\left(y \cdot f(\mathbf{q},\mathbf{a})\right)}}\\
+        \mathcal{L}\left(\mathbf{q}, \mathbf{a}, \{\mathbf{a}'_i\}_{i=1}^{m}\right)&=\tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, 1) + \frac{1}{m}\sum_{i=1}^{m}{\tilde{\mathcal{L}}\left(\mathbf{q}, \mathbf{a}'_i, -1\right)}
+        \end{aligned}
+    \end{align}
+\end{definition}
+
+\begin{definition}
+    Given a dataset $\mathcal{D}=\{(h_i, r_i, t_i)\}_{i=1}^{N}$ of head-relation-tail triplets and labels $\{y_i\}_{i=1}^{N}$ indicating whether each triplet was extracted from the knowledge graph or randomly formed, a \emph{link predictor} $\ell: V \times R \times V \to \mathbb{R}$ is a model that aims to predict the label $y_i$ of each triplet $(h_i,r_i,t_i)$ by scoring it according to how likely it is to have originated from the knowledge graph.
+\end{definition}
+
+% Link predictors are commonly composed of entity-relation embedding models, in order to obtain high-quality feature vectors to pass onto a classifier. 
+
+\begin{definition}
+    Given a dataset $\mathcal{D}=\{(q_i, a_i)\}_{i=1}^{N}$ of query-answer pairs extracted from the knowledge graph, \emph{query answering} entails predicting the answer entity $a_i$ given the query information $q_i$ as input. Classically, this is operationalized by forming the set $\hat{\mathcal{D}}_i=\{(q_i, v)\}_{v \in V}$ by combining the query with every possible answer, then the predicted answer is the one that maximizes a scoring model: $\hat{a}_i = \argmax_{v \in V}{S(q_i,v)}$.
+\end{definition}
+
+\subsubsection{Contributions}
+%\textbf{Volkan: Typically, you state the explicit contributions here then explain later on. I currently do not see a clear ``contribution" statement(s).}
+Most previous work on knowledge graph inference acceleration~\cite{lerer_pytorch-biggraph_2019,zheng_dgl-ke_2020,ren_smore_2021} focuses on \emph{model-free} solutions relying on hardware and software for distribution and parallelization. Few \emph{model-based} approaches exist that do take resource limitations into account, balancing the model's computational cost with performance, with benefits scaling up with graph size instead of number of compute units.
+
+NodePiece~\cite{galkin_nodepiece_2022} and EARL~\cite{chen_entity-agnostic_2023} propose accelerating knowledge graph prediction tasks by reducing the total number of embedding parameters required. This is done by selecting only certain \enquote{reserved} entities to be a part of a vocabulary $\mathcal{T} \subseteq V$, then only pre-computing the vocabulary embeddings. Embeddings for non-vocabulary entities must be obtained on the spot by selecting for each of them $\tau$ reserved nodes from the vocabulary (via a specific assignment rule) and then re-encoding the sequence of the $\tau$ embeddings. 
+
+Both works thus require at least $|\mathcal{T}| + \tau(|V|-|\mathcal{T}|)N$ embedding computations during evaluation, many times larger than the baseline cost of $|V|N$.
+
+On the other hand, our contributions can be summarized as follows: %(I) COINs are a \emph{model-based} approach that performs a novel integration of \emph{community structure information} into optimization and inference, to achieve significant acceleration even with limited resources; and (II) The acceleration potential is exactly derived, with theoretical and empirical arguments for which community structures are optimal.
+\begin{enumerate}[I.]
+    \item COINs are a \emph{model-based} approach that introduces a novel integration of \emph{community structure information} into optimization and inference to achieve significant acceleration even with limited resources, and balancing speed-up in the best way with baseline performance retrieval and model size;
+    \item We derive upper and lower bounds for the total number of embeddings that must be computed during evaluations. By being community-adaptive, our algorithm operates near the lower bound, thereby achieving the best possible speed-ups in practice during evaluation. 
+    
+    %The acceleration potential is exactly derived, with theoretical and empirical arguments for which community structures are optimal.
+\end{enumerate}
+
+
+\subsubsection{Scalable query answering evaluation}
+ Assume that we possess a mapping $c: V \to \mathcal{C}$, assigning knowledge graph entities into one of $|\mathcal{C}| = K \leq |V|$  groups, similar to some previous work~\cite{lerer_pytorch-biggraph_2019,zheng_dgl-ke_2020}. 
+ % Instead of only distributing the model training according to this mapping, if it has certain desirable properties, one can utilize it to speed up query answering evaluation as well, through an alternative two-step procedure: 
+With $c$ we construct an alternative two-step query answering procedure:
+ \begin{enumerate}
+     \item Map the input $(q, a)$ to a group-level query-answer pair $\left(q^{(C)}, c(a)\right)$, and predict $c(a)$ by scoring all $K$ possible answer groups;%, where $q^{(C)} = ([c(v)]_{v \in \mathcal{A}_q},G_q)$;
+     \item Search for the correct answer $a$ only among the entities $\hat{a}$ with $c(\hat{a})=c(a)$.
+ \end{enumerate}
+ % Note that with this new procedure, two scoring models are required, one for each level of prediction, and the performance of the second prediction depends on the first. 
+ % However, we now have the potential to greatly reduce the number of model evaluations required, without a large effect on the original evaluation performance, if the mapping $c$ satisfies conditions that we will motivate in the following paragraphs.
+% In the following paragraphs, we will show the conditions $c$ must satisfy to obtain our guarantees.
+
+\subsubsection{Optimal partition structure}
+
+First note that the mapping $c$ induces a \emph{disjoint partition} of the entity set $V$. Namely, if we construct the sets $$C_k = \{v \in V|c(v)=k\}, k \in \mathcal{C},$$ then $\bigcup_{k=1}^{K}{C_k}=V$ and $\forall i,j \in \mathcal{C},i \neq j, C_i \cap C_j = \emptyset$. 
+
+By analyzing in detail the computational complexity of our new evaluation method, one can easily assess the quality of any such disjoint partition. Proposition~\ref{proposition:complexity} provides our main result. 
+
+\begin{proposition}
+\label{proposition:complexity}
+Let $|C_k|$ denote the size of node group $k$ and $N_k^{\text{test}}=|\{(q, a) \in \mathcal{D}_{\text{test}}|c(a)=k\}|$ denote the number of evaluation samples with query answers in node group $k$. The number of query embedding vectors computed in total during evaluation has the following form and bounds:
+\begin{equation}
+\label{eq:complexity_and_bounds}
+2 N \sqrt{|V|} \leq \sum_{k=1}^{K}{\left(K+|C_k|\right)N_k^{\text{test}}} \leq N \left(|V| + 1\right) 
+\end{equation}
+\end{proposition}
+The proof is available in Appendix~\ref{sec:appendix_proofs}.
+    
+% We can prove a quick intuitive result about disjoint partitions:
+% \begin{proposition}
+% \label{proposition:average_community_size}
+% Given a graph $G=(V, E)$, assume that a disjoint partitioning of $V$ into $K=O(|V|^p)$, groups was obtained, with naturally $p \in (0, 1)$. Then no matter the partition assignment, the average group size will be $O(|V|^{1-p})$.
+% \end{proposition}
+% \begin{proof}
+%     Observe that simply: $\frac{1}{K}\sum_{k=1}^{K}{C_k} = \frac{1}{K}|V|=O(|V|^{-p} \cdot |V|)=O(|V|^{1-p})$.
+% \end{proof}
+
+% Now, the time complexity of the first, node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of model evaluation steps required, and therefore it is on the order of $\Theta(|V|^{p} D)$. On the other hand, the second step on average requires as many model evaluations as the average group size. 
+% From proposition~\ref{proposition:average_community_size} however, we know that for this disjoint partitioning of the node set the average group size will be on the order of $O(|V|^{1-p})$, thus the complexity of the second step amounts to $\Theta(|V|^{1-p} D)$ and the total cost of the new evaluation procedure is thus: $\Theta(N [|V|^{p} + |V|^{1-p}] D)$. 
+% From Proposition~\ref{proposition:average_community_size} however, we know the expected average group size, and thus the complexity of the second step amounts to $\Theta(|V|^{1-p} D)$ and the total cost of the new evaluation procedure is thus: $\Theta(N [|V|^{p} + |V|^{1-p}] D)$. 
+% But, by choosing a different $c$, one has the option to optimize the value of $p$, and the following Proposition~\ref{proposition:min_evaluation_cost} argues which value minimizes our overall cost:
+% \begin{proposition}
+%     \label{proposition:min_evaluation_cost}
+%     With $p=\frac{1}{2}$, one achieves the minimal evaluation cost of $\Theta(N \sqrt{|V|} D)$.
+% \end{proposition}
+% \begin{proof}
+%     Let $g(p) = |V|^{p} + |V|^{1-p}$. Then note that $g'(p) = \log{|V|}(|V|^{p} - |V|^{1-p})$. From this, we find the only critical point of $g$ in $(0, 1)$: $|V|^{p} - |V|^{1-p} = 0 \Leftrightarrow p = 1-p \Leftrightarrow p = \frac{1}{2}$. As $g''(\frac{1}{2}) = 2\log^{2}{|V|}\sqrt{|V|} > 0$, $p^* = \frac{1}{2}$ indeed is the minimizer.
+% \end{proof}
+
+\subsubsection{Query locality}
+The lower bound of equation \eqref{eq:complexity_and_bounds} above states that it is possible to achieve a $\sqrt{|V|}$ dependence in evaluations while the scalable approaches we have discussed so far have a linear dependence on ${|V|}$. 
+%The possibility of quadratically reducing the overall computation time is grounds for sufficient motivation to obtain a partitioning that splits the node set into $K=O(\sqrt{|V|})$ equally sized pieces, as its first important property. 
+However, to minimally affect the baseline performance, we must consider the partitioning quality from the perspective of preserving the relational structure. 
+
+What previous works often fail to consider is that an arbitrary assignment might be \emph{arbitrarily non-local}. Formally, if we construct the set $$V^*(c)=\{v \in V|\exists (u,r), E_R \cap \{(v,r,u), (u, r, v)\} \neq \emptyset, c(u) \neq c(v)\}$$ of entities that participate in between-group relations, then we must have both minimal $|V^*(c)|$ as well as minimal total evaluation cost (Proposition~\ref{proposition:complexity}). 
+
+In this case, the search for the true answer to a query will be most often localized to a small neighborhood in the knowledge graph, a significantly easier problem. Equivalently, one prefers a mapping $c$ such that more relations are present \emph{within} the entity sets $C_k$ than \emph{between} the sets. 
+
+Unfortunately, achieving good localization is an NP-hard problem, but research in the fields of \emph{community detection} and \emph{minimal cuts} for graphs have yielded extremely efficient heuristic algorithms. 
+
+Such is the Leiden algorithm for community detection~\cite{traag_louvain_2019}, the current state-of-the-art, based on heuristic maximization of the Constant Potts Model~\cite{traag_narrow_2011} version of the modularity score~\cite{blondel_fast_2008}, with further manual refinement to guarantee well-connected communities. The single \enquote{resolution} hyperparameter of the algorithm is the only degree of freedom controlling the community assignment quality. To this end, our work represents a novel application of Leiden communities to knowledge graph inference. 
+
+On the other hand, the METIS algorithm for graph partitioning~\cite{karypis_fast_1998}, employed also in~\cite{zheng_dgl-ke_2020}, strives towards minimal graph cuts. For some experiments, we considered it as an alternative to Leiden to estimate the effect of the choice of graph-splitting method.
+
+\subsection{Methodology}
+\label{sec:methodology}
+
+\subsubsection{Community detection}
+
+Given a knowledge graph $(V, E_R, R, \mathbf{X})$, the first step we employ is to execute the Leiden community detection algorithm to obtain a good node-to-community mapping $c: V \to \mathcal{C}$. 
+
+% We observed that, in practice, if the graph is sufficiently sparse, i.e., $|E_R| \ll |R| \cdot |V|^2$, with the resolution parameter of the algorithm simply set to $\frac{1}{|V|}$ one achieves decent performance without the need for further validation. Obtaining quality community assignments for dense graphs, however, is very challenging, and validation of the resolution hyperparameter is recommended. Additionally, one can merge very small weakly connected components into larger communities to achieve a better balance of community sizes. 
+
+For our COINs technique, based on the obtained community assignment map $c$ we extract further discrete information of great utility for efficient training and evaluation. $c$ coarsens $(V, E_R)$ into a \emph{community-level interaction graph}: $$V^{(C)} = \mathcal{C}, E^{(C)}_R = \{(c(u),r,c(v))|(u,r,v) \in E_R\}.$$%
+In addition, one can compute the \emph{inter-community mapping} $z^*: V \to V_{\omega}^*$:
+$$z^*(v)=\begin{cases} v, & \text{ if } v \in V^* \\ \omega, & \text{ otherwise} \end{cases}$$where $V_{\omega}^* = V^* \cup \{\omega\}$ and $\omega$ is a padding node representing all nodes in $V \setminus V^*$.
+
+\subsubsection{COINs training \& evaluation}
+
+% As we introduced previously, state-of-the-art knowledge graph embedding models and methods for achieving better scalability are inapplicable for all scenarios, either since node partitions are sub-optimal or intermediate computation variables are unoptimized for single-machine computation. As such, in the following paragraphs, the proposed COINs knowledge graph representation technique is presented, facilitating the community-based graph data augmentations to their fullest.
+
+Let $\mathcal{F}$ denote the class of knowledge graph embedding models whose scalability we wish to improve, and $\tilde{\mathcal{L}}: \mathcal{E} \times \mathcal{E} \times \{-1,1\} \to \mathbb{R}$ be the per-sample contrastive loss term minimized during training such models (eq. \eqref{eq:contrastive_loss}). 
+% \newpage
+
+COINs requires the optimization of the following models sampled from $\mathcal{F}$:
+\begin{itemize}
+    \item {Community-level embedders} 
+    
+    $g_V^{(C)}: \mathcal{C} \to \mathcal{E}, g_R^{(C)}: R \to \mathcal{R}, g_P^{(C)}: \mathcal{E} \times \mathcal{R} \to \mathcal{E}, g_I^{(C)}: \mathcal{E}^{\mathbb{N}} \to \mathcal{E}$;
+    \item {Intra-community entity embedders} $g_V^{(k)}: C_k \to \mathcal{E}, \forall k \in \mathcal{C}$;
+    \item {Inter-community entity embedder} $g_V^{*}: V_{\omega}^* \to \mathcal{E}$. 
+    \item {Node-level relation and query embedders} 
+    
+    $g_R: R \to \mathcal{R}, g_P: \mathcal{E} \times \mathcal{R} \to \mathcal{E}, g_I: \mathcal{E}^{\mathbb{N}} \to \mathcal{E}$
+\end{itemize}
+
+Additional parameters are: a {node feature embedding matrix} $\mathbf{W} \in \mathbb{R}^{D \times F}$ and {node/relation embedding aggregation weights} $\mathbf{w} \in \mathbb{R}^{3}, \mathbf{w}_R \in \mathbb{R}^{2}$.
+
+\begin{algorithm}[H]
+    \caption{Base knowledge graph representation}
+    \label{algorithm:baseline}
+    \begin{algorithmic}[1]
+    \STATE{\textbf{input} $(q, a)$, $y \in \{-1,1\}$}
+    \STATE{$\mathbf{R}=[g_R(r)]_{r \in R}$}
+    \STATE{$\mathbf{a}=g_V(a), \mathbf{A}=[g_V(v)]_{v \in \mathcal{A}_{q}}$}
+    \STATE{$\mathbf{q}=G_{q}(\mathbf{A};(\mathbf{R},g_P),g_I)$}
+    \STATE{\textbf{return} $\tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, y)$}
+    \end{algorithmic}
+\end{algorithm}
+
+ Algorithm~\ref{algorithm:baseline} presents the baseline inference steps required, Algorithm~\ref{algorithm:coins} details the knowledge graph query representation steps for COINs, utilizing the constructed sub-models, while Figure~\ref{fig:community_preprocessing} provides a visualization of our community-based preprocessing and query representation on a small example. 
+
+This new construction has several desirable properties unlike the baseline: 
+\begin{enumerate}
+    \item Queries spanning multiple communities are treated differently, allowing for greater generalization; 
+    \item $K + \max{(\max_{k=1}^{K}{|C_k|},|V^{*}| + 1)}$ will be the maximum number of entity embeddings to compute for each training iteration instead of the baseline $|V|$, an overall lower time and memory cost;
+    \item The community representation learning will be performed jointly with the node-level, due to the softmax-weighted embedding refinement linking them both, allowing for greater adaptivity;
+    % \item The final embedding refinement will preserve the convexity of the base model, if it has that property.
+\end{enumerate}
+
+% \centerline{
+% \begin{adjustbox}{width=\textwidth}%, totalheight=40ex}
+% \hfill
+% \begin{minipage}{\textwidth}
+\begin{algorithm}[H]
+% \algsetup{linenosize=\tiny}
+% \scriptsize
+\caption{COINs knowledge graph representation}
+\label{algorithm:coins}
+\begin{algorithmic}[1]
+\STATE{\textbf{input} $(q, a)$, $y \in \{-1,1\}$, $c:V \to \mathcal{C}$, $z^*: V \to V_{\omega}^*$, $\alpha \in (0,1)$}
+\STATE{$\mathbf{R}^{(C)}=[g^{(C)}_R(r)]_{r \in R}, \tilde{\mathbf{R}}=[g_R(r)]_{r \in R}$}
+\STATE{$\mathbf{R} = \langle \mathrm{Softmax}(\mathbf{w}_R), [\mathbf{R}^{(C)}, \tilde{\mathbf{R}}] \rangle$}
+\STATE{$q^{(C)} = ([c(v)]_{v \in \mathcal{A}_q},G_q)$}
+\STATE{$\mathbf{a}^{(C)}=g^{(C)}_V(c(a)), \mathbf{A}^{(C)}=[g^{(C)}_V(k)]_{k \in \mathcal{A}^{(C)}_{q}}$}
+\STATE{$\mathbf{q}^{(C)}=G_{q}(\mathbf{A}^{(C)};(\mathbf{R}^{(C)},g_P^{(C)}),g_I^{(C)})$}
+\IF{$\forall v \in q, c(v)=c(a)$}
+\STATE{$\tilde{\mathbf{a}}=g^{(c(a))}_V(a), \tilde{\mathbf{A}}=[g^{(c(a))}_V(v)]_{v \in \mathcal{A}_{q}}$}
+\ELSE
+\STATE{$\tilde{\mathbf{a}}=g^{*}_V(z^*(a)), \tilde{\mathbf{A}}=[g^{*}_V(z^*(v))]_{v \in \mathcal{A}_{q}}$}
+\ENDIF
+\STATE{$\mathbf{a} = \langle \mathrm{Softmax}(\mathbf{w}), [\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{(C)}, \tilde{\mathbf{a}}] \rangle, \mathbf{A}=\langle \mathrm{Softmax}(\mathbf{w}), [\mathbf{W} \mathbf{x}_{v}]_{v \in \mathcal{A}_{q}}, \mathbf{A}^{(C)}, \tilde{\mathbf{A}} \rangle$}
+\STATE{$\mathbf{q}=G_{q}(\mathbf{A};(\mathbf{R},g_P),g_I)$}
+\STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}(\mathbf{q}, \mathbf{a}, y)=(1-\alpha) \tilde{\mathcal{L}}(\mathbf{q}^{(C)}, \mathbf{a}^{(C)}, y) + \alpha \tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, y) $}
+\end{algorithmic}
+\end{algorithm} 
+% \end{minipage}
+% \hfill\mbox{}
+% \end{adjustbox}}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/coins/coins.pdf}
+    \caption[Example of a preprocessed knowledge graph and the COINs representation process on an example query.]{Left: example of a preprocessed knowledge graph, showing its transformation into a community-level graph, with $|V|=6, |E_R|=7, T=2, |R|=2, K=2, |V^*|=2$. Right: the COINs representation process on an example inter-community 2p-query of the graph on the left.}
+    \label{fig:community_preprocessing}
+\end{figure}
+
+Observe that the total number of COINs node embeddings for a graph is $K + \sum_{k=1}^{K}{|C_k|} + |V^*| + 1 = K + |V| + |V^*| + 1$, compared to just $|V|$ node embeddings in the baseline. Thus, using a partitioning that keeps $|V^*| \ll |V|$ has benefits in limiting model size as well. 
+
+Let now $S_C$ denote a learned scoring model for community-level query-answer pairs, obtained after extending the community-level COINs sub-models into a classifier, with $S_V$ the analog for the final node-level query answer scoring. Then, one can implement the proposed novel scalable query answering procedure via Algorithm~\ref{algorithm:scalable_query_answering}. %Note that, all query answering evaluation metrics are aggregates of the predicted \emph{ranks} of the evaluation triplets. %, defined as the index of the descending order statistic of the predicted link scores equal to the score of the true answer triplet. 
+% Thus, our evaluation algorithm also must efficiently compute these ranks while taking into account that the node ranking is performed in two steps. 
+
+% \begin{wrapfigure}{R}{0.5\textwidth}
+% \begin{minipage}{0.5\textwidth}
+% \vspace{-19.85ex}
+\begin{algorithm}[H]
+\caption{COINs query answering evaluation}
+\label{algorithm:scalable_query_answering}
+\begin{algorithmic}[1]
+\STATE{\textbf{input} test set $\mathcal{D}_{\text{test}}=\{(q_i, a_i)\}_{i=1}^{N}$, scorers $S_C, S_V$}
+\FOR{$i \gets 1$ to $N$}
+\STATE{$q^{(C)}_i = ([c(v)]_{v \in \mathcal{A}_{q_i}},G_{q_i})$}
+\STATE{$s_C = [S_C(q^{(C)}_i, k)]_{k \in \mathcal{C}}$}
+\STATE{$\rho^{(i)}_{C} = \mathrm{Rank}(c(a_i),s_C)$}
+\STATE{$F_i=\sum_{1 \leq j < \rho^{(i)}_{C}}{|C_{\mathrm{IndexRank}(j,s_C)}|}$}
+\STATE{$s_V = [S_V(q_i, v)]_{v \in C_{c(a_i)}}$}
+\STATE{$\tilde{\rho}^{(i)} = \mathrm{Rank}(a_i,s_V)$}
+\STATE{$\rho^{(i)} = F_i + \tilde{\rho}^{(i)}$}
+\ENDFOR
+\STATE{\textbf{return} $[\rho^{(i)}]_{i=1}^{N}$}
+\end{algorithmic}
+\end{algorithm} 
+% \end{minipage}
+% \end{wrapfigure}
+
+
+\subsubsection{Tradeoff analysis}
+
+The primary limitation of the COINs evaluation procedure is that incorrect community prediction can result in many nodes being returned as false positives (large $F_i$ term in Algorithm~\ref{algorithm:scalable_query_answering}). This conditional nature of the prediction is the main reason for expecting lower performance compared to the baseline. 
+
+However, as community ranks approach 1, we can much more quickly obtain model predictions with lesser and lesser drawbacks for large graphs. Thus, we prove Proposition~\ref{proposition:condition_applicability}, which quantifies under which conditions the application of COINs is feasible, by theoretically analyzing the tradeoff between the possible scalability benefits and performance losses. 
+
+The general takeaway is that one must \emph{per-community} consider the ratio between acceleration factors and relative error in performance metrics, with specific weight values for aggregating these comparisons to obtain a final conclusion through a simple inequality test.
+
+
+\subsubsection{Distributed COINs}
+
+
+
+\subsubsection{Experiment setup}
+
+\paragraph{Integration with knowledge graph representation models}
+Due to the universality of our COINs technique for scaling up knowledge graph model evaluation, we can integrate it with many established knowledge graph embedding models, described in Table~\ref{tab:algorithms} below. Each performs contrastive learning, i.e., minimization of equation \eqref{eq:contrastive_loss}. 
+\begin{table}[H]
+  \caption[Knowledge graph embedding model summary.]{Knowledge graph embedding model summary. Left to right: node \& relation embedding space, embedding parameter constraints, relation projection model, intersection model, score function.}
+  \label{tab:algorithms}
+  \centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lcccccc}
+\toprule
+Model & $\mathcal{E}$ & $\mathcal{R}$ & Constraints & $g_P(\mathbf{v}, \mathbf{r})$ & $g_I([\mathbf{v}])$ & $f(\mathbf{q}, \mathbf{a})$ \\
+\midrule
+\textbf{TransE}~\cite{bordes_translating_2013} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $||\mathbf{v}||=1$ & $\mathbf{v} + \mathbf{r}$ & \textemdash & $\gamma - ||\mathbf{q} - \mathbf{a}||$ \\
+\textbf{DistMult}~\cite{yang_embedding_2014} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $||\mathbf{v}||=1$ & $\mathbf{v} \odot \mathbf{r}$ & \textemdash & $\langle \mathbf{q}, \mathbf{a} \rangle$ \\
+\textbf{ComplEx}~\cite{trouillon_ComplEx_2016} & $\mathbb{C}^D$ & $\mathbb{C}^D$ & \textemdash & $\mathbf{v} \cdot \mathbf{r}$ & \textemdash & $\text{Re}{(\langle \mathbf{q}, \bar{\mathbf{a}} \rangle)}$ \\
+\textbf{RotatE}~\cite{sun_rotate_2019} & $\mathbb{C}^D$ & $\mathbb{C}^D$ & $\forall d, \left|\mathbf{r}^{(d)}\right|=1$ & $\mathbf{v} \cdot \mathbf{r}$ & \textemdash & $\gamma - ||\mathbf{q} - \mathbf{a}||$ \\
+ \textbf{KBGAT}~\cite{nathani_learning_2019} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $||\mathbf{v}||=1$ & GAT$_r$~\cite{velickovic_graph_2018} & \textemdash & ConvKB~\cite{nguyen_novel_2018} \\
+ \multirow{2}{*}{\textbf{Query2Box}~\cite{ren_query2box_2020}} & \multirow{2}{*}{$\mathbb{R}^{2D}$} & \multirow{2}{*}{$\mathbb{R}^{2D}$} & $\mathbf{v}=[\mathbf{v}^{(c)}, \mathbf{v}^{(o)}]$, & \multirow{2}{*}{$\mathbf{v} + \mathbf{r}$} & $[\text{Att}([\mathbf{v}^{(c)}]),$ & $\gamma - f_{\text{out}}(\mathbf{q},\mathbf{a})  $\\
+  &  &  & $\mathbf{v}^{(o)} \geq 0$ & & $\text{MinDS}([\mathbf{v}^{(o)}])]$  & $-\beta f_{\text{in}}(\mathbf{q},\mathbf{a})$  \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+$\text{Att}([\mathbf{v}^{(c)}])=\langle \text{Softmax}(\text{MLP}([\mathbf{v}])), [\mathbf{v}^{(c)}] \rangle$, \\$\text{MinDS}([\mathbf{v}^{(o)}]) = \min_{\mathbf{u}}{[\mathbf{u}^{(o)}]} \odot \sigma(\text{DeepSets}([\mathbf{v}]))$~\cite{zaheer_deep_2017,hamilton_embedding_2018}, \\
+$f_{\text{out}}(\mathbf{q},\mathbf{a}) = ||\text{ReLU}(\mathbf{a}^{(c)} - \mathbf{q}^{(c)} - \mathbf{q}^{(o)}) + \text{ReLU}(\mathbf{q}^{(c)} - \mathbf{q}^{(o)} - \mathbf{a}^{(c)})||$,\\
+$f_{\text{in}}(\mathbf{q},\mathbf{a}) = ||\mathbf{q}^{(c)} - \min(\mathbf{q}^{(c)} + \mathbf{q}^{(o)}, \max(\mathbf{q}^{(c)} - \mathbf{q}^{(o)},\mathbf{a}^{(c)}))||$
+\end{table}
+%\begin{itemize}
+%    \item \textbf{TransE}~\cite{bordes_translating_2013}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ with $||e_h||=||e_t||=1$, and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}(e_h, \mathbf{r}, e_t) = \gamma - ||e_h + \mathbf{r} - e_t||$, $\gamma \in (0, \infty)$ (minimization of \eqref{eq:contrastive_loss});
+%    \item \textbf{DistMult}~\cite{yang_embedding_2014}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ with $||e_h||=||e_t||=1$, and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}(e_h, \mathbf{r}, e_t) = \langle e_h \odot \mathbf{r}, e_t \rangle$;
+%    \item \textbf{ComplEx}~\cite{trouillon_ComplEx_2016}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{C}^D$, and relation embeddings $\mathbf{r} \in \mathbb{C}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}(e_h, \mathbf{r}, e_t) = \text{Re}{(\langle e_h \cdot \mathbf{r}, \bar{e}_t \rangle)}$;
+%    \item \textbf{RotatE}~\cite{sun_RotatE_2019}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{C}^D$, and relation embeddings $\mathbf{r} \in \mathbb{C}^D$ with $\forall d, \left|\mathbf{r}^{(d)}\right|=1$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}(e_h, \mathbf{r}, e_t) = \gamma - ||e_h \cdot \mathbf{r} - e_t||$, $\gamma \in (0, \infty)$.
+%    % \item \textbf{GATNE}~\cite{cen_representation_2019}: Given a triplet $(h, r, t)$ obtained from a random walk, relation-dependent entity embeddings $e_{h,r},e_{t,r} \in \mathbb{R}^{D}$ are obtained from an attention mechanism between base embeddings and embeddings of neighboring nodes. Model parameters are learned via contrastive learning and scoring function $\mathcal{S}(e_{h_r}, e_{t_r}) = -\langle e_{h_r} \cdot e_{t_r}\rangle$;
+%    % \item \textbf{SACN}~\cite{shang_end--end_2019}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ are obtained from a two-layer Graph Convolutional Network (GCN), while relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters. $\mathcal{S}$ is a learnable CNN, optimized jointly with the embedder via binary cross-entropy minimization.
+%    % \item \textbf{KBGAT}~\cite{nathani-etal-2019-learning}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are obtained after applying two heterogeneous graph attention layers (GAT). $\mathcal{S}$ is a learnable CNN optimized via the soft margin loss.
+%\end{itemize}
+
+\paragraph{Data}
+
+Our approach was tested on three knowledge graph datasets used classically for knowledge graph representation research:
+\begin{itemize}
+    \item \textbf{FB15k-237}~\cite{toutanova_observed_2015}: sample of the Freebase knowledge base;
+    \item \textbf{WN18RR}~\cite{dettmers_convolutional_2018}: a subset of the WordNet ontology;
+    \item \textbf{NELL-995}~\cite{xiong_deeppath_2017}: 995th iteration of the NELL knowledge reasoning system.
+\end{itemize}
+
+\paragraph{Training and evaluation}
+We ran the COINs training and evaluation procedures on all combinations of knowledge graph datasets and embedding algorithms, starting from at least 3 random seeds. 
+
+Query-answer pairs and negative examples are obtained online from the training graph to form mini-batches for both community and node representation, but for COINs training node-level negative examples must only come from the same community as the answer ($\{a'_i\}_{i=1}^m \subseteq C_{c(a)}\setminus\{a\}$ for Definition~\ref{def:contrastive_loss}). 
+
+Fixed validation and testing datasets are built by obtaining queries such that to reach their answers at least one non-training edge must be followed. Pre-selected sets of single-hop (1p-type) train-val-test queries are provided in each dataset, thus we make sure not to bootstrap them. The efficient bi-directional rejection sampling algorithm of SMORE~\cite{ren_smore_2021} is applied for both the training and evaluation query sampling. 
+
+The parameter optimization is performed via the Adam optimization algorithm~\cite{kingma_adam_2015}, with $\ell_2$ parameter regularization. Training loss reduction checks and a patience counter based on validation metrics are employed as early stopping criteria.
+
+Binary classification evaluation metrics are utilized for the link prediction task. On the other hand, after obtaining the predicted ranks $[\rho^{(i)}]_{i=1}^{N}$ of the evaluation query-answer scores (in the \emph{filtered} setting, same as in the baselines), one computes query answering aggregate metrics:
+\begin{itemize}
+    \item \textbf{Hits@k} $= \frac{1}{N}\sum_{i=1}^{N}{\mathbb{I}(\rho^{(i)} \leq k)}$;
+    \item \textbf{MR} $= \bar{\rho} = \frac{1}{N}\sum_{i=1}^{N}{\rho^{(i)}}$, called the mean rank;
+    \item \textbf{MRR} $= \frac{1}{N}\sum_{i=1}^{N}{\frac{1}{\rho^{(i)}}}$, called the mean reciprocal rank.
+\end{itemize}
+
+%
+%We focus on the classical accuracy, F1 score, area under ROC curve (ROC-AUC), and area under PR curve (AP) metrics for link prediction, while we employ Hits@1, Hits@3, Hits@10, and MRR for query answering, to compare with baselines.
+
+\subsection{Results \& discussion}
+\label{sec:results}
+
+\subsubsection{Communities \& Scalability}
+
+Table~\ref{tab:datasets} summarizes the three knowledge graphs via their basic statistics, as well as those of the community partitioning that we managed to obtain. We present the computational complexity improvements via the \emph{acceleration} factor: ratio of the number of query embeddings computed during evaluation between the baseline and COINs. On the other hand, the effects on model complexity can be analyzed via the ratio of total composing node embeddings between COINs and baseline models, referenced as the \emph{overparametrization} factor. 
+
+\begin{table}[H]
+  \caption[Knowledge graph datasets summary.]{Knowledge graph datasets summary. Left to right: number of nodes, edges, node features, edge types, communities, inter-community nodes; acceleration factor (decrease in evaluation time complexity, higher is better), overparametrization factor (increase in memory complexity, lower is better).}
+  \label{tab:datasets}
+  \centering
+  \begin{adjustbox}{width=\textwidth}
+  \begin{tabular}{lccccrrrr}
+    \toprule
+    Dataset & $|V|$ & $|E_R|$ & $F$ & $|R|$ & $K$ & $|V^*|$ & Acceleration $\uparrow$ & Overparametr. $\downarrow$ \\ %& $\frac{N |V|}{\sum_{k=1}^{K}{(K+|C_k|)N_k^{\text{test}}}}$ & $\frac{|V| + K + |V^*| + 1}{|V|}$ \\
+    \midrule
+    FB15k-237 & 14,541 & 310,116 & 1 & 237 & 1,025 & 13,407 & x 4.366 & x 1.993 \\
+    WN18RR & 41,105 & 93,003 & 5 & 11 & 88 & 6,323 & x 4.583 & x 1.156 \\
+    NELL-995 & 75,492 & 154,213 & 269 & 200 & 275 & 4,910 & x 10.289 & x 1.069 \\
+    \bottomrule
+  \end{tabular}
+  \end{adjustbox}
+\end{table}
+
+We note the inability to bring down $K$ and $|V^*|$ further for the FB15k-237 graph due to its higher edge density, yielding the worst scalability effects. Nevertheless, we provide evidence that through elementary validation of the resolution hyperparameter one can optimize the scalability according to desired preferences, due to a surprisingly strong correlation of the factors with the resolution value. Figure~\ref{fig:scalability_resolution} illustrates this through a joint plot of both factors, and one can notice the common pattern across the datasets: there's a critical point for optimal acceleration, while overparametrization simply increases with the resolution.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\textwidth]{figures/coins/scalability_leiden_resolution}
+\end{center}
+\caption[Dependence of time and memory scalability on the value of the resolution hyperparameter of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the value of the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Chosen hyperparameter values that yielded optimal balance between scalability and performance for each dataset annotated via vertical lines.}
+\label{fig:scalability_resolution}
+\end{figure}
+
+
+% Figure~\ref{fig:scalability_cut_size} illustrates an alternative method to optimize the scalability factors, through optimization of the cut size (number of inter-community edges) heuristic utilized by the METIS algorithm. For Leiden, one observes smooth curves with similar properties as in Figure~\ref{fig:scalability_resolution}. For optimal acceleration, there seems to be a critical cut size, while having more inter-community edges implied more parameters for $f_*$. Curiously, we observed the METIS algorithm to yield a non-minimal cut size and there are a lot of Leiden resolution values that achieve lower cut sizes. METIS clearly favors too large of an increase in parameter number. The distribution of the metrics over a batch of 100 random uniform community assignments yielded extremal values: the best acceleration, however the largest cut size and most parameters.
+
+
+% \begin{figure}[ht!]
+% \begin{center}
+% \includegraphics[width=\textwidth]{figures/scalability_leiden_cut_size}
+% \end{center}
+% \caption{Dependence of time and memory scalability (acceleration and overparametrization factors) on the cut size (number of inter-community edges) of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Cut values that yielded optimal balance between scalability and performance for each dataset annotated via black vertical lines. Gray vertical lines denote the cut size values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
+% \label{fig:scalability_cut_size}
+% \end{figure}
+
+\subsubsection{Performance \& Feasibility}
+
+Tables~\ref{tab:performance_query_answering_mrr} and~\ref{tab:performance_query_answering_q2b} contain our MRR metric query answering results and the comparison with the baselines, where KBGAT baselines were retrieved from~\cite{nathani_learning_2019}, Query2Box metrics were obtained by integrating the base algorithm with our experiment code that has COINs integration deactivated, while for all other models, metrics were calculated by running the implementation provided with~\cite{sun_rotate_2019}\footnote{Available at \url{https://github.com/DeepGraphLearning/KnowledgeGraphEmbedding}}. 
+One can observe that on average, the relative error of the metric to the baseline decreases with the model complexity. This is to be expected, as more representation power means better embedding of the complicated community-node interactions. In a third of the single-hop cases and the majority of multi-hop ones, we even improve upon the baseline results.
+%\clearpage
+
+\begin{table}[H]
+  \caption[Computed MRR metric of single-hop query answering experiments.]{Computed MRR metric (higher is better) of single-hop query answering experiments for comparison of COINs results to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}
+  \label{tab:performance_query_answering_mrr}
+  \centering
+\begin{tabular}{lllllll}
+\toprule
+Dataset & \multicolumn{2}{l}{FB15k-237} & \multicolumn{2}{l}{WN18RR} & \multicolumn{2}{l}{NELL-995} \\
+Value &                 Baseline &                              COINs &                Baseline &                           COINs &                 Baseline &                           COINs \\
+Algorithm &                          &                                    &                         &                                 &                          &                                 \\
+\midrule
+TransE    &              ${{0.218}}$ &            ${{0.132}_{\pm 0.004}}$ &              ${{0.16}}$ &  $\mathbf{{0.278}_{\pm 0.008}}$ &              ${{0.312}}$ &         ${{0.218}_{\pm 0.009}}$ \\
+DistMult  &              ${{0.344}}$ &            ${{0.068}_{\pm 0.009}}$ &             ${{0.433}}$ &         ${{0.261}_{\pm 0.071}}$ &              ${{0.395}}$ &         ${{0.127}_{\pm 0.022}}$ \\
+ComplEx   &              ${{0.369}}$ &     $\mathbf{{0.431}_{\pm 0.006}}$ &             ${{0.462}}$ &         ${{0.358}_{\pm 0.018}}$ &              ${{0.466}}$ &  $\mathbf{{0.472}_{\pm 0.005}}$ \\
+RotatE    &              ${{0.383}}$ &  $\underline{{0.381}_{\pm 0.003}}$ &             ${{0.476}}$ &  $\mathbf{{0.487}_{\pm 0.001}}$ &              ${{0.482}}$ &         ${{0.412}_{\pm 0.018}}$ \\
+KBGAT     &              ${{0.518}}$ &            ${{0.245}_{\pm 0.015}}$ &              ${{0.44}}$ &         ${{0.359}_{\pm 0.003}}$ &               ${{0.53}}$ &  $\mathbf{{0.543}_{\pm 0.009}}$ \\
+% Query2Box &  ${{0.154}_{\pm 0.004}}$ &     $\mathbf{{0.261}_{\pm 0.002}}$ &  ${{0.26}_{\pm 0.001}}$ &  $\mathbf{{0.323}_{\pm 0.007}}$ &  ${{0.382}_{\pm 0.004}}$ &  $\mathbf{{0.443}_{\pm 0.004}}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+  \caption[Computed per-query-structure MRR metric of Query2Box query answering experiments.]{Computed per-query-structure MRR metric (higher is better) of Query2Box query answering experiments to compare our results with COINs training and evaluation to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}
+  \label{tab:performance_query_answering_q2b}
+  \centering
+    \begin{adjustbox}{width=\textwidth}   
+\begin{tabular}{lllllll}
+\toprule
+Dataset & \multicolumn{2}{l}{FB15k-237} & \multicolumn{2}{l}{WN18RR} & \multicolumn{2}{l}{NELL-995} \\
+Value &                 Baseline &                           COINs &                 Baseline &                              COINs &                 Baseline &                             COINs \\
+Query &                          &                                 &                          &                                    &                          &                                   \\
+\midrule
+1p    &  ${{0.176}_{\pm 0.004}}$ &  $\mathbf{{0.276}_{\pm 0.003}}$ &  ${{0.258}_{\pm 0.004}}$ &     $\mathbf{{0.336}_{\pm 0.004}}$ &  ${{0.397}_{\pm 0.005}}$ &    $\mathbf{{0.463}_{\pm 0.009}}$ \\
+2p    &  ${{0.027}_{\pm 0.001}}$ &  $\mathbf{{0.124}_{\pm 0.004}}$ &  ${{0.194}_{\pm 0.016}}$ &  $\underline{{0.182}_{\pm 0.026}}$ &  ${{0.516}_{\pm 0.033}}$ &    $\mathbf{{0.524}_{\pm 0.008}}$ \\
+3p    &   ${{0.02}_{\pm 0.001}}$ &  $\mathbf{{0.117}_{\pm 0.008}}$ &  ${{0.141}_{\pm 0.009}}$ &      $\mathbf{{0.15}_{\pm 0.044}}$ &  ${{0.086}_{\pm 0.017}}$ &    $\mathbf{{0.172}_{\pm 0.022}}$ \\
+2i    &  ${{0.091}_{\pm 0.008}}$ &  $\mathbf{{0.259}_{\pm 0.005}}$ &  ${{0.533}_{\pm 0.016}}$ &     $\mathbf{{0.668}_{\pm 0.025}}$ &  ${{0.313}_{\pm 0.063}}$ &    $\mathbf{{0.315}_{\pm 0.003}}$ \\
+3i    &  ${{0.135}_{\pm 0.015}}$ &   $\mathbf{{0.303}_{\pm 0.01}}$ &  ${{0.913}_{\pm 0.151}}$ &         $\mathbf{{1.0}_{\pm 0.0}}$ &  ${{0.421}_{\pm 0.058}}$ &           ${{0.357}_{\pm 0.007}}$ \\
+ip    &  ${{0.046}_{\pm 0.005}}$ &  $\mathbf{{0.188}_{\pm 0.008}}$ &  ${{0.329}_{\pm 0.068}}$ &            ${{0.193}_{\pm 0.029}}$ &  ${{0.487}_{\pm 0.029}}$ &           ${{0.278}_{\pm 0.033}}$ \\
+pi    &  ${{0.039}_{\pm 0.004}}$ &   $\mathbf{{0.24}_{\pm 0.003}}$ &  ${{0.549}_{\pm 0.008}}$ &     $\mathbf{{0.609}_{\pm 0.075}}$ &  ${{0.585}_{\pm 0.073}}$ &  $\underline{{0.528}_{\pm 0.05}}$ \\
+\midrule
+Average &  ${{0.154}_{\pm 0.004}}$ &     $\mathbf{{0.261}_{\pm 0.002}}$ &  ${{0.26}_{\pm 0.001}}$ &  $\mathbf{{0.323}_{\pm 0.007}}$ &  ${{0.382}_{\pm 0.004}}$ &  $\mathbf{{0.443}_{\pm 0.004}}$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+Refer to Tables~\ref{tab:performance_query_answering} and~\ref{tab:performance_query_answering_2} in Appendix~\ref{sec:appendix_results} for the full query answering metrics. 
+
+To add further context to our obtained results, in Table~\ref{tab:performance_query_answering_related_work} we compared COINs-RotatE's performance to that reported by NodePiece~\cite{galkin_nodepiece_2022} and EARL~\cite{chen_entity-agnostic_2023}, the previously-mentioned related work that also provides scalable model-based solutions at the cost of some performance. From the table, we can infer that in all cases, our approach either beats the baseline or is the one that preserves the most of its strength.
+
+\begin{table}[H]
+  \caption[Comparison of Hits@10 and MRR values for query answering between the RotatE baseline, NodePiece, EARL and COINs.]{Comparison of Hits@10 and MRR values (averaged across seeds) for RotatE query answering between the baseline results in~\cite{sun_rotate_2019}, previous results by the related work NodePiece and EARL provided in~\cite{chen_entity-agnostic_2023} and this work. The top model is in bold, while the second best is underlined.}
+  \label{tab:performance_query_answering_related_work}
+  \centering
+\begin{tabular}{lrrrr}
+\toprule
+{} & \multicolumn{2}{l}{Hits@10} & \multicolumn{2}{l}{MRR} \\
+Dataset & FB15k-237 & WN18RR & FB15k-237 & WN18RR \\
+Value     &           &        &           &        \\
+\midrule
+Baseline  &     \textbf{0.584} &  \underline{0.538} &  \textbf{0.383} &  \underline{0.476} \\
+NodePiece &     0.420 &  0.515 &     0.256 &  0.403 \\
+EARL      &     0.501 &  0.527 &     0.310 &  0.440 \\
+COINs     &     \underline{0.552} &  \textbf{0.586} &     \underline{0.381} &  \textbf{0.487} \\
+\bottomrule
+\end{tabular}
+% \begin{tabular}{lrrrrrr}
+% \toprule
+% {} & \multicolumn{2}{l}{MRR} & \multicolumn{2}{l}{Overparametrization} & \multicolumn{2}{l}{Ratio} \\
+% Dataset & FB15k-237 & WN18RR &           FB15k-237 & WN18RR & FB15k-237 & WN18RR \\
+% Value     &           &        &                     &        &           &        \\
+% \midrule
+% Baseline  &     0.383 &  0.476 &               1.000 &  1.000 &     0.383 &  0.476 \\
+% NodePiece &     0.256 &  0.403 &               1.103 &  1.073 &     0.232 &  0.376 \\
+% EARL      &     0.310 &  0.440 &               0.621 &  0.927 &     0.499 &  0.475 \\
+% COINs     &     0.381 &  0.487 &               1.995 &  1.165 &     0.191 &  0.418 \\
+% \bottomrule
+% \end{tabular}
+\end{table}
+
+However, a relevant comparison to the baseline is difficult to perform without the aid of an additional scalability-dependent investigation of the applicability of our proposed approach. Unlike~\cite{chen_entity-agnostic_2023}, which only evaluated the ratio of absolute MRR to model size, we believe the more direct and robust scalability comparison is one between the relative error and speed-up. Thus, we plot our values for the relative error in MRR to the baseline against acceleration (reduction in computational complexity) in Figure~\ref{fig:feasibility}. 
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\textwidth]{figures/coins/feasibility_2.pdf}
+\end{center}
+\caption[Plot of relative error in MRR against acceleration.]{Plot of relative error in MRR (lower is better) against acceleration (higher is better). The feasible region is the one shaded, where the speed-up is by at least 100\% larger than the error. Top vs. bottom: values computed from ranks after both steps vs. just the second step of COINs. Removing the error in the ranks caused by the community prediction shows improvement and feasibility of all experiments, explaining the outliers, i.e. some models' inability to learn Freebase communities well. Left to right: different datasets.}
+\label{fig:feasibility}
+\end{figure}
+
+From the top plots, one can observe that almost all COINs experiments lie deep in the feasible region, with the bottom plots explaining the reason for the few outliers. On the other hand, the NodePiece and EARL baselines are made infeasible by the time-memory trade-off of tokenization.
+
+\subsection{Summary}
+
+In this section we introduced COINs, a method for accelerating link prediction and query answering models for knowledge graphs, to be applicable even in low computational resource settings. COINs featured a two-step prediction procedure: query answer prediction via community prediction and within-community localization. 
+% This first answer localization step was found to be very impactful on overall model performance. 
+We theoretically and empirically elaborated that the quality of the community structure of the knowledge graph has a broad-reaching influence on the possible scalability improvements provided by our method, as well as its prediction performance compared to baselines. As such, one can conclude that before selecting COINs to accelerate the embedding of a knowledge graph, it is important to study and evaluate its community structure. 
+
+The achieved impressive accuracy and acceleration benefits motivate strongly modeling and predicting over both the community-level coarsened version of a knowledge graph in addition to the local structures, no matter the task. We would apply both holistic and reductionist techniques to solve a knowledge graph problem perhaps otherwise computationally intractable.
