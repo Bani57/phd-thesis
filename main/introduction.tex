@@ -1,0 +1,17 @@
+\chapter{Introduction}
+\label{chp: introduction}
+% \addcontentsline{toc}{chapter}{Introduction}
+
+When approaching a novel scientific problem of significant complexity (and in computer science a problem's complexity is observed through the computational costs required), there are two main idea camps one's solution usually belongs to: holism and reductionism. On one hand, reductionism advises to break up the complex problem into many smaller subproblems that are either already solved or much easier than the full task \cite{doniger_merriam-websters_1999, kricheldorf_getting_2016}. On the other hand, holistic approaches simplify the problem by disregarding finer details supported by natural assumptions and focus on the global features of the task, i.e. \enquote{the whole is more that the sum of its parts} \cite{marshall_unity_2002, noauthor_what_2022}. 
+
+What I will argue overall in this thesis, is that for the problem topics of this work, belonging to the scientific discipline of graph machine learning, we obtain the best tradeoffs by employing both holistic and reductionist viewpoints. A good analogy I find to be the solution steps for the 5x5 Rubick's cube puzzle, where one first arranges the many small pieces to resemble a virtual 3x3 cube which then is solved as an easier second step, instead of directly placing the 5x5 pieces correctly \cite{guangzhou_ganyuan_intelligent_technology_co_ltd_5x5_nodate}.
+
+Specifically, this thesis will describe how to achieve methods scalable to large graphs in both performance and computational cost, in several tasks: knowledge graph link prediction and query answering, and graph generation with GANs and diffusion models. Importantly, the common techniques for achieving these scalability results will be graph coarsening and abstraction \cite{boneva_graph_2007}, mainly through community detection, with graph learning and prediction at both coarse and fine levels. Regardless of the diversity of the tasks, I will present how one can always scale up graph models by modeling graph data both holistically and piece by piece.
+
+In Chapter \ref{chp: background}, I will introduce the main mathematical background for the scientific field of graph machine learning, while future chapters will introduce further relevant theory for a given task for which we provided a scalable solution. 
+
+Speaking of which, Chapter \ref{chp: kg_reasoning} presents our COINs technique for scalable knowledge graph reasoning, with both theoretical guarantees and a successful industry application. The work which will be discussed here is an extension and generalization of my master thesis \cite{janchevski_graph_2021}.
+
+Next, Chapter \ref{chp: generation} details our experimentation into scalable graph generation, through the GGGCRP autoregressive GAN, HiGenDiff diffusion model and MultiProx sampler, as well as an exploration into the applicability of generative models to knowledge graphs. 
+
+Finally, Chapter \ref{chp: conclusion} provides brief concluding remarks and lists the potential directions future work can take to extend upon this work.
