@@ -341,9 +341,62 @@ However, as community ranks approach 1, we can much more quickly obtain model pr
 The general takeaway is that one must \emph{per-community} consider the ratio between acceleration factors and relative error in performance metrics, with specific weight values for aggregating these comparisons to obtain a final conclusion through a simple inequality test.
 
 
-\subsubsection{Distributed COINs}
+\subsubsection{Distributed extension}
 
+As previously mentioned, previous work mainly solves the problem of query answering scalability by distributing the knowledge graph embedding model across many compute units. Both data and model parallelism are almost fully achieved in this manner, however the acceleration is always only at best linear with respect to the number of machines available. As such, to scale to very large knowledge graphs a very large cluster of at least hundreds of machines is required. In this part of the thesis, I will suggest how to utilize available computation resources more efficiently through extending COINs to the distributed learning setting.
 
+Namely, the COINs submodel structure naturally permits partial model parallelism in addition to the acceleration incurred from the two-step inference process. The intra-community and inter-community models used during step 2 of the process are by design independent. This is due to the fact that each of those models trains and predicts over a disjoint subset of the knowledge graph edges. As such, Step 2 can be completely parallelized across multiple machines, by assigning for each intra-community or inter-community model a dedicated compute unit. The only unavoidable bottleneck is having to sequentially wait for the community prediction of Step 1 to finish, in order to have the information to which machine a data point needs to be communicated.
+
+The distributed COINs architecture is proposed to be as follows. Let $U$ be a finite set of compute units available to the application, and let $\mathcal{M} \subset \mathcal{F}$ be the full set of COINs submodels. The assignment of COINs models to units will be represented through the mapping $u: \mathcal{M} \to U$. First, select a machine $u^* \in U$ to serve as the \emph{leader} node. The leader performs Step 1, sends and receives data between itself and the other machines to orchestrate Step 2 and perfoms the final aggregation steps. Formally, we fix these assignments:
+$$u(g_V^{(C)})=u(g_R^{(C)})=u(g_P^{(C)})=u(g_I^{(C)})=u(g_R)=u(g_P)=u(g_I)=u(\mathbf{W})=u(\mathbf{w})=u(\mathbf{w}_R)=u^*.$$
+Then with this setup, Algorithm \ref{algorithm:coins_distributed} details the distributed version of Algorithms \ref{algorithm:coins}. For easier comparison, I color-highlight the required changes for the distributed extension.
+
+\begin{algorithm}[H]
+% \algsetup{linenosize=\tiny}
+% \scriptsize
+\caption{Distributed COINs knowledge graph representation}
+\label{algorithm:coins_distributed}
+\begin{algorithmic}[1]
+\STATE{\textcolor{blue}{\textbf{on} $u^*$:}}
+\STATE{\textbf{input} $(q, a)$, $y \in \{-1,1\}$, $c:V \to \mathcal{C}$, $z^*: V \to V_{\omega}^*$, $\alpha \in (0,1)$}
+\STATE{$\mathbf{R}^{(C)}=[g^{(C)}_R(r)]_{r \in R}, \tilde{\mathbf{R}}=[g_R(r)]_{r \in R}$}
+\STATE{$\mathbf{R} = \langle \mathrm{Softmax}(\mathbf{w}_R), [\mathbf{R}^{(C)}, \tilde{\mathbf{R}}] \rangle$}
+\STATE{$q^{(C)} = ([c(v)]_{v \in \mathcal{A}_q},G_q)$}
+\STATE{$\mathbf{a}^{(C)}=g^{(C)}_V(c(a)), \mathbf{A}^{(C)}=[g^{(C)}_V(k)]_{k \in \mathcal{A}^{(C)}_{q}}$}
+\STATE{$\mathbf{q}^{(C)}=G_{q}(\mathbf{A}^{(C)};(\mathbf{R}^{(C)},g_P^{(C)}),g_I^{(C)})$}
+\IF{$\forall v \in q, c(v)=c(a)$}
+\STATE{\textcolor{blue}{\textbf{async send} $(\mathcal{A}_q, a) \to u(g_V^{c(a)})$}}
+\STATE{\textcolor{blue}{\textbf{on } $u(g_V^{c(a)})$:}}
+\STATE{$\tilde{\mathbf{a}}=g^{(c(a))}_V(a), \tilde{\mathbf{A}}=[g^{(c(a))}_V(v)]_{v \in \mathcal{A}_{q}}$}
+\STATE{\textcolor{blue}{\textbf{async send} $(\tilde{\mathbf{A}}, \tilde{\mathbf{a}}) \to u^*$}}
+\ELSE
+\STATE{\textcolor{blue}{\textbf{async send} $(\mathcal{A}_q, a) \to u(g_V^{*})$}}
+\STATE{\textcolor{blue}{\textbf{on } $u(g_V^{*})$:}}
+\STATE{$\tilde{\mathbf{a}}=g^{*}_V(z^*(a)), \tilde{\mathbf{A}}=[g^{*}_V(z^*(v))]_{v \in \mathcal{A}_{q}}$}
+\STATE{\textcolor{blue}{\textbf{async send} $(\tilde{\mathbf{A}}, \tilde{\mathbf{a}}) \to u^*$}}
+\ENDIF
+\STATE{\textcolor{blue}{\textbf{on} $u^*$:}}
+\STATE{\textcolor{blue}{\textbf{sync wait} $(\tilde{\mathbf{A}}, \tilde{\mathbf{a}})$}}
+\STATE{$\mathbf{a} = \langle \mathrm{Softmax}(\mathbf{w}), [\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{(C)}, \tilde{\mathbf{a}}] \rangle, \mathbf{A}=\langle \mathrm{Softmax}(\mathbf{w}), [\mathbf{W} \mathbf{x}_{v}]_{v \in \mathcal{A}_{q}}, \mathbf{A}^{(C)}, \tilde{\mathbf{A}} \rangle$}
+\STATE{$\mathbf{q}=G_{q}(\mathbf{A};(\mathbf{R},g_P),g_I)$}
+\STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}(\mathbf{q}, \mathbf{a}, y)=(1-\alpha) \tilde{\mathcal{L}}(\mathbf{q}^{(C)}, \mathbf{a}^{(C)}, y) + \alpha \tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, y) $}
+\end{algorithmic}
+\end{algorithm} 
+
+The choice on which machine to assign to the inter-community model and each intra-community model is arbitrary, however there exists expectedly an optimal assignment in order to achieve the best scalability benefits. Interestingly, by optimizing the model-to-machine distribution in conjunction with the community sizes, one can achieve a cubic instead of quadratic overall acceleration. Proposition \ref{proposition:complexity_distributed} presents this new result, which extends Proposition \ref{proposition:complexity} to the distributed setting and whose proof I provide in Appendix \ref{sec:appendix_proofs}. The introduced changes to the single-machine computational complexity are highlighted for easier comparison.
+
+\begin{proposition}
+\label{proposition:complexity_distributed}
+    Let $N_{k,k}^{\text{test}}=|\{(q, a) \in \mathcal{D}_{\text{test}}|\forall v \in q, c(v)=c(a)=k\}|$ denote the number of intra-community evaluation samples with query nodes and answers in node group $k$. The largest number of query embedding vectors computed in parallel during distributed evaluation has the following form and bounds:
+\begin{equation}
+\label{eq:complexity_and_bounds_distributed}
+\frac{3}{2} N \sqrt[3]{2|V|} \leq KN+\textcolor{blue}{\max_{l=1}^{|U|}}{\left(\sum_{k=1}^{K}{|C_k|[N_{k,k}^{\text{test}}\textcolor{blue}{\mathbb{I}(u(g_V^k)=u_l)} + (N_k^{\text{test}}-N_{k,k}^{\text{test}})\textcolor{blue}{\mathbb{I}(u(g_V^*)=u_l)}]}\right)} \leq N \left(|V| + 1\right) 
+\end{equation}
+\end{proposition}
+
+The proof of the previous results explains that to achieve the best possible cost after parallelization of COINs, we must distribute equally the amount of work each machine will do for Step 2. With integer packet sizes however, this is called the \emph{balanced partition} problem, a known NP-hard variant of the 0-1 Knapsack problem. 
+
+In our case, we have an array of costs $\{p_k\}_{k=1}^{K+1}=\{|C_k|N_{k,k}^{\text{test}}\}_{k=1}^{K}\cup\{\sum_{k=1}^{K}{|C_k|(N_{k}^{\text{test}}-N_{k,k}^{\text{test}})}\}$ that have to be assigned to $|U|$ knapsacks, such that the maximal total amount in one knapsack is minimal. A brute-force algorithm checking all possible assignments would have a worst case cost of $O(|U|^{K+1})$, which is infeasible. There exists an alternative dynamic programming solution with the pseudo-polynomial complexity of $O((K+1)S^{|U|-1})$, where $S$ is the number of unique subset sums in $\{p_k\}_{k=1}^{K+1}$. However, in practice it is also often infeasible to run for $|U|\geq 3$. Thus, for this problem an inexact greedy algorithm can be preferred, as by simply assigning one-by-one the biggest packet to the least-filled knapsack one very closely approximates the optimal solution, with the much lower computation cost of $O((K+1)\log_2{(|U|(K+1)}))$. For completeness, in Appendix \ref{sec:appendix_balanced_partition_algs} we provide the pseudocode for the two assignment algorithms.
 
 \subsubsection{Experiment setup}
 
@@ -559,4 +612,4 @@ In this section we introduced COINs, a method for accelerating link prediction a
 % This first answer localization step was found to be very impactful on overall model performance. 
 We theoretically and empirically elaborated that the quality of the community structure of the knowledge graph has a broad-reaching influence on the possible scalability improvements provided by our method, as well as its prediction performance compared to baselines. As such, one can conclude that before selecting COINs to accelerate the embedding of a knowledge graph, it is important to study and evaluate its community structure. 
 
-The achieved impressive accuracy and acceleration benefits motivate strongly modeling and predicting over both the community-level coarsened version of a knowledge graph in addition to the local structures, no matter the task. We would apply both holistic and reductionist techniques to solve a knowledge graph problem perhaps otherwise computationally intractable.
+The achieved impressive accuracy and acceleration benefits motivate strongly modeling and predicting over both the community-level coarsened version of a knowledge graph in addition to the local structures, no matter the task. We would in such a way apply both holistic and reductionist techniques to solve a knowledge graph problem perhaps otherwise computationally intractable.

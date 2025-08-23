@@ -143,6 +143,105 @@ The better model is deemed the one with lower overall expected cost up until a c
     \end{align*}
 \end{proof}
 
+\begin{proof}[Proposition \ref{proposition:complexity_distributed}]
+    To explain the complexity, we note that in a parallel computing setting, where we assume equal computation power for each machine, the overall cost of Step 2 is equal to that of the machine who will do the most work (in this case the most node-level query-answer embeddings computed). The additional $KN$ term is the total cost of Step 1, which is not parallelized.
+
+    The largest overall cost is naturally achieved when $|U|=1$, i.e. we fall back to the single-machine setting without parallelization, thus the upper bound is the same as before.
+
+    The lower bound requires a new argument based on calculus. To start, the obvious lower bound to the maximum cost across machines is the minimum cost. We would achieve this lower bound when the max and min are equal, i.e. only when each machine does the same amount of work. In our case, this quantity is $\textcolor{blue}{\frac{1}{|U|}}\sum_{k=1}^{K}{|C_k|N_k^{\text{test}}}$. If we keep $|U|$ and $K$ fixed as constants, we can use the KKT result from the proof of Proposition \ref{proposition:complexity} and deduce that now the only extremal points will have the form $N(K+\frac{|V|}{K\textcolor{blue}{|U|}})$. Note that we have the constraints $1 \leq K \leq |V|$ and $1 \leq |U| \leq K$ (having more machines than communities is useless).
+
+    Let $f(K, |U|)=N(K+\frac{|V|}{K|U|})$. Then $\nabla f (K, |U|)=\left(\frac{\partial f}{\partial K},\frac{\partial f}{\partial |U|}\right)=\left(N(1-\frac{|V|}{K^2|U|}), -N\frac{|V|}{K|U|^2})\right)$.
+
+    Setting $\nabla f = (0, 0)$ yields that we must have $K^2|U|=|V|$ and $K|U|^2 \to \infty$, which is impossible with the constraints. So the only critical points can be boundary points:
+    \begin{itemize}
+        \item The corners $\{(1, 1), (|V|, 1), (|V|,|V|)\}$;
+        \item On the line $|U|=1$, we know $K=\sqrt{|V|}$ is a local minimum;
+        \item On the line $K=|V|$, $f(K, |U|)=N(|V|+\frac{1}{|U|})$ simply monotonically decreases with $|U|$, so there is no local minimum on this line;
+        \item On the line $|U|=K$, $f(K, |U|)=N(K+\frac{|V|}{K^2})$. So $\frac{d f}{d K}=N(1-\frac{2|V|}{K^3})$. Setting $\frac{d f}{d K}=0$ yields the local minimum $K=\sqrt[3]{2|V|}$ on this line.
+    \end{itemize}
+    So the full set of global minimum candidates is: $$(K^*, |U|^*) \in \{(1, 1), (|V|, 1), (|V|,|V|), (\sqrt{|V|}, 1), (\sqrt[3]{2|V|}, \sqrt[3]{2|V|}) \}.$$ Out of all of them, using both $\sqrt[3]{2|V|}$ communities and machines yields the minimal function value of $\frac{3}{2}N\sqrt[3]{2|V|}$.
+\end{proof}
+
+\section{Distributed COINs model distribution}
+\label{sec:appendix_balanced_partition_algs}
+
+Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the balanced partition problem using top-down dynamic programming, while Algorithm \ref{algorithm:balanced_partition_greedy} displays the scalable greedy method.
+
+\begin{algorithm}[H]
+\algsetup{linenosize=\tiny}
+\scriptsize
+\caption{Exact Balanced Partition}
+\label{algorithm:balanced_partition}
+\begin{algorithmic}[1]
+\STATE{\textbf{input} $\{p_k\}_{k=1}^{K+1}$, $U=\{u_1,u_2,\dots\}$}
+\STATE{$S=\sum_{k=1}^{K+1}{p_k}$}
+\STATE{MEMO$=\{\}$}
+\STATE{\textbf{function} MinCost($k$,$\{s_j\}_{j=1}^{|U|-1}$):}
+% \bindent
+\IF{$(k,\{s_j\}_{j=1}^{|U|-1})\notin$ MEMO}
+% \bindent
+\IF{$k=K+2$}
+% \bindent
+\STATE{$\mu=\max(\max_{j=1}^{|U|-1}{s_j},S-\sum_{j=1}^{|U|-1}{s_j})$}
+% \eindent
+\ELSE
+% \bindent
+\STATE{$\mu=$MinCost$(k+1,\{s_j\}_{j=1}^{|U|-1})$}
+\FOR{$i \leftarrow 1$ to $|U|-1$}
+% \bindent
+\STATE{$\mu=\min(\mu, $MinCost$(k+1,\{s_j\}_{j=1}^{i-1}\cup\{s_i+p_k\}\cup\{s_j\}_{j=i+1}^{|U|-1}))$}
+% \eindent
+\ENDFOR
+% \eindent
+\ENDIF
+% \eindent
+\STATE{MEMO$[(k,\{s_j\}_{j=1}^{|U|-1})]=\mu$}
+\ENDIF
+\RETURN{MEMO$[(k,\{s_j\}_{j=1}^{|U|-1})]$}
+% \eindent
+\STATE{\textbf{end} MinCost}
+\STATE{$\mu^*=$MinCost$(1, \{0\}_{j=1}^{|U|-1})$}
+\STATE{$\{s^*_j\}_{j=1}^{|U|-1}=\{0\}_{j=1}^{|U|-1})$}
+\FOR{$k \leftarrow 1$ to $K+1$}
+\STATE{$i^*=|U|$}
+\FOR{$i \leftarrow 1$ to $|U|-1$}
+\IF{MEMO$[(k+1, \{s^*_j\}_{j=1}^{i-1}\cup\{s^*_j+p_k\}\cup\{s^*_j\}_{j=i+1}^{|U|-1})]=\mu^*$}
+\STATE{$i^*=i$}
+\ENDIF
+\ENDFOR
+\STATE{$s_{i^*}^*=s_{i^*}^*+p_k$}
+\IF{$k=K+1$}
+\STATE{$u(g_V^*)=u_{i^*}$}
+\ELSE
+\STATE{$u(g_V^k)=u_{i^*}$}
+\ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+% \algsetup{linenosize=\tiny}
+% \scriptsize
+\caption{Greedy Balanced Partition}
+\label{algorithm:balanced_partition_greedy}
+\begin{algorithmic}[1]
+\STATE{\textbf{input} $\{p_k\}_{k=1}^{K+1}$, $U=\{u_1,u_2,\dots\}$}
+\STATE{$h_C=$MaxHeap($\{(p_k,k)\}_{k=1}^{K+1}$)}
+\STATE{$h_U=$MinHeap($\{(0,j)\}_{j=1}^{|U|-1}$)}
+\FOR{$l \leftarrow 1$ to $K+1$}
+\STATE{$(p_k^*,k^*)=$HeapPop($h_C$)}
+\STATE{$(s_i^*,i^*)=$HeapPop($h_U$)}
+\IF{$k^*=K+1$}
+\STATE{$u(g_V^*)=u_{i^*}$}
+\ELSE
+\STATE{$u(g_V^{k^*})=u_{i^*}$}
+\ENDIF
+\STATE{HeapPush($h_U,(s_i^*+p_k^*,i^*)$)}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+
 \section{Hyperparameters}
 \label{sec:appendix_hpars}
 

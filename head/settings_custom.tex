@@ -75,9 +75,13 @@
 % If you use the hyperref package, please uncomment the following two lines
 % to display URLs in blue roman font according to Springer's eBook style:
 \usepackage[breaklinks]{hyperref}
+\hypersetup{pdfborder={0 0 0},
+	colorlinks=true,
+	linkcolor=blue,
+	citecolor=blue,
+	urlcolor=blue}
+\urlstyle{same}
 \PassOptionsToPackage{hyphens}{url}
-\usepackage{color}
-\renewcommand\UrlFont{\color{blue}\rmfamily}
 % \urlstyle{rm}
 
 \usepackage{booktabs}						% professional-quality tables
@@ -96,7 +100,14 @@
 \allowdisplaybreaks
 \usepackage{algorithm}
 \usepackage{algorithmic}
-\usepackage{wrapfig}
+\newlength\myindent
+\setlength\myindent{2em}
+\newcommand\bindent{%
+  \begingroup
+  \setlength{\itemindent}{\myindent}
+  \addtolength{\algorithmicindent}{\myindent}
+}
+\newcommand\eindent{\endgroup}\usepackage{wrapfig}
 \raggedbottom
 
 \DeclareMathOperator*{\argmax}{arg\,max}
