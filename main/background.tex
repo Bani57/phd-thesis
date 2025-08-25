@@ -54,7 +54,7 @@ Analogously as for node degree, the notions of \emph{in-neighbourhood} and \emph
 \end{definition}
 
 \begin{definition}
-A \emph{path} in a graph $G=(V, E)$ is a sequence of nodes $v_1,\dots,v_M \in V$ in which every pair of consecutive nodes are connected by an edge:\\ $\forall i \in \{1,\dots,M-1\},(v_i,v_{i+1})\in E$. $M$ is referred to as the \emph{length} of the path.
+A \emph{path} in a graph $G=(V, E)$ is a sequence of nodes $v_1,\dots,v_n \in V$ in which every pair of consecutive nodes are connected by an edge:\\ $\forall i \in \{1,\dots,n-1\},(v_i,v_{i+1})\in E$. A \emph{cycle} is a path where $v_1=v_n$.
 \end{definition}
 
 \begin{definition}
@@ -71,21 +71,54 @@ A directed graph is \emph{strongly connected} if a path exists between all pairs
 
 \subsection{Importance measures}
 
-Network science teaches that networks have specific relevant computable attributes that can be used to analyse the network in order to summarize, characterize and model it. One class of these metrics deals with the problem of how to assign an \enquote{importance} score to nodes and edges, but different metrics encode different contexts in doing this.
+Network science teaches that networks have specific relevant computable attributes that can be used to analyze the network in order to summarize, characterize, and model it. One class of these metrics deals with the problem of how to assign an \enquote{importance} score to nodes and edges, but different metrics encode different contexts in doing this.
 
-For example, there exist several so-called \emph{centrality} indices that attempt to rank nodes or edges for different purposes, such as \emph{degree centrality}, \emph{betweenness centrality}, \emph{closeness centrality} etc. Generally, these metrics give more importance to nodes/edges, which contribute more to the graph's connectivity and are derived from the node degree, number of paths, or other elementary properties.
+For example, there exist several so-called \emph{centrality} indices that attempt to rank nodes or edges for different purposes, such as \emph{degree centrality}, \emph{betweenness centrality}, \emph{closeness centrality}, etc. Generally, these metrics give more importance to nodes/edges, which contribute more to the graph's connectivity and are derived from the node degree, number of paths, or other elementary properties.
 
 \begin{definition}
 The betweenness centrality of an edge is defined as the number of shortest paths in the graph that pass through (contain) that edge in ratio with the total number of shortest paths.
 \end{definition}
 
-The \emph{clustering coefficient} scores vertices on the number of connections present in their neighbourhood in ratio with the number of total possible. This measure is essential when comparing networks w.r.t. average local connectivity and gauge a rich community structure.
+The \emph{clustering coefficient} scores vertices on the number of connections present in their neighbourhood in ratio with the number of total possible. This measure is essential when comparing networks w.r.t. average local connectivity and gauging a rich community structure.
 
 \begin{definition}
 Given a graph $G=(V, E)$, the clustering coefficient $cc(v)$ is computed as: \begin{equation}
 cc(v)=\frac{|E'(v)|}{{|N(v)| \choose 2}} = \frac{2|E'(v)|}{|N(v)|(|N(v)|-1)},\end{equation}
 where $|E'(v)|$ is the number of edges in the subgraph $G'(v)=(N(v), E'(v))$ formed out of the neighbourhood of $v$, $N(v)$.
 \end{definition}
+
+More intricate algorithms for computing node importance in network science historically were devised by viewing the problem as a form of \enquote{edge flow}: for example, the flow of current in the context of physics or in the context of page ranking on the World Wide Web, traffic through hyperlinks. These algorithms have in common the idea that nodes start with an equal \enquote{amount of importance} in regards to some context, but this importance can continuously flow through the edges of the network. Depending on the network connectivity, in the end, the process will converge to some steady state, where each node has the correct amount of true importance. We will elaborate on two such well-established algorithms in computer science that were considered for this work.
+
+\paragraph{HITS} In 1999 \cite{kleinberg_authoritative_1999} described the Hyperlink-Induced Topic Search (HITS) algorithm for rating Web pages. The idea behind HITS stemmed from insight into creating web pages when the Internet was initially forming. The author defined two notions: a good \emph{hub} represents a page that points to many other pages, while a good \emph{authority} represents a page that is linked by many different hubs. By modelling the pages as nodes and the possible hyperlinks between them as edges, one can use the hubs and authorities scheme to construct an algorithm for computing two importance measures for the graph nodes: hub and authority values. Implementation-independent pseudocode for the process is given in Algorithm \ref{algorithm:hits}.
+
+\begin{algorithm}[H]
+\caption{Hubs and authorities}
+\label{algorithm:hits}
+\begin{algorithmic}
+\STATE{\textbf{input} graph $G = (V, E)$}
+\STATE{\textbf{initialize} $\forall v \in V, \pmb{h}_0(v) = \pmb{a}_0(v) = \frac{1}{|V|^2}$}
+\WHILE{convergence criteria not reached}
+\STATE{\textbf{update} $\forall v \in V, \pmb{h}_{t}(v) = \sum_{u \in N_{\text{out}}(v)}{\pmb{a}_{t-1}(u)}$}
+\STATE{\textbf{update} $\forall v \in V, \pmb{a}_{t}(v) = \sum_{u \in N_{\text{in}}(v)}{\pmb{h}_{t-1}(u)}$}
+\STATE{\textbf{normalize} $\forall v \in V, \pmb{h}_t(v) = \frac{\pmb{h}_t(v)}{||\pmb{h}_t||_2}, \pmb{a}_t(v) = \frac{\pmb{a}_t(v)}{||\pmb{a}_t||_2}$}
+\ENDWHILE
+\RETURN{final hub scores $\pmb{h} \in \mathbb{R}^{|V|}$, final authority scores $\pmb{a} \in \mathbb{R}^{|V|}$}
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{PageRank} Brin and Page published in \cite{brin_anatomy_1998} how their novel search engine works. They describe the PageRank algorithm for ranking Web pages, a technique for obtaining node importances extremely widespread in use even today. The underlying assumption employed by PageRank is that more important websites/nodes are likely to receive more links/edges from other important websites/nodes. Expressly, PageRank scores for nodes represent probabilities that a random walker (Web crawler) will end up at the nodes while also considering that this walker can teleport to a random node when reaching a dead end. Implementation-independent pseudocode for the process is given in Algorithm \ref{algorithm:pagerank}.
+
+\begin{algorithm}[H]
+\caption{PageRank}
+\label{algorithm:pagerank}
+\begin{algorithmic}
+\STATE{\textbf{input} adjacency matrix $A \in \mathbb{R}^{|V| \times |V|}$, teleportation probability $p \in [0,1]$}
+\STATE{\textbf{compute} $\forall i,j \in \{1,\dots,|V|\}, R_{ij} = \frac{A_{ji}}{\sum_{k=1}^{|V|}{A_{jk}}}$}
+\STATE{\textbf{compute} $M = (1-p)R + p \frac{1}{|V|}$}
+\STATE{\textbf{compute} $\pmb{r}$, eigenvector of $M$ associated to the largest eigenvalue}
+\RETURN{PageRank scores $\pmb{r} \in \mathbb{R}^{|V|}$}
+\end{algorithmic}
+\end{algorithm}
 
 % \subsection{Community structure}
 % Network science also focuses on analysing another common and important characteristic of graphs: community structure. In the context of networks, community structure details groups of nodes more densely connected internally than to other nodes. This inhomogeneity of connections would suggest that the network has certain natural divisions within it.
