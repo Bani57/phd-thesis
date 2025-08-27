@@ -76,13 +76,13 @@ Network science teaches that networks have specific relevant computable attribut
 For example, there exist several so-called \emph{centrality} indices that attempt to rank nodes or edges for different purposes, such as \emph{degree centrality}, \emph{betweenness centrality}, \emph{closeness centrality}, etc. Generally, these metrics give more importance to nodes/edges, which contribute more to the graph's connectivity and are derived from the node degree, number of paths, or other elementary properties.
 
 \begin{definition}
-The betweenness centrality of an edge is defined as the number of shortest paths in the graph that pass through (contain) that edge in ratio with the total number of shortest paths.
+The \emph{betweenness centrality} of an edge is defined as the number of shortest paths in the graph that pass through (contain) that edge in ratio with the total number of shortest paths.
 \end{definition}
 
-The \emph{clustering coefficient} scores vertices on the number of connections present in their neighbourhood in ratio with the number of total possible. This measure is essential when comparing networks w.r.t. average local connectivity and gauging a rich community structure.
+The clustering coefficient scores vertices on the number of connections present in their neighbourhood in ratio with the number of total possible. This measure is essential when comparing networks w.r.t. average local connectivity and gauging a rich community structure.
 
 \begin{definition}
-Given a graph $G=(V, E)$, the clustering coefficient $cc(v)$ is computed as: \begin{equation}
+Given a graph $G=(V, E)$, the \emph{clustering coefficient} $cc(v)$ is computed as: \begin{equation}
 cc(v)=\frac{|E'(v)|}{{|N(v)| \choose 2}} = \frac{2|E'(v)|}{|N(v)|(|N(v)|-1)},\end{equation}
 where $|E'(v)|$ is the number of edges in the subgraph $G'(v)=(N(v), E'(v))$ formed out of the neighbourhood of $v$, $N(v)$.
 \end{definition}
@@ -120,15 +120,21 @@ More intricate algorithms for computing node importance in network science histo
 \end{algorithmic}
 \end{algorithm}
 
-% \subsection{Community structure}
-% Network science also focuses on analysing another common and important characteristic of graphs: community structure. In the context of networks, community structure details groups of nodes more densely connected internally than to other nodes. This inhomogeneity of connections would suggest that the network has certain natural divisions within it.
+\subsection{Community structure}
+Network science also focuses on analysing another common and important characteristic of graphs: community structure. In the context of networks, community structure details groups of nodes more densely connected internally than to other nodes. This inhomogeneity of connections would suggest that the network has certain natural divisions within it.
 
-% \emph{Communities} are classically defined as a disjoint partition of the node-set, however in some contexts allowing overlapping communities can also be relevant. For this work, the traditional definition was used.
-% \begin{definition}
-% Given a graph $G = (V, E)$, its \emph{community structure} is defined by the sequence of sets $C_1, \dots, C_K$, called communities, for which it holds that \\ $\forall k \in {1,\dots,K}, C_k \subseteq V$, $\bigcup_{k=1}^{K}{C_k}=V$ and $\forall i,j \in {1,\dots,K},i \neq j, C_i \cap C_j = \emptyset$.
-% \end{definition} 
+\emph{Communities} are classically defined as a disjoint partition of the node set; however, in some contexts, allowing overlapping communities can also be relevant.
+\begin{definition}
+Given a graph with a set of nodes $V$, \emph{communities} are node sets $C_1, \dots, C_K$ that form a \emph{covering} of $V$: $C_1, \dots, C_K \subseteq V$, $\bigcup_{j=1}^{K}{C_j} = V$. In the more common \emph{disjoint} case, the communities form a disjoint partitioning of $V$: $\bigcap_{j=1}^{K}{C_j}=\emptyset$. However, this is not true in general, where \emph{overlapping regions} might exist between communities: $\exists j,k \in \{1,\dots,K\}$, $j \neq k$, such that $O_{j,k} = C_j \cap C_k \neq \emptyset$.
+\end{definition} 
 
-% For the model presented in this work, finding an underlying community structure in the input network is vital for several reasons. Communities allow our model to create a large-scale map of the network, as individual communities can be viewed as meta-nodes linked with meta-edges according to the inter-community connectivity of the data. In addition, in real-world networks, such as the Swisscom knowledge graph, community structure is often strongly present. Communities can have meaning beyond just structural units of the graph and paint a clearer picture of the system. However, the most crucial point is that communities can often have very different properties than the average properties of the networks, so models that take these local deviations into account should be more robust.
+For the models presented in this thesis, finding an underlying community structure in the input network is vital for several reasons. Communities allow our model to create a large-scale map of the network, as individual communities can be viewed as meta-nodes linked with meta-edges according to the inter-community connectivity of the data. In addition, in real-world networks, such as the Swisscom knowledge graph, community structure is often strongly present.
+
+\begin{definition}
+    Given a graph $G=(V,E)$ with community sets $C_1, \dots, C_K$, \emph{graph coarsening} involves constructing a new community-level interaction graph according to the node-to-community memberships and original edges. Formally, we output $G^C=(V^C,E^C)$, where $V^C=\{C_1,\dots,C_K\}$ and $E^C=\{(C_k,C_l)|\exists (v,u) \in E,v \in C_k \wedge u \in C_l\}$.
+\end{definition}
+
+Communities can have meaning beyond just structural units of the graph and paint a clearer picture of the system. However, the most crucial point is that communities can often have very different properties than the average properties of the networks, so models that take these local deviations into account should be more robust. Community detection and graph coarsening are the two key processes that allow us to employ both holistic and reductionist views and models of graph data.
 
 
 % \subsection{Random walks}
