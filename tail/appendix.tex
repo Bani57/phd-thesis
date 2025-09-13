@@ -654,3 +654,96 @@ All code was executed on a single machine with the following specifications:
 
 
 
+
+\chapter{Appendix for HiGenDiff}
+
+\section{Proofs}
+\label{sec:appendix_higendiff_theory}
+
+\begin{proof}[Proposition~\ref{proposition:complexity_higendiff}]
+Let $\{c^{(L)}_k\}_{k=1}^{n^{(L+1)}}$ be the sizes of the communities imposed by $M^{(L)}$, i.e., $\forall k, c^{(L)}_k=\sum_{i=1}^{n^{(L)}}{M^{(L)}_{k,i}}$. Then the worst-case cost of one diffusion step of HiGenDiff for a given adjacency matrix $A^{(L)}$ will be thus ${n^{(L+1)}}^2 + \sum_{j=1}^{n^{(L+1)}}\sum_{k=1}^{n^{(L+1)}}{c^{(L)}_j c^{(L)}_k \bar{A}_{j,k}^{(L+1)}}$. This is because we need to sample all the edges of the parent graph and then sample all communities and the bipartites that should exist, according to the parent level's adjacency. Since all the above quantities are random variables, under the i.i.d. Bernoulli assumption the expectation yields:
+\begin{align}
+    \begin{split}
+        \mathbb{E}[{n^{(L+1)}}^2 + \sum_{j=1}^{n^{(L+1)}}\sum_{k=1}^{n^{(L+1)}}{c^{(L)}_j c^{(L)}_k \bar{A}_{j,k}^{(L+1)}}] 
+        &= \mathbb{E}[{n^{(L+1)}}^2]+\sum_{j=1}^{n^{(L+1)}}\sum_{k=1}^{n^{(L+1)}}{\mathbb{E}[c^{(L)}_j c^{(L)}_k] \mathbb{E}[\bar{A}_{j,k}^{(L+1)}]} \\
+        &= \mathbb{E}[{n^{(L+1)}}^2]+p\sum_{j=1}^{n^{(L+1)}}\sum_{k=1}^{n^{(L+1)}}{(\mathrm{Cov}[c^{(L)}_j,c^{(L)}_k]+\mathbb{E}[c^{(L)}_j]\mathbb{E}[c^{(L)}_k])} \\
+        &= \mathbb{E}[{n^{(L+1)}}^2]+p(\mathrm{Cov}[\sum_{j=1}^{n^{(L+1)}}{c^{(L)}_j},\sum_{k=1}^{n^{(L+1)}}{c^{(L)}_k}]+\mathbb{E}[\sum_{k=1}^{n^{(L+1)}}{c^{(L)}_k}]^2)\\
+         &= \mathbb{E}[{n^{(L+1)}}^2] +p (\mathbb{V}[n^{(L)}]+\mathbb{E}[n^{(L)}]^2) \\
+          &= \mathbb{E}[{n^{(L+1)}}^2] + p\mathbb{E}[{n^{(L)}}^2]
+    \end{split}
+\end{align}
+For the upper bound, note that always $p \leq 1$ and $n^{(L+1)} \leq n^{(L)}$.
+
+For the lower bound, we know that $p \geq \frac{1}{n^{(L+1)}}$, as in the best case, there will not be a single bipartite to generate, but we always have to sample the communities (the self-loops in the parent). Thus taking the expectation of $p$ w.r.t. $n^{(L)}$ implies: $\mathbb{E}[{n^{(L+1)}}^2] +p\mathbb{E}[{n^{(L)}}^2] \geq \mathbb{E}[{n^{(L+1)}}^2 + \frac{{n^{(L)}}^2}{n^{(L+1)}}]$. Similar to the proof of Proposition \ref{proposition:complexity_distributed}, we find that the minimum of the function $f(K)=K^2+\frac{|V|}{K}$ is $\frac{3}{2}\sqrt[3]{2|V|^2}$ and is achieved when $K=\frac{1}{2}\sqrt[3]{4|V|}$. Plugging in $|V|={n^{(L)}}^2$ and $K=n^{(L+1)}$ yields the result.
+\end{proof}
+
+\section{Detailed results}
+\label{sec:appendix_higendiff_results}
+
+\begin{table}[H]
+    \centering
+\caption[All MMD metrics for HiGenDiff.]{All MMD metrics (lower is better) for HiGenDiff of the model ablation experiments for each dataset.}
+\label{tab:higendiff_full}
+\begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{lllrrrr}
+\toprule
+ &  &  & Degree MMD & Cluster MMD & Orbit MMD & Spectral MMD \\
+Dataset & Model & Bucketized &  &  &  &  \\
+\midrule
+\multirow[t]{5}{*}{enzyme} & Simple & No & 0.002 & 0.018 & 0.046 & 0.008 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Integer} & No & 0.007 & 0.019 & 0.048 & 0.01 \\
+ &  & Yes & 0.004 & 0.016 & 0.025 & 0.005 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Ordinal} & No & 0.007 & 0.018 & 0.034 & 0.007 \\
+ &  & Yes & 0.004 & 0.019 & 0.043 & 0.008 \\
+% \cline{1-7} \cline{2-7}
+\midrule
+\multirow[t]{5}{*}{SBM} & Simple & No & 0.002 & 0.03 & 0.044 & 0.004 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Integer} & No & 0.001 & 0.028 & 0.047 & 0.004 \\
+ &  & Yes & 0.001 & 0.027 & 0.04 & 0.004 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Ordinal} & No & 0.001 & 0.029 & 0.046 & 0.004 \\
+ &  & Yes & 0.001 & 0.03 & 0.068 & 0.005 \\
+% \cline{1-7} \cline{2-7}
+\midrule
+\multirow[t]{5}{*}{Ego2} & Simple & No & 0.002 & 0.06 & 0.036 & 0.005 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Integer} & No & 0.002 & 0.065 & 0.033 & 0.003 \\
+ &  & Yes & 0.002 & 0.055 & 0.053 & 0.007 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Ordinal} & No & 0.011 & 0.064 & 0.035 & 0.02 \\
+ &  & Yes & 0.002 & 0.059 & 0.042 & 0.004 \\
+% \cline{1-7} \cline{2-7}
+\midrule
+\multirow[t]{5}{*}{DD2} & Simple & No & 0.004 & 0.08 & 0.024 & 0.005 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Integer} & No & 0.009 & 0.092 & 0.05 & 0.007 \\
+ &  & Yes & 0.013 & 0.109 & 0.035 & 0.008 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Ordinal} & No & 0.002 & 0.072 & 0.112 & 0.007 \\
+ &  & Yes & 0.008 & 0.09 & 0.031 & 0.007 \\
+% \cline{1-7} \cline{2-7}
+\midrule
+\multirow[t]{5}{*}{RoC} & Simple & No & 0.003 & 0.218 & 0.002 & 0.027 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Integer} & No & 0.013 & 0.312 & 0.014 & 0.044 \\
+ &  & Yes & 0.008 & 0.266 & 0.018 & 0.039 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Ordinal} & No & 0.015 & 0.297 & 0.029 & 0.044 \\
+ &  & Yes & 0.01 & 0.298 & 0.019 & 0.041 \\
+% \cline{1-7} \cline{2-7}
+\midrule
+\multirow[t]{5}{*}{LFR} & Simple & No & 0.022 & 0.214 & 0.12 & 0.004 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Integer} & No & 0.103 & 0.309 & 0.448 & 0.055 \\
+ &  & Yes & 0.037 & 0.05 & 0.162 & 0.012 \\
+% \cline{2-7}
+ & \multirow[t]{2}{*}{Ordinal} & No & 0.086 & 0.202 & 0.364 & 0.042 \\
+ &  & Yes & 0.023 & 0.33 & 0.184 & 0.009 \\
+% \cline{1-7} \cline{2-7}
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}

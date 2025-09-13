@@ -5,7 +5,7 @@
 
 In this section we present a new method, called COINs for \textbf{CO}mmunity \textbf{IN}formed graph embedding\textbf{s}, to enhance the efficiency of knowledge graph models for link prediction and conjunctive query answering. COINs uses a community-detection-based graph data augmentation and a two-step prediction pipeline: we first achieve node localization through community prediction, and subsequently, we further localize within the predicted community. We establish theoretical criteria to evaluate our method in our specific context and establish a direct expression of the reduction in time complexity. We empirically demonstrate an important scalability-performance trade-off where for the median evaluation sample we preserve 97.18\% of the baseline accuracy in single-hop query answering, for only 7.52\% of the original computational cost on a single-CPU-GPU machine. 
 
-The work in this section has been published as .
+The work in this section has been accepted for publication as \cite{janchevski_coins_2025}.
 
 \subsection{Motivation}
 %Knowledge graphs have recently attracted significant attention from both industry and academia in scenarios that require exploiting large-scale heterogeneous data collections. 
@@ -470,7 +470,7 @@ Binary classification evaluation metrics are utilized for the link prediction ta
 
 \subsubsection{Communities \& Scalability}
 
-Table~\ref{tab:datasets} summarizes the three knowledge graphs via their basic statistics, as well as those of the community partitioning that we managed to obtain. We present the computational complexity improvements via the \emph{acceleration} factor: ratio of the number of query embeddings computed during evaluation between the baseline and COINs. On the other hand, the effects on model complexity can be analyzed via the ratio of total composing node embeddings between COINs and baseline models, referenced as the \emph{overparametrization} factor. 
+Table~\ref{tab:datasets} summarizes the three knowledge graphs via their basic statistics, as well as those of the best-performing community partitioning that we managed to obtain. We present the computational complexity improvements via the \emph{acceleration} factor: ratio of the number of query embeddings computed during evaluation between the baseline and COINs. On the other hand, the effects on model complexity can be analyzed via the ratio of total composing node embeddings between COINs and baseline models, referenced as the \emph{overparametrization} factor. 
 
 \begin{table}[H]
   \caption[Knowledge graph datasets summary.]{Knowledge graph datasets summary. Left to right: number of nodes, edges, node features, edge types, communities, inter-community nodes; acceleration factor (decrease in evaluation time complexity, higher is better), overparametrization factor (increase in memory complexity, lower is better).}

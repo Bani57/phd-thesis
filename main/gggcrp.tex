@@ -33,7 +33,7 @@ This research is still ongoing, to attempt to answer remaining questions posed b
 \subsubsection{Preliminaries}
 
 \begin{definition}
-    Given a set of samples $\mathcal{D}=\{(\mathbf{X}_i)\}_{i=1}^{N}$, with $\mathbf{X}_i \in \mathbb{R}^F$, a \emph{generative model} $\mathcal{M}=\{f,g\}$ models sample likelihoods as $\mathbb{P}(\mathbf{X} \in \mathcal{D})=\sigma(f(\mathbf{X}))$ with $f: \mathbb{R}^F \times \to \mathbb{R}$, and generates new samples from the dataset as $\hat{\mathbf{X}}=g(Z)$, from sampled latent noise $Z\in\mathbb{R}^D$ with $g_n:\mathbb{R}^D \to \mathbb{R}^F$. The optimal sampler $g$ is found most commonly by minimizing the expected \emph{negative log-likelihood loss}:
+    Given a set of samples $\mathcal{D}=\{(\mathbf{X}_i)\}_{i=1}^{N}$, with $\mathbf{X}_i \in \mathbb{R}^F$, a \emph{generative model} $\mathcal{M}=\{f,g\}$ models sample likelihoods as $\mathbb{P}(\mathbf{X} \in \mathcal{D})=\sigma(f(\mathbf{X}))$ with $f: \mathbb{R}^F \to \mathbb{R}$, and generates new samples from the dataset as $\hat{\mathbf{X}}=g(Z)$, from sampled latent noise $Z\in\mathbb{R}^D$ with $g_n:\mathbb{R}^D \to \mathbb{R}^F$. The optimal sampler $g$ is found most commonly by minimizing the expected \emph{negative log-likelihood loss}:
     \begin{equation}
         g^*=\argmin_{g}{\mathbb{E}_{\mathcal{D},Z}[-\log{\mathbb{P}(g(Z) \in \mathcal{D})}]}=\argmin_{g}{\mathbb{E}_{\mathcal{D},Z}[-\log{\sigma(f(g(Z)))}]}
     \end{equation}
@@ -139,19 +139,19 @@ Recall that in order for GG-GAN's generator to be robust to variation in graph s
 Instead of just the maximum graph size, the full list of estimated order statistics is now:
 \begin{itemize}
 \item Maximum graph size: $n_{\max}=\max_{i=1}^{N}{n_i}$
-\item Maximum number of communities: $$k_{\max}=\max_{i=1}^{N}{k_i}$$
-\item Maximum community size: $$c_{\max}=\max_{i=1}^{N}\max_{k=1}^{k_i}{c_{i,k}}$$
-\item Maximum overlapping region size: $$o_{\max}=\max_{i=1}^{N}\max_{j=1}^{k_i}\max_{k=1}^{k_i}{O_{i,j,k}}$$
+\item Maximum number of communities: $k_{\max}=\max_{i=1}^{N}{k_i}$
+\item Maximum community size: $c_{\max}=\max_{i=1}^{N}\max_{k=1}^{k_i}{c_{i,k}}$
+\item Maximum overlapping region size: $o_{\max}=\max_{i=1}^{N}\max_{j=1}^{k_i}\max_{k=1}^{k_i}{O_{i,j,k}}$
 \end{itemize}
 
 The full list of random variables and vectors that need to be modeled and sampled for GGG-CRP is:
 
 \begin{itemize}
 \item Number of nodes / graph size: $n \in \mathbb{N}_{n_{\max}}$
-\item Number of overlapping region cardinalities: $$K^c \in \mathbb{N}_{k_{\max}}$$
-\item Number of nodes per cardinality: $$N^c \in (\mathbb{N}_{n_{\max}} \cup \{0\})^{k_{\max}}$$
-\item Number of communities per cardinality: $$K \in \mathbb{N}_{k_{\max}}^{k_{\max}}$$
-\item Overlapping region size: $$O \in (\mathbb{N}_{o_{\max}} \cup \{0\})^{k_{\max} \times k_{\max}}$$
+\item Number of overlapping region cardinalities: $K^c \in \mathbb{N}_{k_{\max}}$
+\item Number of nodes per cardinality: $N^c \in (\mathbb{N}_{n_{\max}} \cup \{0\})^{k_{\max}}$
+\item Number of communities per cardinality: $K \in \mathbb{N}_{k_{\max}}^{k_{\max}}$
+\item Overlapping region size: $O \in (\mathbb{N}_{o_{\max}} \cup \{0\})^{k_{\max} \times k_{\max}}$
 \end{itemize}
 
 The collection of graph meta-variables is thus $(N, K^c, N^c, K, O)$ and to generalize GG-GAN's approach, is modeled with a jointly-categorical distribution $\mathcal{F}$ whose probabilities are estimated from the data as relative frequencies. In this manner, no independence assumptions are introduced, though for larger graphs, due to potential memory issues, a sparse implementation of the estimated probability tensors is recommended.
@@ -159,7 +159,7 @@ The collection of graph meta-variables is thus $(N, K^c, N^c, K, O)$ and to gene
 \paragraph{Graph meta-variable sampling}
 
 The pseudocode of the full meta-variable sampling algorithm for GGG-CRP is given in Algorithm \ref{algorithm:graph_meta_sampling}. Note: a subscripted $\mathcal{F}$ in the pseudocode denotes a marginalized version of the joint meta-variable distribution.
-\begin{algorithm}[t!]
+\begin{algorithm}[H]
 \caption{Graph meta-variable sampling}
 \label{algorithm:graph_meta_sampling}
 \begin{algorithmic}
@@ -172,12 +172,12 @@ The pseudocode of the full meta-variable sampling algorithm for GGG-CRP is given
 \STATE{\textbf{sample} membership: $M_{i,\mathcal{N}_{i,j}} \sim \text{BipartiteGraphDistribution}(j \cdot 1_{N^c_{i,j}},O_{i,j})$}
 \ENDFOR
 \STATE{\textbf{compute} number of communities: $K_i = \max_{j=1}^{k_{\max}}{K_{i, j}}$}
-\STATE{\textbf{compute} community sizes: $C_i = O^T_i \cdot 1_{k_{\max}}$}
-\RETURN{$n_i, K_i, C_i, O_i, M_i$}
+\STATE{\textbf{compute} community sizes: $c_i = O^T_i \cdot 1_{k_{\max}}$}
+\RETURN{$n_i, K_i, c_i, O_i, M_i$}
 \end{algorithmic}
 \end{algorithm} 
 
-$\text{PartitionDistribution}(n,m,p)$ denotes the distribution over partitions of the integer $n$ into exactly $m$ parts, where $p$ is a probability distribution over the possible sizes of the parts in $\mathbb{N}_{n}$. \cite{fristedt_structure_1993} gives an algorithm that performs partition sampling, with the guarantee of the least amount of rejections and $\text{PartitionDistribution}(n,m,\text{Uniform}) \sim \text{Uniform}$, i.e., it is also provably unbiased in the case of uniform part size probabilities. Unfortunately, in the general scenario for our model, $p$ is not uniform if we wish to be robust to any region size distribution. Therefore, instead of this algorithm, we employed general rejection sampling. Further work might show how to extend Fristedt's guarantees to general part size distributions.
+$\text{PartitionDistribution}(n,m,p)$ denotes the distribution over partitions of the integer $n$ into exactly $m$ parts, where $p$ is a probability distribution over the possible sizes of the parts in $\mathbb{N}_{n}$. Fristedt in \cite{fristedt_structure_1993} gives an algorithm that performs partition sampling, with the guarantee of the least amount of rejections and $\text{PartitionDistribution}(n,m,\text{Uniform}) \sim \text{Uniform}$, i.e., it is also provably unbiased in the case of uniform part size probabilities. Unfortunately, in the general scenario for our model, $p$ is not uniform if we wish to be robust to any region size distribution. Therefore, instead of this algorithm, we employed general rejection sampling. Further work might show how to extend Fristedt's guarantees to general part size distributions.
     
 $\text{BipartiteGraphDistribution}(a,b)$ denotes the uniform distribution over all bipartite graphs with the two degree sequences $a$ and $b$. We can observe that each node-chunk membership matrix indeed can be viewed as a bipartite graph, where the other graph meta-variables represent its node and chunk degree sequences. The membership matrix of each graph has to be randomly sampled, as there are usually multiple valid solutions to the assignment problem. 
     
@@ -186,12 +186,12 @@ To sample a uniform random bipartite graph with degree constraints, one can empl
 \subsubsection{Exchangeable graph generation agnostic to community structure}
 As stated above, to utilize the benefits of exchangeable autoregressive models, instead of single-shot graph generation, we will employ a block-by-block CRP-inspired technique. The generation will thus take place in multiple \emph{rounds}, such that in each round the edges incident to the nodes in one block will be generated. In this manner, the generated graph sequentially grows to its target size.
 
-The first crucial decision is thus how to perform the block assignment of nodes, and as also stated above, the computed overlapping communities will serve the role of CRP blocks. Formally, given graph meta-data $(n_i, K_i, C_i, O_i, M_i)$, computed from the dataset or sampled, we compute the community sets $\mathcal{C}_{i,1},\dots,\mathcal{C}_{i,K_i} \subseteq \mathbb{N}_{n_i}$ according to the given membership matrix: $$\forall k \in \mathbb{N}_{K_i},\mathcal{C}_{i,k}=\{l \in \mathbb{N}_{n_i}| M_{i,l,k} = 1\}$$
+The first crucial decision is thus how to perform the block assignment of nodes, and as also stated above, the computed overlapping communities will serve the role of CRP blocks. Formally, given graph meta-data $(n_i, K_i, c_i, O_i, M_i)$, computed from the dataset or sampled, we compute the community sets $C_{i,1},\dots,C_{i,K_i} \subseteq \mathbb{N}_{n_i}$ according to the given membership matrix: $$\forall k \in \mathbb{N}_{K_i},C_{i,k}=\{l \in \mathbb{N}_{n_i}| M_{i,l,k} = 1\}$$
 
 GGG-CRP's generator now computes the root for each block/round separately, by collecting the latent points according to the block assignment:
 \begin{align*}
 &\forall k \in \mathbb{N}_{k_{\max}}, \forall l \in \mathbb{N}_{c_{\max}}, \\
-R_{i,l}^{(k)} &= \begin{cases} z_i||\Phi_{i,\mathcal{C}_{i,k,l}}, & l \leq C_{i,k} \\ 0, & \text{otherwise} \end{cases}
+R_{i,l}^{(k)} &= \begin{cases} z_i||\Phi_{i,C_{i,k,l}}, & l \leq c_{i,k} \\ 0, & \text{otherwise} \end{cases}
 \end{align*}
 The autoregressive architecture of GGG-CRP is facilitated through a new edge readout function $r'$, modified to accept the discriminator features of the current graph in addition to the trunk's output for the current block. 
 
@@ -202,10 +202,10 @@ With this setup in mind, GGG-CRP's generator pipeline design is given in Algorit
 \label{algorithm:crp_generator}
 \begin{algorithmic}
 \STATE{\textbf{initialize} first graph: $A_{i}^{(1)} = r(t(R_{i}^{(1)}))$}
-\STATE{\textbf{initialize} prior: $X_{i}^{(1)} = R_{i}^{(1)}$}
+\STATE{\textbf{initialize} prior: $\hat{\mathbf{X}}_{i}^{(1)} = R_{i}^{(1)}$}
 \FOR{round $k \gets 2$ to $k_{\max}$}
-\STATE{\textbf{update} graph: $A_{i}^{(k)} = r'(t(R_{i}^{(k)}),X_{i}^{(k-1)})$}
-\STATE{\textbf{update} prior: $X_{i}^{(k)} = d_f(A_{i}^{(k)})$}
+\STATE{\textbf{update} graph: $A_{i}^{(k)} = r'(t(R_{i}^{(k)}),\hat{\mathbf{X}}_{i}^{(k-1)})$}
+\STATE{\textbf{update} prior: $\hat{\mathbf{X}}_{i}^{(k)} = d_f(A_{i}^{(k)})$}
 \ENDFOR
 \RETURN{final generated graph $A_i = A_{i}^{(k_{\max})}$}
 \end{algorithmic}
@@ -248,7 +248,7 @@ Table \ref{tab:expressive_power} contains the MMD scores obtained by the current
 %\adjustbox{width=0.475\textwidth}{
 \begin{tabular}{llrr}
 \toprule
-Dataset & Metric MMD & GG-GAN & GG-CRP \\
+Dataset & Metric MMD & GG-GAN & GGG-CRP \\
 \midrule
 QM9 & Degree & 0.0038 & 0.1079\\
 QM9 & Cluster & 0.0341 & 0.0234 \\
@@ -331,7 +331,7 @@ HouseFloorplan & / & 3868 \\
 
 We do note another positive behaviour of the GGG-CRP model observed during the training phase: for the Community20 graphs, which possess a very clear community structure, the convergence time compared to the base model was greatly decreased. Less than ten epochs yielded a stable Wasserstein score to obtain the displayed visual results. Autoregressive models in general are known to show greater performance when such graph structures are present, and we are pleased that these benefits are also obtained for our model.
 
-% Due to time constraints, at the time of writing the parameter validation phase for the GG-CRP model unfortunately is in its infancy and the presented results reflect this. However, we believe these initial findings show potential for immediate improvement following extensive testing in future work.
+% Due to time constraints, at the time of writing the parameter validation phase for the GGG-CRP model unfortunately is in its infancy and the presented results reflect this. However, we believe these initial findings show potential for immediate improvement following extensive testing in future work.
 
 \subsection{Summary}
 \label{sec:conclusion}

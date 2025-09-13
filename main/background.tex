@@ -69,6 +69,21 @@ Between a pair of nodes in a graph, there might be more than one or no paths, de
 A directed graph is \emph{strongly connected} if a path exists between all pairs of nodes in the graph. A directed graph is \emph{weakly connected} if a path exists between all pairs of nodes in the undirected graph obtained by converting all of the edges of the original directed graph in undirected form. If a whole directed graph is not strongly/weekly connected, but a subgraph is, this subgraph is called a \emph{strongly/weakly connected component} of the original graph, respectively.
 \end{definition}
 
+\begin{definition}
+    Given an adjacency matrix $A \in \{0,1\}^{|V|\times|V|}$ of a graph $G=(V, E)$, its \emph{spectral decomposition} is computed as $L=U \Sigma U^T$, where the matrix $L\in\mathbb{Z}^{|V|\times|V|}$ is referred to as the \emph{graph Laplacian}, with: 
+    \begin{equation}
+        L_{ij}=\begin{cases}
+            d(v_i)-A_{ij}, & i=j \\
+            -A{ij}, & i\neq j
+        \end{cases}
+    \end{equation}
+    $\{\Sigma_{ii}\}_{i=1}^{|V|}$ is thus the set of \emph{graph eigenvalues} and $\{U^T_{i}\}_{i=1}^{|V|}$ the set of all \emph{graph eigenvectors}.
+\end{definition}
+
+\begin{definition}
+    Given a graph $G=(V,E)$, the \emph{orbits} of the graph are the sets $V_1,V_2,\dots,V_n$ that are the equivalence classes of the graph's automorphism $\pi:V \to V$. Namely, $\bigcup_{i=1}^{n}{V_i}=V$, $\forall i\neq j, V_i \cap V_j=\emptyset$ and $V_u=\{v \in V|\pi(v)=\pi(u)\}$. We usually are interested only in the \emph{orbit distribution}, the orbit sizes $\{|V_i|\}_{i=1}^{n}$.
+\end{definition}
+
 \subsection{Importance measures}
 
 Network science teaches that networks have specific relevant computable attributes that can be used to analyze the network in order to summarize, characterize, and model it. One class of these metrics deals with the problem of how to assign an \enquote{importance} score to nodes and edges, but different metrics encode different contexts in doing this.
@@ -200,7 +215,7 @@ Before delving further, we will give an example. One of the simplest models we c
 The general linear model is an example of a typical model that is said to be able to perform \emph{regression} - prediction of real-valued continuous output. When the output space is a \emph{discrete} set, we refer to that prediction problem as \emph{classification}. Instead of the MSE loss, the cross-entropy loss function is chosen for classification problems.
 
 \begin{definition}
-Given a discrete output space $\mathcal{Y}=\{1,\dots,D\}$, we define the \emph{cross-entropy loss} as: $\text{CrossEntropy}: [0, 1]^D \times \mathcal{Y} \to \mathcal{R}$, such that:
+Given a discrete output space $\mathcal{Y}=\{1,\dots,D\}$, we define the \emph{cross-entropy loss} as: $\text{CrossEntropy}: [0, 1]^D \times \mathcal{Y} \to \mathbb{R}$, such that:
 \begin{equation}
 \forall \hat{\pmb{y}} \in [0, 1]^D, y \in \mathcal{Y}, \text{CrossEntropy}(\hat{\pmb{y}},y)= - \log{\left(\frac{e^{\hat{y}_y}}{\sum_{d=1}^{D}{e^{\hat{y}_d}}}\right)}\end{equation}
 \end{definition}
