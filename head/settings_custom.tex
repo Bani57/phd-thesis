@@ -72,14 +72,17 @@
 
 % *********** The end is near ***********
 
+\definecolor{darkred}{rgb}{0.75, 0.0, 0.0}
+\definecolor{crimson}{rgb}{0.86, 0.08, 0.24}
+
 % If you use the hyperref package, please uncomment the following two lines
 % to display URLs in blue roman font according to Springer's eBook style:
 \usepackage[breaklinks]{hyperref}
 \hypersetup{pdfborder={0 0 0},
 	colorlinks=true,
-	linkcolor=blue,
-	citecolor=blue,
-	urlcolor=blue}
+    citecolor=darkred,
+    linkcolor=darkred,
+    urlcolor=crimson}
 \urlstyle{same}
 \PassOptionsToPackage{hyphens}{url}
 % \urlstyle{rm}
@@ -119,10 +122,39 @@
 \newtheorem{proposition}{Proposition}
 \theoremstyle{plain}
 \newtheorem{lemma}{Lemma}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
 
 \numberwithin{lemma}{section}
 \numberwithin{proposition}{section}
 \numberwithin{definition}{section}
+\numberwithin{theorem}{section}
 \numberwithin{figure}{section}
 \numberwithin{table}{section}
 \numberwithin{algorithm}{section}
+
+\relpenalty=10000
+\binoppenalty=10000
+
+% \usepackage{nath}
+
+\newcommand{\of}[1]{\mathopen{}\left(#1\right)}
+\newcommand{\off}[1]{\mathopen{}\left[#1\right]}
+\newcommand{\offf}[1]{\mathopen{}\left\{#1\right\}}
+\newcommand{\ang}[1]{\mathopen{}\left\langle#1\right\rangle}
+\newcommand{\abs}[1]{\mathopen{}\left|#1\right|}
+
+\usepackage{tikz}
+\usepackage{environ}
+\makeatletter
+\newsavebox{\measure@tikzpicture}
+\NewEnviron{scaletikzpicturetowidth}[1]{%
+  \def\tikz@width{#1}%
+  \def\tikzscale{1}\begin{lrbox}{\measure@tikzpicture}%
+  \BODY
+  \end{lrbox}%
+  \pgfmathparse{#1/\wd\measure@tikzpicture}%
+  \edef\tikzscale{\pgfmathresult}%
+  \BODY
+}
+\makeatother

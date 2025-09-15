@@ -33,22 +33,22 @@ This research is still ongoing, to attempt to answer remaining questions posed b
 \subsubsection{Preliminaries}
 
 \begin{definition}
-    Given a set of samples $\mathcal{D}=\{(\mathbf{X}_i)\}_{i=1}^{N}$, with $\mathbf{X}_i \in \mathbb{R}^F$, a \emph{generative model} $\mathcal{M}=\{f,g\}$ models sample likelihoods as $\mathbb{P}(\mathbf{X} \in \mathcal{D})=\sigma(f(\mathbf{X}))$ with $f: \mathbb{R}^F \to \mathbb{R}$, and generates new samples from the dataset as $\hat{\mathbf{X}}=g(Z)$, from sampled latent noise $Z\in\mathbb{R}^D$ with $g_n:\mathbb{R}^D \to \mathbb{R}^F$. The optimal sampler $g$ is found most commonly by minimizing the expected \emph{negative log-likelihood loss}:
+    Given a set of samples $\mathcal{D}=\offf{\of{\mathbf{X}_i}}_{i=1}^{N}$, with $\mathbf{X}_i \in \mathbb{R}^F$, a \emph{generative model} $\mathcal{M}=\offf{f,g}$ models sample likelihoods as $\mathbb{P}\of{\mathbf{X} \in \mathcal{D}}=\sigma\of{f\of{\mathbf{X}}}$ with $f: \mathbb{R}^F \to \mathbb{R}$, and generates new samples from the dataset as $\hat{\mathbf{X}}=g\of{Z}$, from sampled latent noise $Z\in\mathbb{R}^D$ with $g_n:\mathbb{R}^D \to \mathbb{R}^F$. The optimal sampler $g$ is found most commonly by minimizing the expected \emph{negative log-likelihood loss}:
     \begin{equation}
-        g^*=\argmin_{g}{\mathbb{E}_{\mathcal{D},Z}[-\log{\mathbb{P}(g(Z) \in \mathcal{D})}]}=\argmin_{g}{\mathbb{E}_{\mathcal{D},Z}[-\log{\sigma(f(g(Z)))}]}
+        g^*=\argmin_{g}{\mathbb{E}_{\mathcal{D},Z}\off{-\log{\mathbb{P}\of{g\of{Z} \in \mathcal{D}}}}}=\argmin_{g}{\mathbb{E}_{\mathcal{D},Z}\off{-\log{\sigma\of{f\of{g\of{Z}}}}}}
     \end{equation}
 \end{definition}
 
 Wasserstein GANs are one of the most powerful generative models.
 
 \begin{definition}
-   A Wasserstein Generative Adversarial Network (WGAN) \cite{arjovsky_wasserstein_2017} is a generative model $\mathcal{M}=\{d,g\}$, where both $d$ and $g$ are parametrized as neural networks whose parameters are optimized with min-max optimization of the \emph{Wasserstein distance}:
-   $$g^*=\argmin_{g}\max_{\text{1-Lipschitz } d}{\mathbb{E}_{\mathbf{X}\in\mathcal{D},Z}[d(\mathbf{X})-d(g(Z))]},$$
+   A Wasserstein Generative Adversarial Network (WGAN) \cite{arjovsky_wasserstein_2017} is a generative model $\mathcal{M}=\offf{d,g}$, where both $d$ and $g$ are parametrized as neural networks whose parameters are optimized with min-max optimization of the \emph{Wasserstein distance}:
+   $$g^*=\argmin_{g}\max_{\text{1-Lipschitz } d}{\mathbb{E}_{\mathbf{X}\in\mathcal{D},Z}\off{d\of{\mathbf{X}}-d\of{g\of{Z}}}},$$
    where the primal variable $g$ is referred to as the \emph{generator} and the dual variable $d$ as the \emph{discriminator}. The 1-Lipschitz constraint for the dual variable is enforced artificially through various empirical techniques.
 \end{definition}
 
 \begin{definition}
-Given the dataset $\mathcal{D}=\{(n_i,\mathbf{X}_i,A_i,\mathbf{y}_i)\}_{i=1}^{N}$, where $n_i$ is the number of nodes in the $i$-th graph sample, $\mathbf{X}_i \in \mathbb{R}^{n_i \times F_V}$ is the matrix of node features, $A_i \in \{0,1,\dots,|R|\}^{n_i \times n_i}$ is the graph adjacency matrix enhanced with edge label information and $\mathbf{y}_i \in \mathbb{R}^{F_G}$ is the vector of global graph features, \emph{dense graph generation} involves learning a generative model $\mathcal{M}=\{f,g\}$ for this specific sample structure. Formally, $\mathcal{M}$ samples graph sizes $n$, models the likelihood as $\mathbb{P}((\mathbf{X},A,\mathbf{y}) \in \mathcal{D})=\sigma(f_n(\mathbf{X},A,\mathbf{y}))$ with $f_n: \mathbb{R}^{n \times F_V} \times \{0,1,\dots,|R|\}^{n \times n} \times \mathbb{R}^{F_G} \to \mathbb{R}$, and generates new samples from the dataset as $(\hat{\mathbf{X}},\hat{A},\hat{\mathbf{y}})=g_n(Z)$, from sampled latent noise $Z\in\mathbb{R}^D$ with $g_n:\mathbb{R}^D \to \mathbb{R}^{n \times F_V} \times \{0,1,\dots,|R|\}^{n \times n} \times \mathbb{R}^{F_G}$.
+Given the dataset $\mathcal{D}=\offf{\of{n_i,\mathbf{X}_i,A_i,\mathbf{y}_i}}_{i=1}^{N}$, where $n_i$ is the number of nodes in the $i$-th graph sample, $\mathbf{X}_i \in \mathbb{R}^{n_i \times F_V}$ is the matrix of node features, $A_i \in \offf{0,1,\dots,\abs{R}}^{n_i \times n_i}$ is the graph adjacency matrix enhanced with edge label information and $\mathbf{y}_i \in \mathbb{R}^{F_G}$ is the vector of global graph features, \emph{dense graph generation} involves learning a generative model $\mathcal{M}=\offf{f,g}$ for this specific sample structure. Formally, $\mathcal{M}$ samples graph sizes $n$, models the likelihood as $\mathbb{P}\of{\of{\mathbf{X},A,\mathbf{y}} \in \mathcal{D}}=\sigma\of{f_n\of{\mathbf{X},A,\mathbf{y}}}$ with $f_n: \mathbb{R}^{n \times F_V} \times \offf{0,1,\dots,\abs{R}}^{n \times n} \times \mathbb{R}^{F_G} \to \mathbb{R}$, and generates new samples from the dataset as $\of{\hat{\mathbf{X}},\hat{A},\hat{\mathbf{y}}}=g_n\of{Z}$, from sampled latent noise $Z\in\mathbb{R}^D$ with $g_n:\mathbb{R}^D \to \mathbb{R}^{n \times F_V} \times \offf{0,1,\dots,\abs{R}}^{n \times n} \times \mathbb{R}^{F_G}$.
 \end{definition}
 
 \subsubsection{Geometric Graph Generation with GG-GAN}
@@ -58,7 +58,7 @@ Two main issues plague current top non-equivariant graph generators:
 \item In general, they are not \emph{injective} functions; they have no guarantee that two random latent vectors will not be mapped to the same graph (\emph{collisions}) - GG-GAN's novel generator latent state helps to mitigate this problem, though not yet completely.  
 \end{itemize}
 
-GG-GAN \cite{krawczuk_gg-gan_2020} is an LP-penalty Wasserstein GAN \cite{gulrajani_improved_2017} with a permutation-equivariant generator and discriminator duo. GG-GAN's generator $g$ conceptually consists of three serially-connected parts; its architecture is visually represented in Figure \ref{fig:gg_gan_g}. The \emph{root} constructs the node latent state used as initialization from the generator. Here the novel alternative to the standard Gaussian latent state, $Z_i \in \mathbb{R}^{n_i \times D} \sim N(0,I)$, is the idea to leave $P<D$ of the latent dimensions as \emph{fixed}, while the remaining a part of a single random context vector $z \in \mathbb{R}^{D-P}$. This fixed point set $\Phi_i \in \mathbb{R}^{n_i \times P}$ could either be a fully-learnable parameter set or, e.g., chosen fixed points in a higher-dimensional binary or spherical embedding space. With this setup, the collision avoidance task is addressed together with the instability issues of GAN training at the same time. 
+GG-GAN \cite{krawczuk_gg-gan_2020} is an LP-penalty Wasserstein GAN \cite{gulrajani_improved_2017} with a permutation-equivariant generator and discriminator duo. GG-GAN's generator $g$ conceptually consists of three serially-connected parts; its architecture is visually represented in Figure \ref{fig:gg_gan_g}. The \emph{root} constructs the node latent state used as initialization from the generator. Here the novel alternative to the standard Gaussian latent state, $Z_i \in \mathbb{R}^{n_i \times D} \sim N\of{0,I}$, is the idea to leave $P<D$ of the latent dimensions as \emph{fixed}, while the remaining a part of a single random context vector $z \in \mathbb{R}^{D-P}$. This fixed point set $\Phi_i \in \mathbb{R}^{n_i \times P}$ could either be a fully-learnable parameter set or, e.g., chosen fixed points in a higher-dimensional binary or spherical embedding space. With this setup, the collision avoidance task is addressed together with the instability issues of GAN training at the same time. 
 
 The \emph{trunk} is a permutation-equivariant function $t: \mathbb{R}^D \to \mathbb{R}^{F}$ that computes a further embedding of the node set, $X_i \in \mathbb{R}^{n_i \times F}$, which is given to the \emph{edge readout} function $r: \mathbb{R}^{n_i \times F} \to \mathbb{R}^{n_i \times n_i}$ to transform it into a probabilistic adjacency matrix. The final adjacency output $A_i$ is obtained by sampling the sigmoid-activated readout values as Bernoulli random variables. A \emph{node readout} function with a similar structure can generate node features $\mathbf{X}_i$ if required. To guarantee equivariance, both the trunk and readouts utilize provably-equivariant deep layers such as (multi-head) attention or point-wise MLPs. To allow the generator \emph{adaptability} to variable graph sizes $n_i$, this single graph meta-variable is modeled and sampled as a categorical random variable whose probability mass function and range are estimated from the dataset.
 
@@ -85,9 +85,9 @@ The discriminator $d$, represented in Figure \ref{fig:gg_gan_d}, passes each gra
 In probability theory, the Chinese Restaurant Process (CRP) is a discrete-time stochastic process, analogous to a customer-table assignment sequence in a restaurant \cite{aldous_exchangeability_1985}. Imagine a restaurant with an infinite number of circular tables, each with infinite capacity. Each customer chooses to either sit at an occupied table with a probability proportional to the number of customers already there or at an unoccupied table. At time $n$, $n$ customers have been partitioned among $k \leq n$ tables (or \emph{blocks} of the partition).
 
 \begin{definition}
-    Formally, given $n \in \mathbb{N}$, at time $n$ the \emph{Chinese Restaurant Process} is the collection of random variables $\pmb{X}=\{X_i\}_{i=1}^{n}$ whose support is $\mathcal{P}_n$, the set of all integer partitions of the number $n$, i.e. $\sum_{i=1}^{n}{X_i}=n$. The CRP's probability transition function is given by: 
+    Formally, given $n \in \mathbb{N}$, at time $n$ the \emph{Chinese Restaurant Process} is the collection of random variables $\pmb{X}=\offf{X_i}_{i=1}^{n}$ whose support is $\mathcal{P}_n$, the set of all integer partitions of the number $n$, i.e. $\sum_{i=1}^{n}{X_i}=n$. The CRP's probability transition function is given by: 
 \begin{align*}
-&\mathbb{P}\{\pmb{X}=\{x_i\}_{i=1}^{n}|\pmb{X}=\{y_i\}_{i=1}^{n-1}\} = \\
+&\mathbb{P}\offf{\pmb{X}=\offf{x_i}_{i=1}^{n} \vert \pmb{X}=\offf{y_i}_{i=1}^{n-1}} = \\
 &= \begin{cases} 
 \frac{y_k}{n}, & x_n=0, x_k = y_k+1 \wedge \forall j \neq k, x_j=y_j \\
 \frac{1}{n}, & x_n = 1 \wedge \forall j \leq n-1, x_j=y_j \\
@@ -96,7 +96,7 @@ In probability theory, the Chinese Restaurant Process (CRP) is a discrete-time s
 \end{definition}
 
 Based on this and using the ratio definition and chain rule of probability, it can be shown that the CRP's probability mass function can be given by: 
-$$\mathbb{P}\{\pmb{X}=\{x_i\}_{i=1}^{n}\} = \frac{1}{n!}\prod_{i=1}^{n}{(x_i - 1)!}$$
+$$\mathbb{P}\offf{\pmb{X}=\offf{x_i}_{i=1}^{n}} = \frac{1}{n!}\prod_{i=1}^{n}{\of{x_i - 1}!}$$
 
 So we observe the main benefit of the CRP, the realizations of this process are exchangeable, meaning the order in which the \enquote{customers sit} does not affect the probability of the final distribution, as due to the permutation-invariance of products, it only depends on the block size values and not their order. This is a very useful property, as it leads to the possibility of building an autoregressive variant of the GG-GAN generator that will remain exchangeable, by envisioning graph nodes as the \enquote{customers} and generalizing the CRP block (\enquote{table}) assignment to be agnostic to graph structure (instead of purely stochastic).
 
@@ -118,18 +118,18 @@ As hinted in the previous section, we require a CRP block assignment that will b
 
 In the following text, we will present our approach on how to integrate permutation-invariant community-based metrics into a CRP to perform exchangeable sequence modelling for graph generation. This approach, when integrated into GG-GAN, yields a new variation of the model, tentatively named GGG-CRP. 
 
-\textbf{Notes on notation:} $\mathbb{N}_{m} = \{1,\dots,m\}$ will denote the set of the first $m$ natural numbers; the index $i$ will denote a batch sample (graph); $j$ will denote the \emph{cardinality} of an overlapping region, defined as the number of different communities that are overlapping to form the region; $k$ will denote a community and $l$ will denote a single node.
+\textbf{Notes on notation:} $\mathbb{N}_{m} = \offf{1,\dots,m}$ will denote the set of the first $m$ natural numbers; the index $i$ will denote a batch sample (graph); $j$ will denote the \emph{cardinality} of an overlapping region, defined as the number of different communities that are overlapping to form the region; $k$ will denote a community and $l$ will denote a single node.
 
 \subsubsection{Data augmentation}
-The first step required for the new graph distribution modeling approach for GG-GAN is to run a selected overlapping community detection algorithm on each graph in the dataset. The dataset for GG-GAN is represented as the set $\mathcal{D} = \{(\mathbf{X}_i, A_i)\}_{i=1}^{N}$, where $x_i$ are the node feature vectors, $A_i$ are the graph adjacency matrices, i.e., we do not consider global graph features. We condense and represent the output of the graph partitioning algorithm through the matrix $M_i = \text{OCD}(A_i) \in \{0, 1\}^{n_i \times k_i}$, which from here on shall be referred to as the \emph{membership matrix}. $k_i \leq n_i$ is the number of detected communities and $M_{i,l,k}=1$ denotes that in graph $i$, node $l$ is a member of community $k$.
+The first step required for the new graph distribution modeling approach for GG-GAN is to run a selected overlapping community detection algorithm on each graph in the dataset. The dataset for GG-GAN is represented as the set $\mathcal{D} = \offf{\of{\mathbf{X}_i, A_i}}_{i=1}^{N}$, where $x_i$ are the node feature vectors, $A_i$ are the graph adjacency matrices, i.e., we do not consider global graph features. We condense and represent the output of the graph partitioning algorithm through the matrix $M_i = \text{OCD}\of{A_i} \in \offf{0, 1}^{n_i \times k_i}$, which from here on shall be referred to as the \emph{membership matrix}. $k_i \leq n_i$ is the number of detected communities and $M_{i,l,k}=1$ denotes that in graph $i$, node $l$ is a member of community $k$.
 
-The membership matrix in the general case has two natural constraints: all communities must be non-empty, $\forall k \in \mathbb{N}_{k_i}, (M^T_i \cdot 1_{n_i})_k > 0$; all nodes must be assigned $\forall l \in \mathbb{N}_{n_i}, (M_i \cdot 1_{k_i})_l > 0$. In the special case of disjoint communities, this property is represented by $M_i$ satisfying additionally: $M_i \cdot 1_{k_i} = 1_{n_i}$.
+The membership matrix in the general case has two natural constraints: all communities must be non-empty, $\forall k \in \mathbb{N}_{k_i}, \of{M^T_i \cdot 1_{n_i}}_k > 0$; all nodes must be assigned $\forall l \in \mathbb{N}_{n_i}, \of{M_i \cdot 1_{k_i}}_l > 0$. In the special case of disjoint communities, this property is represented by $M_i$ satisfying additionally: $M_i \cdot 1_{k_i} = 1_{n_i}$.
 
-During model training, as will also be evident from later explanations, the new generator would require only the membership matrix as additional input from the data. However, for graph sampling during evaluation, novel node permutation-invariant graph meta-statistics are required as a replacement for it. One is the \emph{overlapping region size matrix} $O_i \in (\mathbb{N}\cup\{0\})^{k_i \times k_i}$, where $O_{i,j,k}$ counts how many nodes of overlapping region cardinality $j$ are members of community $k$ for graph $i$. It can be computed directly from the membership matrix:
-$$O_i = \text{OneHotEncode}(M_i \cdot 1_{k_i})^T \cdot M_i$$
+During model training, as will also be evident from later explanations, the new generator would require only the membership matrix as additional input from the data. However, for graph sampling during evaluation, novel node permutation-invariant graph meta-statistics are required as a replacement for it. One is the \emph{overlapping region size matrix} $O_i \in \of{\mathbb{N}\cup\offf{0}}^{k_i \times k_i}$, where $O_{i,j,k}$ counts how many nodes of overlapping region cardinality $j$ are members of community $k$ for graph $i$. It can be computed directly from the membership matrix:
+$$O_i = \text{OneHotEncode}\of{M_i \cdot 1_{k_i}}^T \cdot M_i$$
 The \emph{community size vector} $c_i \in \mathbb{N}^{k_i}$ counting the number of nodes assigned to each community can also easily be computed: $$c_i = M^T_i \cdot 1_{n_i} = O_i^T \cdot 1_{k_i}$$
 In the special case of disjoint communities, we have only cardinality-1 nodes (each nodes belongs to only one community): $$O_{i,1}=c_i, O_{i,2}=\dots=O_{i,k_i}=0_{k_i}$$.
-The final augmented dataset is thus the collection: $$\mathcal{D}^* = \{(\mathbf{X}_i, A_i, k_i, c_i, O_i, M_i)\}_{i=1}^{B}$$
+The final augmented dataset is thus the collection: $$\mathcal{D}^* = \offf{\of{\mathbf{X}_i, A_i, k_i, c_i, O_i, M_i}}_{i=1}^{B}$$
 
 \subsubsection{Modeling and sampling of permutation-invariant graph meta-variables}
 Recall that in order for GG-GAN's generator to be robust to variation in graph size in a dataset, the graph size is estimated and sampled as a categorical random variable. We can now naturally improve the adaptability of the model by estimating and sampling the newly available community-related statistics as well.
@@ -149,12 +149,12 @@ The full list of random variables and vectors that need to be modeled and sample
 \begin{itemize}
 \item Number of nodes / graph size: $n \in \mathbb{N}_{n_{\max}}$
 \item Number of overlapping region cardinalities: $K^c \in \mathbb{N}_{k_{\max}}$
-\item Number of nodes per cardinality: $N^c \in (\mathbb{N}_{n_{\max}} \cup \{0\})^{k_{\max}}$
+\item Number of nodes per cardinality: $N^c \in \of{\mathbb{N}_{n_{\max}} \cup \offf{0}}^{k_{\max}}$
 \item Number of communities per cardinality: $K \in \mathbb{N}_{k_{\max}}^{k_{\max}}$
-\item Overlapping region size: $O \in (\mathbb{N}_{o_{\max}} \cup \{0\})^{k_{\max} \times k_{\max}}$
+\item Overlapping region size: $O \in \of{\mathbb{N}_{o_{\max}} \cup \offf{0}}^{k_{\max} \times k_{\max}}$
 \end{itemize}
 
-The collection of graph meta-variables is thus $(N, K^c, N^c, K, O)$ and to generalize GG-GAN's approach, is modeled with a jointly-categorical distribution $\mathcal{F}$ whose probabilities are estimated from the data as relative frequencies. In this manner, no independence assumptions are introduced, though for larger graphs, due to potential memory issues, a sparse implementation of the estimated probability tensors is recommended.
+The collection of graph meta-variables is thus $\of{N, K^c, N^c, K, O}$ and to generalize GG-GAN's approach, is modeled with a jointly-categorical distribution $\mathcal{F}$ whose probabilities are estimated from the data as relative frequencies. In this manner, no independence assumptions are introduced, though for larger graphs, due to potential memory issues, a sparse implementation of the estimated probability tensors is recommended.
 
 \paragraph{Graph meta-variable sampling}
 
@@ -164,12 +164,12 @@ The pseudocode of the full meta-variable sampling algorithm for GGG-CRP is given
 \label{algorithm:graph_meta_sampling}
 \begin{algorithmic}
 \STATE{\textbf{sample} number of nodes and cardinalities: $n_i, K^c_i \sim \hat{\mathcal{F}}_{N,K^c}$}
-\STATE{\textbf{sample} partition of nodes across cardinalities: $N^c_i \sim \text{PartitionDistribution}(n_i, K^c_i, \hat{\mathcal{F}}_{n_i, K^c_i, N^c})$}
+\STATE{\textbf{sample} partition of nodes across cardinalities: $N^c_i \sim \text{PartitionDistribution}\of{n_i, K^c_i, \hat{\mathcal{F}}_{n_i, K^c_i, N^c}}$}
 \FOR{cardinality $j \gets 1$ to $k_{\max}$}
 \STATE{\textbf{sample} number of communities for cardinality: $K_{i,j} \sim \hat{\mathcal{F}}_{n_i, K^c_i, N^c_{i,j}, K_j}$}
-\STATE{\textbf{sample} overlapping region sizes: $O_{i,j} \sim \text{PartitionDistribution}(j \cdot N^c_{i,j}, K_{i,j}, \hat{\mathcal{F}}_{n_i, K^c_i, N^c_{i,j}, K_{i,j}, O_j})$}
-\STATE{\textbf{assign} nodes with cardinality: $\mathcal{N}_{i,j} = \left\{\sum_{k=1}^{j-1}{N^c_{i,k}},\dots,\sum_{k=1}^{j}{N^c_{i,k}}\right\} \subseteq \mathbb{N}_{n_{\max}}$}
-\STATE{\textbf{sample} membership: $M_{i,\mathcal{N}_{i,j}} \sim \text{BipartiteGraphDistribution}(j \cdot 1_{N^c_{i,j}},O_{i,j})$}
+\STATE{\textbf{sample} overlapping region sizes: $O_{i,j} \sim \text{PartitionDistribution}\of{j \cdot N^c_{i,j}, K_{i,j}, \hat{\mathcal{F}}_{n_i, K^c_i, N^c_{i,j}, K_{i,j}, O_j}}$}
+\STATE{\textbf{assign} nodes with cardinality: $\mathcal{N}_{i,j} = \offf{\sum_{k=1}^{j-1}{N^c_{i,k}},\dots,\sum_{k=1}^{j}{N^c_{i,k}}} \subseteq \mathbb{N}_{n_{\max}}$}
+\STATE{\textbf{sample} membership: $M_{i,\mathcal{N}_{i,j}} \sim \text{BipartiteGraphDistribution}\of{j \cdot 1_{N^c_{i,j}},O_{i,j}}$}
 \ENDFOR
 \STATE{\textbf{compute} number of communities: $K_i = \max_{j=1}^{k_{\max}}{K_{i, j}}$}
 \STATE{\textbf{compute} community sizes: $c_i = O^T_i \cdot 1_{k_{\max}}$}
@@ -177,21 +177,21 @@ The pseudocode of the full meta-variable sampling algorithm for GGG-CRP is given
 \end{algorithmic}
 \end{algorithm} 
 
-$\text{PartitionDistribution}(n,m,p)$ denotes the distribution over partitions of the integer $n$ into exactly $m$ parts, where $p$ is a probability distribution over the possible sizes of the parts in $\mathbb{N}_{n}$. Fristedt in \cite{fristedt_structure_1993} gives an algorithm that performs partition sampling, with the guarantee of the least amount of rejections and $\text{PartitionDistribution}(n,m,\text{Uniform}) \sim \text{Uniform}$, i.e., it is also provably unbiased in the case of uniform part size probabilities. Unfortunately, in the general scenario for our model, $p$ is not uniform if we wish to be robust to any region size distribution. Therefore, instead of this algorithm, we employed general rejection sampling. Further work might show how to extend Fristedt's guarantees to general part size distributions.
+$\text{PartitionDistribution}\of{n,m,p}$ denotes the distribution over partitions of the integer $n$ into exactly $m$ parts, where $p$ is a probability distribution over the possible sizes of the parts in $\mathbb{N}_{n}$. Fristedt in \cite{fristedt_structure_1993} gives an algorithm that performs partition sampling, with the guarantee of the least amount of rejections and $\text{PartitionDistribution}\of{n,m,\text{Uniform}} \sim \text{Uniform}$, i.e., it is also provably unbiased in the case of uniform part size probabilities. Unfortunately, in the general scenario for our model, $p$ is not uniform if we wish to be robust to any region size distribution. Therefore, instead of this algorithm, we employed general rejection sampling. Further work might show how to extend Fristedt's guarantees to general part size distributions.
     
-$\text{BipartiteGraphDistribution}(a,b)$ denotes the uniform distribution over all bipartite graphs with the two degree sequences $a$ and $b$. We can observe that each node-chunk membership matrix indeed can be viewed as a bipartite graph, where the other graph meta-variables represent its node and chunk degree sequences. The membership matrix of each graph has to be randomly sampled, as there are usually multiple valid solutions to the assignment problem. 
+$\text{BipartiteGraphDistribution}\of{a,b}$ denotes the uniform distribution over all bipartite graphs with the two degree sequences $a$ and $b$. We can observe that each node-chunk membership matrix indeed can be viewed as a bipartite graph, where the other graph meta-variables represent its node and chunk degree sequences. The membership matrix of each graph has to be randomly sampled, as there are usually multiple valid solutions to the assignment problem. 
     
-To sample a uniform random bipartite graph with degree constraints, one can employ methods such as the Configuration Model \cite{newman_structure_2003} or the Havel-Hakimi algorithm \cite{hakimi_realizability_1963, kleitman_algorithms_1973}. Another idea is to sample the assignment based on node-chunk distance in the root latent space. Formally, if the root's fixed latent point set is $\Phi_i \in \mathbb{R}^{n_i \times P}$, we can also assign a fixed latent representation for each community: $\Phi^c_i \in \mathbb{R}^{k_i \times P}$. If $\ell: \mathbb{R}^{P} \times \mathbb{R}^{P} \to \mathbb{R}$ is an appropriate distance metric for the latent space, then the assignment probabilities can be computed as: $$\mathbb{P}\{M_{i,l,k}=1\}=\frac{\ell(\Phi_{i,l},\Phi^c_{i,k})}{\sum_{k' \in \mathbb{N}_{k_{\max}}}{\ell(\Phi_{i,l},\Phi^c_{i,k'})}}$$
+To sample a uniform random bipartite graph with degree constraints, one can employ methods such as the Configuration Model \cite{newman_structure_2003} or the Havel-Hakimi algorithm \cite{hakimi_realizability_1963, kleitman_algorithms_1973}. Another idea is to sample the assignment based on node-chunk distance in the root latent space. Formally, if the root's fixed latent point set is $\Phi_i \in \mathbb{R}^{n_i \times P}$, we can also assign a fixed latent representation for each community: $\Phi^c_i \in \mathbb{R}^{k_i \times P}$. If $\ell: \mathbb{R}^{P} \times \mathbb{R}^{P} \to \mathbb{R}$ is an appropriate distance metric for the latent space, then the assignment probabilities can be computed as: $$\mathbb{P}\offf{M_{i,l,k}=1}=\frac{\ell\of{\Phi_{i,l},\Phi^c_{i,k}}}{\sum_{k' \in \mathbb{N}_{k_{\max}}}{\ell\of{\Phi_{i,l},\Phi^c_{i,k'}}}}$$
 
 \subsubsection{Exchangeable graph generation agnostic to community structure}
 As stated above, to utilize the benefits of exchangeable autoregressive models, instead of single-shot graph generation, we will employ a block-by-block CRP-inspired technique. The generation will thus take place in multiple \emph{rounds}, such that in each round the edges incident to the nodes in one block will be generated. In this manner, the generated graph sequentially grows to its target size.
 
-The first crucial decision is thus how to perform the block assignment of nodes, and as also stated above, the computed overlapping communities will serve the role of CRP blocks. Formally, given graph meta-data $(n_i, K_i, c_i, O_i, M_i)$, computed from the dataset or sampled, we compute the community sets $C_{i,1},\dots,C_{i,K_i} \subseteq \mathbb{N}_{n_i}$ according to the given membership matrix: $$\forall k \in \mathbb{N}_{K_i},C_{i,k}=\{l \in \mathbb{N}_{n_i}| M_{i,l,k} = 1\}$$
+The first crucial decision is thus how to perform the block assignment of nodes, and as also stated above, the computed overlapping communities will serve the role of CRP blocks. Formally, given graph meta-data $\of{n_i, K_i, c_i, O_i, M_i}$, computed from the dataset or sampled, we compute the community sets $C_{i,1},\dots,C_{i,K_i} \subseteq \mathbb{N}_{n_i}$ according to the given membership matrix: $$\forall k \in \mathbb{N}_{K_i},C_{i,k}=\offf{l \in \mathbb{N}_{n_i} \mid M_{i,l,k} = 1}$$
 
 GGG-CRP's generator now computes the root for each block/round separately, by collecting the latent points according to the block assignment:
 \begin{align*}
 &\forall k \in \mathbb{N}_{k_{\max}}, \forall l \in \mathbb{N}_{c_{\max}}, \\
-R_{i,l}^{(k)} &= \begin{cases} z_i||\Phi_{i,C_{i,k,l}}, & l \leq c_{i,k} \\ 0, & \text{otherwise} \end{cases}
+R_{i,l}^{\of{k}} &= \begin{cases} z_i||\Phi_{i,C_{i,k,l}}, & l \leq c_{i,k} \\ 0, & \text{otherwise} \end{cases}
 \end{align*}
 The autoregressive architecture of GGG-CRP is facilitated through a new edge readout function $r'$, modified to accept the discriminator features of the current graph in addition to the trunk's output for the current block. 
 
@@ -201,13 +201,13 @@ With this setup in mind, GGG-CRP's generator pipeline design is given in Algorit
 \caption{GGG-CRP graph generation}
 \label{algorithm:crp_generator}
 \begin{algorithmic}
-\STATE{\textbf{initialize} first graph: $A_{i}^{(1)} = r(t(R_{i}^{(1)}))$}
-\STATE{\textbf{initialize} prior: $\hat{\mathbf{X}}_{i}^{(1)} = R_{i}^{(1)}$}
+\STATE{\textbf{initialize} first graph: $A_{i}^{\of{1}} = r\of{t\of{R_{i}^{\of{1}}}}$}
+\STATE{\textbf{initialize} prior: $\hat{\mathbf{X}}_{i}^{\of{1}} = R_{i}^{\of{1}}$}
 \FOR{round $k \gets 2$ to $k_{\max}$}
-\STATE{\textbf{update} graph: $A_{i}^{(k)} = r'(t(R_{i}^{(k)}),\hat{\mathbf{X}}_{i}^{(k-1)})$}
-\STATE{\textbf{update} prior: $\hat{\mathbf{X}}_{i}^{(k)} = d_f(A_{i}^{(k)})$}
+\STATE{\textbf{update} graph: $A_{i}^{\of{k}} = r'\of{t\of{R_{i}^{\of{k}}},\hat{\mathbf{X}}_{i}^{\of{k-1}}}$}
+\STATE{\textbf{update} prior: $\hat{\mathbf{X}}_{i}^{\of{k}} = d_f\of{A_{i}^{\of{k}}}$}
 \ENDFOR
-\RETURN{final generated graph $A_i = A_{i}^{(k_{\max})}$}
+\RETURN{final generated graph $A_i = A_{i}^{\of{k_{\max}}}$}
 \end{algorithmic}
 \end{algorithm} 
 
@@ -218,8 +218,8 @@ In addition, to mitigate a discovered vanishing gradient issue with the CRP gene
 \subsubsection{Multi-level connectivity regularization}
 With the computation of community-based metadata for the graphs, we obtain a unique opportunity to add a special type of regularization for the generator. Namely, one can compute a coarsening of each graph, the connectivity between communities as nodes themselves. The generator would be evaluated now with an additional Wasserstein score added to the discriminator loss, computed based on this higher-level connectivity, with a dedicated regularization parameter. 
 
-Formally, let $(\mathbf{X}_i, A_i, k_i, c_i, O_i, M_i)$ be a graph sample from the augmented dataset or sampled from the generator. One can compute the community-level features $\mathbf{X}^C_i \in \mathbb{R}^{k_i \times F}$ and (multiplex) edges $A^C_i \in (\mathbb{N} \cup \{0\})^{k_i \times k_i}$ in the following manner: $$\mathbf{X}^C_i = (M^T_i \cdot \mathbf{X}_i) \oslash c_i, A^C_i = M^T_i \cdot A_i \cdot M_i$$
-The coarser graph sample is thus the collection $(\mathbf{X}^C_i, A^c_i, k_i)$.
+Formally, let $\of{\mathbf{X}_i, A_i, k_i, c_i, O_i, M_i}$ be a graph sample from the augmented dataset or sampled from the generator. One can compute the community-level features $\mathbf{X}^C_i \in \mathbb{R}^{k_i \times F}$ and (multiplex) edges $A^C_i \in \of{\mathbb{N} \cup \offf{0}}^{k_i \times k_i}$ in the following manner: $$\mathbf{X}^C_i = \of{M^T_i \cdot \mathbf{X}_i} \oslash c_i, A^C_i = M^T_i \cdot A_i \cdot M_i$$
+The coarser graph sample is thus the collection $\of{\mathbf{X}^C_i, A^c_i, k_i}$.
 
 We stress that the proper validation of this score's regularization parameter is crucial, since if the discriminator weighs too strongly the coarser connectivity, it will underfit as the coarse-to-fine graph mapping is not injective, leaving the generator a chance to fool the discriminator. This can also be mitigated by enriching the coarse graph with further features as edge weights, to reduce collisions.
 

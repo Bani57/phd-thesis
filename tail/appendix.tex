@@ -5,33 +5,21 @@
 \label{sec:appendix_proofs}
 
 \begin{proof}[Proposition~\ref{proposition:complexity}]
-    The time complexity of the first node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of embeddings required. On the other hand, the second step requires as many model evaluations as the number of nodes in the group, $|C_k|$. For each sample, the total is thus $K+|C_k|$, while each node group is represented by $N_k^{\text{test}}$ samples in the test data. By summing over all groups $k$ one obtains the provided exact complexity.
+    The time complexity of the first node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of embeddings required. On the other hand, the second step requires as many model evaluations as the number of nodes in the group, $\abs{C_k}$. For each sample, the total is thus $K+\abs{C_k}$, while each node group is represented by $N_k^{\text{test}}$ samples in the test data. By summing over all groups $k$ one obtains the provided exact complexity.
 
-    Regarding the expression $\sum_{k=1}^{K}{(K+|C_k|)N_k^{\text{test}}}$, let us first assume that we have fixed the number of groups $K$ to some value in $\{1,\dots,|V|\}$ and we are aiming to optimize the distribution of nodes and evaluation samples across groups for this fixed $K$. Using the KKT theorem, one can prove that extremal configurations only occur when all groups are of equal size and/or all groups are represented with an equal amount of samples in the evaluation set. Lemma~\ref{lemma:kkt_evaluation_cost} gives the details. It is easier to strive towards $|C_k| \approx \frac{|V|}{K}$, however, in any case, the number of node embedding computations will then equal $N\left(K + \frac{|V|}{K}\right)$. 
+    Regarding the expression $\sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k^{\text{test}}}$, let us first assume that we have fixed the number of groups $K$ to some value in $\offf{1,\dots,\abs{V}}$ and we are aiming to optimize the distribution of nodes and evaluation samples across groups for this fixed $K$. Using the KKT theorem, one can prove that extremal configurations only occur when all groups are of equal size and/or all groups are represented with an equal amount of samples in the evaluation set. Lemma~\ref{lemma:kkt_evaluation_cost} gives the details. It is easier to strive towards $\abs{C_k} \approx \frac{\abs{V}}{K}$, however, in any case, the number of node embedding computations will then equal $N\of{K + \frac{\abs{V}}{K}}$. 
     
-    To conclude, we prove that the value of $K$ is what decides whether the lower or upper bound stated above is achieved: $K=\sqrt{V}$ gives the motivating lower bound, while $K \in \{1, |V|\}$ produces the worst performance, which is in the same order as the baseline $N |V|$. Lemma~\ref{lemma:min_max_evaluation_cost} gives the details.
-    % \textbf{Upper bound}: Note first that since $c$ induces a disjoint partitioning of $V$, we have that $\sum_{k=1}^{K}{|C_k|} = |V|$ and $\sum_{k=1}^{K}{N_k^{\text{test}}} = N$. Now, by the distributive rule and $K \leq |V|$:
-    % \begin{align*}
-    % \sum_{k=1}^{K}{(K+|C_k|)N_k^{\text{test}}} 
-    % &= K \left(\sum_{k=1}^{K}{N_k^{\text{test}}}\right) + \sum_{k=1}^{K}{|C_k|N_k^{\text{test}}} 
-    % \leq K N + \sum_{k=1}^{K}{\sum_{l=1}^{K}{|C_k||E_l^{\text{test}}|}} \\
-    % &\leq K N + \left(\sum_{k=1}^{K}{|C_k|} \right)\left(\sum_{l=1}^{K}{|E_l^{\text{test}}|}\right)
-    % \leq K N + |V| N 
-    % \leq 2 N |V|
-    % \end{align*}
-    % As all $|C_k|$ are positive and all $N_k^{\text{test}}$ non-negative, equality with the upper bound is achieved only when $K = |V|$, i.e. when all $|C_k| = 1$. 
-    % \textbf{Lower bound}: A sum of products of two non-negative terms can have the lowest value when the partition is such that the smallest groups are the most represented in the test data. Formally, if $|C_{(k)}|$ and $|E_{(k)}^{\text{test}}|$ denote the order statistics of the two sequences, then: $$ \sum_{k=1}^{K}{(K+|C_k|)N_k^{\text{test}}} \geq \sum_{k=1}^{K}{(K+|C_{(k)}|)|E_{(K - k + 1)}^{\text{test}}|}.$$
-    % The lower bound is achievable if one of the sequences is constant and one can strive towards all $|C_k|=\frac{|V|}{K}$. In this scenario, the complexity is $N \left(K + \frac{|V|}{K}\right)$. But, if one is able to control $K$ as well, then one can prove that $K = \sqrt{|V|}$ is the minimizer that yields $2 N \sqrt{|V|}$ (Proposition~\ref{proposition:min_evaluation_cost}).
+    To conclude, we prove that the value of $K$ is what decides whether the lower or upper bound stated above is achieved: $K=\sqrt{V}$ gives the motivating lower bound, while $K \in \offf{1, \abs{V}}$ produces the worst performance, which is in the same order as the baseline $N \abs{V}$. Lemma~\ref{lemma:min_max_evaluation_cost} gives the details.
 \end{proof}
 
 \begin{lemma}
     \label{lemma:kkt_evaluation_cost}
-    Let $\{a_k\}_{k=1}^{K}=\{|C_k|\}_{k=1}^{K}$ and $\{b_k\}_{k=1}^{K}=\{N_k^{\text{test}}\}_{k=1}^{K}$ denote the learnable parameters. Then with the constraints $$\sum_{k=1}^{K}{a_k}=|V|, \sum_{k=1}^{K}{b_k}=N, \forall k, a_k > 0, b_k \geq 0,$$ the only extremal points of $g(\{a_k\},\{b_k\})=\sum_{k=1}^{K}{(K + a_k)b_k}$ are $\forall k, a^*_k = \frac{|V|}{K}$ and/or $\forall k, b^*_k = \frac{N}{K}$, with the extreme value of $g(\{a^*_k\},\{b^*_k\})=N\left(K + \frac{|V|}{K}\right)$.
+    Let $\offf{a_k}_{k=1}^{K}=\offf{\abs{C_k}}_{k=1}^{K}$ and $\offf{b_k}_{k=1}^{K}=\offf{N_k^{\text{test}}}_{k=1}^{K}$ denote the learnable parameters. Then with the constraints $$\sum_{k=1}^{K}{a_k}=\abs{V}, \sum_{k=1}^{K}{b_k}=N, \forall k, a_k > 0, b_k \geq 0,$$ the only extremal points of $g\of{\offf{a_k},\offf{b_k}}=\sum_{k=1}^{K}{\of{K + a_k}b_k}$ are $\forall k, a^*_k = \frac{\abs{V}}{K}$ and/or $\forall k, b^*_k = \frac{N}{K}$, with the extreme value of $g\of{\offf{a^*_k},\offf{b^*_k}}=N\of{K + \frac{\abs{V}}{K}}$.
 \end{lemma}
     \begin{proof}
         The Lagrangian of the optimization problem is the following:
         \begin{align*}
-             L(\{a_k\},\{b_k\}) &= \sum_{k=1}^{K}{(K + a_k)b_k} + \lambda_1 \left(\sum_{k=1}^{K}{a_k} - |V|\right) + \lambda_2 \left(\sum_{k=1}^{K}{b_k} - N\right) \\
+             L\of{\offf{a_k},\offf{b_k}} &= \sum_{k=1}^{K}{\of{K + a_k}b_k} + \lambda_1 \of{\sum_{k=1}^{K}{a_k} - \abs{V}} + \lambda_2 \of{\sum_{k=1}^{K}{b_k} - N} \\
              &- \sum_{k=1}^{K}{\mu_k a_k} - \sum_{k=1}^{K}{\nu_k b_k}
         \end{align*}
         $$$$
@@ -42,45 +30,45 @@
     \end{align*}
     Now, by the primal equality constraints:
     \begin{align*}
-        \sum_{k=1}^{K}{a_k} &= |V| \Leftrightarrow \sum_{k=1}^{K}{(\nu_k - \lambda_2 - K)} = |V| \Leftrightarrow \lambda_2 = \frac{1}{K} \sum_{k=1}^{K}{\nu_k} - \frac{|V|}{K} - K \\
-        \Rightarrow \forall k, a_k &= \nu_k - \frac{1}{K} \sum_{j=1}^{K}{\nu_j} + \frac{|V|}{K} \\
-        \sum_{k=1}^{K}{b_k} &= N \Leftrightarrow \sum_{k=1}^{K}{(\mu_k - \lambda_1)} = N \Leftrightarrow \lambda_1 = \frac{1}{K} \sum_{k=1}^{K}{\mu_k} - \frac{N}{K} \\
+        \sum_{k=1}^{K}{a_k} &= \abs{V} \Leftrightarrow \sum_{k=1}^{K}{\of{\nu_k - \lambda_2 - K}} = \abs{V} \Leftrightarrow \lambda_2 = \frac{1}{K} \sum_{k=1}^{K}{\nu_k} - \frac{\abs{V}}{K} - K \\
+        \Rightarrow \forall k, a_k &= \nu_k - \frac{1}{K} \sum_{j=1}^{K}{\nu_j} + \frac{\abs{V}}{K} \\
+        \sum_{k=1}^{K}{b_k} &= N \Leftrightarrow \sum_{k=1}^{K}{\of{\mu_k - \lambda_1}} = N \Leftrightarrow \lambda_1 = \frac{1}{K} \sum_{k=1}^{K}{\mu_k} - \frac{N}{K} \\
         \Rightarrow \forall k, b_k &= \mu_k - \frac{1}{K} \sum_{j=1}^{K}{\mu_j} + \frac{N}{K}
     \end{align*}
     Finally, by the complementary slackness KKT conditions, primal inequality constraints, and dual feasibility KKT conditions:
     \begin{align*}
         \sum_{k=1}^{K}{\mu_k a_k} &= 0 \Leftrightarrow \forall k, \mu_k = 0 \Rightarrow \forall k, b^*_k=\frac{N}{K} & \text{ as $\forall k, a_k>0,\mu_k \geq 0$}\\
-        \sum_{k=1}^{K}{\nu_k b_k} &= 0 \Leftarrow \forall k, \nu_k = 0 \Rightarrow \forall k, a^*_k = \frac{|V|}{K} & \text{ as $\forall k, b_k \geq 0,\nu_k \geq 0$}
+        \sum_{k=1}^{K}{\nu_k b_k} &= 0 \Leftarrow \forall k, \nu_k = 0 \Rightarrow \forall k, a^*_k = \frac{\abs{V}}{K} & \text{ as $\forall k, b_k \geq 0,\nu_k \geq 0$}
     \end{align*}
     \end{proof}
 
 \begin{lemma}
     \label{lemma:min_max_evaluation_cost}
-    By choosing $K=\sqrt{|V|}$, one achieves the minimal evaluation cost $2 N \sqrt{|V|}$, while with $K \in \{1, |V|\}$ one achieves the maximum $N(|V| + 1)$.
+    By choosing $K=\sqrt{\abs{V}}$, one achieves the minimal evaluation cost $2 N \sqrt{\abs{V}}$, while with $K \in \offf{1, \abs{V}}$ one achieves the maximum $N\of{\abs{V} + 1}$.
 \end{lemma}
 \begin{proof}
-    Let $f(K) = N(K + \frac{|V|}{K})$. Then note that $f'(K) = N - \frac{N |V|}{K^2}$. From this, we find the only critical point of $f$ in $(1, |V|)$: 
+    Let $f\of{K} = N\of{K + \frac{\abs{V}}{K}}$. Then note that $f'\of{K} = N - \frac{N \abs{V}}{K^2}$. From this, we find the only critical point of $f$ in $\of{1, \abs{V}}$: 
     
-    $N - \frac{N |V|}{K^2} = 0 \Leftrightarrow K^2 = \frac{N |V|}{N} \Leftrightarrow K = \sqrt{|V|}$. 
+    $N - \frac{N \abs{V}}{K^2} = 0 \Leftrightarrow K^2 = \frac{N \abs{V}}{N} \Leftrightarrow K = \sqrt{\abs{V}}$. 
     
-    Now $f''(K)=\frac{2 N |V|}{K^3}$. As $\forall K \in [1, |V|], f''(K) > 0$, $f$ is a convex function for all values of $K$. Thus, $\sqrt{|V|}$ will be both a local and global minimum, while the endpoints of the interval will be global maxima, as $\forall K \neq \sqrt{|V|}, f'(K) > 0$, i.e., $f$ increases away from the minimum in both directions.
+    Now $f''\of{K}=\frac{2 N \abs{V}}{K^3}$. As $\forall K \in \off{1, \abs{V}}, f''\of{K} > 0$, $f$ is a convex function for all values of $K$. Thus, $\sqrt{\abs{V}}$ will be both a local and global minimum, while the endpoints of the interval will be global maxima, as $\forall K \neq \sqrt{\abs{V}}, f'\of{K} > 0$, i.e., $f$ increases away from the minimum in both directions.
 \end{proof}
 
 
 \begin{proposition}
     \label{proposition:condition_applicability}
-    Let $C \in \{1,\dots,K\}$ be a r.v. storing from which community a sample belongs. Let $\forall k \in \{1,\dots,K\}, H'_k \in \{1,\dots\,|C_k|\}$ be the r.v. counting how many samples need to be evaluated before a correct hit in community $k$ is achieved by COINs, with $\forall k, H_k$ counting the same for the baseline model. 
+    Let $C \in \offf{1,\dots,K}$ be a r.v. storing from which community a sample belongs. Let $\forall k \in \offf{1,\dots,K}, H'_k \in \offf{1,\dots\,\abs{C_k}}$ be the r.v. counting how many samples need to be evaluated before a correct hit in community $k$ is achieved by COINs, with $\forall k, H_k$ counting the same for the baseline model. 
     
-    Let $\forall k, T'_k=K+|C_k|$ denote the number of embedding computations required for evaluating a sample in community $k$ (recall Proposition~\ref{proposition:complexity}), with $T_k=|V|$ counting the same for the baseline model. 
+    Let $\forall k, T'_k=K+\abs{C_k}$ denote the number of embedding computations required for evaluating a sample in community $k$ (recall Proposition~\ref{proposition:complexity}), with $T_k=\abs{V}$ counting the same for the baseline model. 
     
     Let $\forall k, \bar{\rho}'_k$ be the evaluated mean rank for samples from community $k$ for COINs, with $\bar{\rho}$ denoting the baseline mean rank. 
     
-    Finally, let $\forall k, \varepsilon_k = \frac{\bar{\rho}'_k - \bar{\rho}}{\bar{\rho}}$ denote the per-community relative error in mean rank incurred to the baseline after training and evaluating the model with COINs, while let $\forall k, A_k=\frac{T_k}{T'_k}=\frac{|V|}{K+|C_k|}$ denote the per-community acceleration achieved. 
+    Finally, let $\forall k, \varepsilon_k = \frac{\bar{\rho}'_k - \bar{\rho}}{\bar{\rho}}$ denote the per-community relative error in mean rank incurred to the baseline after training and evaluating the model with COINs, while let $\forall k, A_k=\frac{T_k}{T'_k}=\frac{\abs{V}}{K+\abs{C_k}}$ denote the per-community acceleration achieved. 
     
     Then, if we assume that:
     \begin{itemize}
-        \item $\forall k, \mathbb{P}(C=k)=\frac{N_k^{\text{test}}}{N}$, and
-        \item $\forall j \in \{1,\dots\,|C_k|\}, \mathbb{P}(H_k \leq j)=(\text{Hits@j})_k$,
+        \item $\forall k, \mathbb{P}\of{C=k}=\frac{N_k^{\text{test}}}{N}$, and
+        \item $\forall j \in \offf{1,\dots\,\abs{C_k}}, \mathbb{P}\of{H_k \leq j}=\of{\text{Hits@j}}_k$,
     \end{itemize}
      the application of COINs is justified if:
     \begin{equation}
@@ -91,7 +79,7 @@
 \begin{proof}
 The better model is deemed the one with lower overall expected cost up until a correct hit:
     \begin{align*}
-        \mathbb{E}[T' H'] &< \mathbb{E}[T H] \\
+        \mathbb{E}\off{T' H'} &< \mathbb{E}\off{T H} \\
         \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T'_k \bar{\rho}'_k} &< T \bar{\rho}, & \text{ by Lemma~\ref{lemma:expected_evaluations}} \\
         \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1 + \varepsilon_k}{A_k}} &< 1, & \text{ after dividing by RHS}
     \end{align*}
@@ -99,44 +87,44 @@ The better model is deemed the one with lower overall expected cost up until a c
 
 \begin{lemma}
     \label{lemma:expected_evaluations}
-    Let $C \in \{1,\dots,K\}$ be a r.v. storing from which community a sample belongs. Let $H$ be the r.v. counting how many queries were evaluated before a correct hit is achieved and let $F$ denote the r.v. counting the number of embedding computations required for evaluating a sample. Then:
-    $$\mathbb{E}[T H] = \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \bar{\rho}_k}$$
+    Let $C \in \offf{1,\dots,K}$ be a r.v. storing from which community a sample belongs. Let $H$ be the r.v. counting how many queries were evaluated before a correct hit is achieved and let $F$ denote the r.v. counting the number of embedding computations required for evaluating a sample. Then:
+    $$\mathbb{E}\off{T H} = \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \bar{\rho}_k}$$
 \end{lemma}
 \begin{proof}
     \begin{align*}
-        &\mathbb{E}[T H] = \mathbb{E}_{C}[\mathbb{E}[T H | C]]%, & \text{ by the Law of Total Expectation} 
+        &\mathbb{E}\off{T H} = \mathbb{E}_{C}\off{\mathbb{E}\off{T H \mid C}}%, & \text{ by the Law of Total Expectation} 
         %\\
         %&
-        = \sum_{k=1}^{K}{\mathbb{E}[T H | C=k] \mathbb{P}(C=k)}%, & \text{ by definition and the LOTUS} 
+        = \sum_{k=1}^{K}{\mathbb{E}\off{T H \mid C=k} \mathbb{P}\of{C=k}}%, & \text{ by definition and the LOTUS} 
         \\
-        &= \sum_{k=1}^{K}{T_k \mathbb{E}[H_k] \mathbb{P}(C=k)}%, & \text{ by definition and linearity of exp.} 
+        &= \sum_{k=1}^{K}{T_k \mathbb{E}\off{H_k} \mathbb{P}\of{C=k}}%, & \text{ by definition and linearity of exp.} 
         %\\
         %&
-        = \sum_{k=1}^{K}{\mathbb{P}(C=k) T_k \sum_{j=1}^{|C_k|}{j \mathbb{P}(H_k=j)}}%, & \text{ by definition} 
+        = \sum_{k=1}^{K}{\mathbb{P}\of{C=k} T_k \sum_{j=1}^{\abs{C_k}}{j \mathbb{P}\of{H_k=j}}}%, & \text{ by definition} 
         \\
-        &= \sum_{k=1}^{K}{\mathbb{P}(C=k) T_k \sum_{j=1}^{|C_k|}{j [\mathbb{P}(H_k \leq j) - \mathbb{P}(H_k \leq j-1)]}}%, & \text{ since $H_k$'s are discrete r.v.s} 
+        &= \sum_{k=1}^{K}{\mathbb{P}\of{C=k} T_k \sum_{j=1}^{\abs{C_k}}{j \off{\mathbb{P}\of{H_k \leq j} - \mathbb{P}\of{H_k \leq j-1}}}}%, & \text{ since $H_k$'s are discrete r.v.s} 
         \\
-        &= \sum_{k=1}^{K}{\mathbb{P}(C=k) T_k \left[|C_k|- \sum_{j=1}^{|C_k|-1}{\mathbb{P}(H_k \leq j)}\right]}%, & \text{ after cancelling out the telescoping} 
+        &= \sum_{k=1}^{K}{\mathbb{P}\of{C=k} T_k \off{\abs{C_k}- \sum_{j=1}^{\abs{C_k}-1}{\mathbb{P}\of{H_k \leq j}}}}%, & \text{ after cancelling out the telescoping} 
         \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- \sum_{j=1}^{|C_k|-1}{(\text{Hits@j})_k}\right]}%, & \text{ by the assumptions} 
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \sum_{j=1}^{\abs{C_k}-1}{\of{\text{Hits@j}}_k}}}%, & \text{ by the assumptions} 
         \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- \sum_{j=1}^{|C_k|-1}{\frac{1}{N_k^{\text{test}}}\sum_{i | c(a_i)=k}{\mathbb{I}(\rho^{(i)} \leq j)}}\right]}%, & \text{ by definition} 
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \sum_{j=1}^{\abs{C_k}-1}{\frac{1}{N_k^{\text{test}}}\sum_{i \mid c\of{a_i}=k}{\mathbb{I}\of{\rho^{\of{i}} \leq j}}}}}%, & \text{ by definition} 
         \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- \frac{1}{N_k^{\text{test}}}\sum_{i | c(a_i)=k}{(|C_k|- \rho^{(i)})}\right]}%, & \text{ after switching sum order} 
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \frac{1}{N_k^{\text{test}}}\sum_{i \mid c\of{a_i}=k}{\of{\abs{C_k}- \rho^{\of{i}}}}}}%, & \text{ after switching sum order} 
         \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- |C_k| + \frac{1}{N_k^{\text{test}}}\sum_{i | c(a_i)=k}{\rho^{(i)}}\right]}%, & \text{ after distributing} 
+        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \abs{C_k} + \frac{1}{N_k^{\text{test}}}\sum_{i \mid c\of{a_i}=k}{\rho^{\of{i}}}}}%, & \text{ after distributing} 
         \\
-        % &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \left[|C_k|- |C_k| + \bar{\rho}_k \right]}, & \text{ by definition} \\
+        % &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \abs{C_k} + \bar{\rho}_k }}, & \text{ by definition} \\
         &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \bar{\rho}_k}%, & \text{ by definition}
     \end{align*}
     If $\forall k, T_k = T$ like for the baseline models, then:
     \begin{align*}
-        \mathbb{E}[T H] &= T \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \bar{\rho}_k}%, & \text{ by linearity of expectation and everything before} 
+        \mathbb{E}\off{T H} &= T \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \bar{\rho}_k}%, & \text{ by linearity of expectation and everything before} 
         %\\ 
         %&
-        = T \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1}{N_k^{\text{test}}}\sum_{i | c(a_i)=k}{\rho^{(i)}}}%, & \text{ by definition} 
+        = T \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1}{N_k^{\text{test}}}\sum_{i \mid c\of{a_i}=k}{\rho^{\of{i}}}}%, & \text{ by definition} 
         \\
-        &= T \frac{1}{N} \sum_{i=1}^{N}{\rho^{(i)}}%, & \text{ after cancelling and combining the sums} 
+        &= T \frac{1}{N} \sum_{i=1}^{N}{\rho^{\of{i}}}%, & \text{ after cancelling and combining the sums} 
         %\\
         %&
         = T \bar{\rho}%, & \text{ by definition}
@@ -146,20 +134,20 @@ The better model is deemed the one with lower overall expected cost up until a c
 \begin{proof}[Proposition \ref{proposition:complexity_distributed}]
     To explain the complexity, we note that in a parallel computing setting, where we assume equal computation power for each machine, the overall cost of Step 2 is equal to that of the machine who will do the most work (in this case the most node-level query-answer embeddings computed). The additional $KN$ term is the total cost of Step 1, which is not parallelized.
 
-    The largest overall cost is naturally achieved when $|U|=1$, i.e. we fall back to the single-machine setting without parallelization, thus the upper bound is the same as before.
+    The largest overall cost is naturally achieved when $\abs{U}=1$, i.e. we fall back to the single-machine setting without parallelization, thus the upper bound is the same as before.
 
-    The lower bound requires a new argument based on calculus. To start, the obvious lower bound to the maximum cost across machines is the minimum cost. We would achieve this lower bound when the max and min are equal, i.e. only when each machine does the same amount of work. In our case, this quantity is $\textcolor{blue}{\frac{1}{|U|}}\sum_{k=1}^{K}{|C_k|N_k^{\text{test}}}$. If we keep $|U|$ and $K$ fixed as constants, we can use the KKT result from the proof of Proposition \ref{proposition:complexity} and deduce that now the only extremal points will have the form $N(K+\frac{|V|}{K\textcolor{blue}{|U|}})$. Note that we have the constraints $1 \leq K \leq |V|$ and $1 \leq |U| \leq K$ (having more machines than communities is useless).
+    The lower bound requires a new argument based on calculus. To start, the obvious lower bound to the maximum cost across machines is the minimum cost. We would achieve this lower bound when the max and min are equal, i.e. only when each machine does the same amount of work. In our case, this quantity is $\textcolor{blue}{\frac{1}{\abs{U}}}\sum_{k=1}^{K}{\abs{C_k}N_k^{\text{test}}}$. If we keep $\abs{U}$ and $K$ fixed as constants, we can use the KKT result from the proof of Proposition \ref{proposition:complexity} and deduce that now the only extremal points will have the form $N\of{K+\frac{\abs{V}}{K\textcolor{blue}{\abs{U}}}}$. Note that we have the constraints $1 \leq K \leq \abs{V}$ and $1 \leq \abs{U} \leq K$ (having more machines than communities is useless).
 
-    Let $f(K, |U|)=N(K+\frac{|V|}{K|U|})$. Then $\nabla f (K, |U|)=\left(\frac{\partial f}{\partial K},\frac{\partial f}{\partial |U|}\right)=\left(N(1-\frac{|V|}{K^2|U|}), -N\frac{|V|}{K|U|^2})\right)$.
+    Let $f\of{K, \abs{U}}=N\of{K+\frac{\abs{V}}{K\abs{U}}}$. Then $\nabla f \of{K, \abs{U}}=\of{\frac{\partial f}{\partial K},\frac{\partial f}{\partial \abs{U}}}=\of{N\of{1-\frac{\abs{V}}{K^2\abs{U}}}, -N\frac{\abs{V}}{K\abs{U}^2}})$.
 
-    Setting $\nabla f = (0, 0)$ yields that we must have $K^2|U|=|V|$ and $K|U|^2 \to \infty$, which is impossible with the constraints. So the only critical points can be boundary points:
+    Setting $\nabla f = \of{0, 0}$ yields that we must have $K^2\abs{U}=\abs{V}$ and $K\abs{U}^2 \to \infty$, which is impossible with the constraints. So the only critical points can be boundary points:
     \begin{itemize}
-        \item The corners $\{(1, 1), (|V|, 1), (|V|,|V|)\}$;
-        \item On the line $|U|=1$, we know $K=\sqrt{|V|}$ is a local minimum;
-        \item On the line $K=|V|$, $f(K, |U|)=N(|V|+\frac{1}{|U|})$ simply monotonically decreases with $|U|$, so there is no local minimum on this line;
-        \item On the line $|U|=K$, $f(K, |U|)=N(K+\frac{|V|}{K^2})$. So $\frac{d f}{d K}=N(1-\frac{2|V|}{K^3})$. Setting $\frac{d f}{d K}=0$ yields the local minimum $K=\sqrt[3]{2|V|}$ on this line.
+        \item The corners $\offf{\of{1, 1}, \of{\abs{V}, 1}, \of{\abs{V},\abs{V}}}$;
+        \item On the line $\abs{U}=1$, we know $K=\sqrt{\abs{V}}$ is a local minimum;
+        \item On the line $K=\abs{V}$, $f\of{K, \abs{U}}=N\of{\abs{V}+\frac{1}{\abs{U}}}$ simply monotonically decreases with $\abs{U}$, so there is no local minimum on this line;
+        \item On the line $\abs{U}=K$, $f\of{K, \abs{U}}=N\of{K+\frac{\abs{V}}{K^2}}$. So $\frac{d f}{d K}=N\of{1-\frac{2\abs{V}}{K^3}}$. Setting $\frac{d f}{d K}=0$ yields the local minimum $K=\sqrt[3]{2\abs{V}}$ on this line.
     \end{itemize}
-    So the full set of global minimum candidates is: $$(K^*, |U|^*) \in \{(1, 1), (|V|, 1), (|V|,|V|), (\sqrt{|V|}, 1), (\sqrt[3]{2|V|}, \sqrt[3]{2|V|}) \}.$$ Out of all of them, using both $\sqrt[3]{2|V|}$ communities and machines yields the minimal function value of $\frac{3}{2}N\sqrt[3]{2|V|}$.
+    So the full set of global minimum candidates is: $$\of{K^*, \abs{U}^*} \in \offf{\of{1, 1}, \of{\abs{V}, 1}, \of{\abs{V},\abs{V}}, \of{\sqrt{\abs{V}}, 1}, \of{\sqrt[3]{2\abs{V}}, \sqrt[3]{2\abs{V}}} }.$$ Out of all of them, using both $\sqrt[3]{2\abs{V}}$ communities and machines yields the minimal function value of $\frac{3}{2}N\sqrt[3]{2\abs{V}}$.
 \end{proof}
 
 \section{Balanced Partitioning for Distributed COINs}
@@ -173,47 +161,47 @@ Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the
 \caption{Exact Balanced Partition}
 \label{algorithm:balanced_partition}
 \begin{algorithmic}[1]
-\STATE{\textbf{input} $\{p_k\}_{k=1}^{K+1}$, $U=\{u_1,u_2,\dots\}$}
+\STATE{\textbf{input} $\offf{p_k}_{k=1}^{K+1}$, $U=\offf{u_1,u_2,\dots}$}
 \STATE{$S=\sum_{k=1}^{K+1}{p_k}$}
-\STATE{MEMO$=\{\}$}
-\STATE{\textbf{function} MinCost($k$,$\{s_j\}_{j=1}^{|U|-1}$):}
+\STATE{MEMO$=\offf{}$}
+\STATE{\textbf{function} $\text{MinCost}\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}$:}
 % \bindent
-\IF{$(k,\{s_j\}_{j=1}^{|U|-1})\notin$ MEMO}
+\IF{$\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}\notin$ MEMO}
 % \bindent
 \IF{$k=K+2$}
 % \bindent
-\STATE{$\mu=\max(\max_{j=1}^{|U|-1}{s_j},S-\sum_{j=1}^{|U|-1}{s_j})$}
+\STATE{$\mu=\max\of{\max_{j=1}^{\abs{U}-1}{s_j},S-\sum_{j=1}^{\abs{U}-1}{s_j}}$}
 % \eindent
 \ELSE
 % \bindent
-\STATE{$\mu=$MinCost$(k+1,\{s_j\}_{j=1}^{|U|-1})$}
-\FOR{$i \leftarrow 1$ to $|U|-1$}
+\STATE{$\mu=\text{MinCost}\of{k+1,\offf{s_j}_{j=1}^{\abs{U}-1}}$}
+\FOR{$i \leftarrow 1$ to $\abs{U}-1$}
 % \bindent
-\STATE{$\mu=\min(\mu, $MinCost$(k+1,\{s_j\}_{j=1}^{i-1}\cup\{s_i+p_k\}\cup\{s_j\}_{j=i+1}^{|U|-1}))$}
+\STATE{$\mu=\min\of{\mu, \text{MinCost}\of{k+1,\offf{s_j}_{j=1}^{i-1}\cup\offf{s_i+p_k}\cup\offf{s_j}_{j=i+1}^{\abs{U}-1}}}$}
 % \eindent
 \ENDFOR
 % \eindent
 \ENDIF
 % \eindent
-\STATE{MEMO$[(k,\{s_j\}_{j=1}^{|U|-1})]=\mu$}
+\STATE{MEMO$\off{\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}}=\mu$}
 \ENDIF
-\RETURN{MEMO$[(k,\{s_j\}_{j=1}^{|U|-1})]$}
+\RETURN{MEMO$\off{\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}}$}
 % \eindent
 \STATE{\textbf{end} MinCost}
-\STATE{$\mu^*=$MinCost$(1, \{0\}_{j=1}^{|U|-1})$}
-\STATE{$\{s^*_j\}_{j=1}^{|U|-1}=\{0\}_{j=1}^{|U|-1})$}
+\STATE{$\mu^*=$MinCost$\of{1, \offf{0}_{j=1}^{\abs{U}-1}}$}
+\STATE{$\offf{s^*_j}_{j=1}^{\abs{U}-1}=\offf{0}_{j=1}^{\abs{U}-1}$}
 \FOR{$k \leftarrow 1$ to $K+1$}
-\STATE{$i^*=|U|$}
-\FOR{$i \leftarrow 1$ to $|U|-1$}
-\IF{MEMO$[(k+1, \{s^*_j\}_{j=1}^{i-1}\cup\{s^*_j+p_k\}\cup\{s^*_j\}_{j=i+1}^{|U|-1})]=\mu^*$}
+\STATE{$i^*=\abs{U}$}
+\FOR{$i \leftarrow 1$ to $\abs{U}-1$}
+\IF{MEMO$\off{\of{k+1, \offf{s^*_j}_{j=1}^{i-1}\cup\offf{s^*_j+p_k}\cup\offf{s^*_j}_{j=i+1}^{\abs{U}-1}}}=\mu^*$}
 \STATE{$i^*=i$}
 \ENDIF
 \ENDFOR
 \STATE{$s_{i^*}^*=s_{i^*}^*+p_k$}
 \IF{$k=K+1$}
-\STATE{$u(g_V^*)=u_{i^*}$}
+\STATE{$u\of{g_V^*}=u_{i^*}$}
 \ELSE
-\STATE{$u(g_V^k)=u_{i^*}$}
+\STATE{$u\of{g_V^k}=u_{i^*}$}
 \ENDIF
 \ENDFOR
 \end{algorithmic}
@@ -225,18 +213,18 @@ Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the
 \caption{Greedy Balanced Partition}
 \label{algorithm:balanced_partition_greedy}
 \begin{algorithmic}[1]
-\STATE{\textbf{input} $\{p_k\}_{k=1}^{K+1}$, $U=\{u_1,u_2,\dots\}$}
-\STATE{$h_C=$MaxHeap($\{(p_k,k)\}_{k=1}^{K+1}$)}
-\STATE{$h_U=$MinHeap($\{(0,j)\}_{j=1}^{|U|-1}$)}
+\STATE{\textbf{input} $\offf{p_k}_{k=1}^{K+1}$, $U=\offf{u_1,u_2,\dots}$}
+\STATE{$h_C=\text{MaxHeap}\of{\offf{\of{p_k,k}}_{k=1}^{K+1}}$}
+\STATE{$h_U=\text{MinHeap}\of{\offf{\of{0,j}}_{j=1}^{\abs{U}-1}}$}
 \FOR{$l \leftarrow 1$ to $K+1$}
-\STATE{$(p_k^*,k^*)=$HeapPop($h_C$)}
-\STATE{$(s_i^*,i^*)=$HeapPop($h_U$)}
+\STATE{$\of{p_k^*,k^*}=\text{HeapPop}\of{h_C}$}
+\STATE{$\of{s_i^*,i^*}=\text{HeapPop}\of{h_U}$}
 \IF{$k^*=K+1$}
-\STATE{$u(g_V^*)=u_{i^*}$}
+\STATE{$u\of{g_V^*}=u_{i^*}$}
 \ELSE
-\STATE{$u(g_V^{k^*})=u_{i^*}$}
+\STATE{$u\of{g_V^{k^*}}=u_{i^*}$}
 \ENDIF
-\STATE{HeapPush($h_U,(s_i^*+p_k^*,i^*)$)}
+\STATE{$\text{HeapPush}\of{h_U,\of{s_i^*+p_k^*,i^*}}$}
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
@@ -370,7 +358,7 @@ NELL-995 & TransE & Baseline &                          &                       
 \end{table}
 
 % \setlength{\LTcapwidth}{\textwidth}
-% \begin{longtable}[ht!]{c|c|c||c|c|c|c|c}
+% \begin{longtable}[ht!]{cccccccc}
 \begin{table}[!ht]
   \caption[Decomposition of COINs metrics into the overall values and metrics for the second prediction step separately.]{Decomposition of COINs metrics into the overall values shown before and metrics for the second prediction step separately. Values in bold indicate the superiority of COINs compared to the baselines, while underlined values have a relative error lower than 10\%.}
   \label{tab:performance_query_answering_2}%\tabularnewline
@@ -598,7 +586,7 @@ All code was executed on a single machine with the following specifications:
 % \begin{table}
 % \caption{Table captions should be placed above the
 % tables.}\label{tab1}
-% \begin{tabular}{|l|l|l|}
+% \begin{tabular}{lll}
 % \hline
 % Heading level &  Example & Font size and style\\
 % \hline
@@ -651,30 +639,26 @@ All code was executed on a single machine with the following specifications:
 % \cite{ref_article1,ref_lncs1,ref_book1},
 % \cite{ref_article1,ref_book1,ref_proc1,ref_url1}.
 
-
-
-
-
 \chapter{Appendix for HiGenDiff}
 
 \section{Proofs}
 \label{sec:appendix_higendiff_theory}
 
 \begin{proof}[Proposition~\ref{proposition:complexity_higendiff}]
-Let $\{c^{(L)}_k\}_{k=1}^{n^{(L+1)}}$ be the sizes of the communities imposed by $M^{(L)}$, i.e., $\forall k, c^{(L)}_k=\sum_{i=1}^{n^{(L)}}{M^{(L)}_{k,i}}$. Then the worst-case cost of one diffusion step of HiGenDiff for a given adjacency matrix $A^{(L)}$ will be thus ${n^{(L+1)}}^2 + \sum_{j=1}^{n^{(L+1)}}\sum_{k=1}^{n^{(L+1)}}{c^{(L)}_j c^{(L)}_k \bar{A}_{j,k}^{(L+1)}}$. This is because we need to sample all the edges of the parent graph and then sample all communities and the bipartites that should exist, according to the parent level's adjacency. Since all the above quantities are random variables, under the i.i.d. Bernoulli assumption the expectation yields:
+Let $\offf{c^{\of{L}}_k}_{k=1}^{n^{\of{L+1}}}$ be the sizes of the communities imposed by $M^{\of{L}}$, i.e., $\forall k, c^{\of{L}}_k=\sum_{i=1}^{n^{\of{L}}}{M^{\of{L}}_{k,i}}$. Then the worst-case cost of one diffusion step of HiGenDiff for a given adjacency matrix $A^{\of{L}}$ will be thus ${n^{\of{L+1}}}^2 + \sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_j c^{\of{L}}_k \bar{A}_{j,k}^{\of{L+1}}}$. This is because we need to sample all the edges of the parent graph and then sample all communities and the bipartites that should exist, according to the parent level's adjacency. Since all the above quantities are random variables, under the i.i.d. Bernoulli assumption the expectation yields:
 \begin{align}
     \begin{split}
-        \mathbb{E}[{n^{(L+1)}}^2 + \sum_{j=1}^{n^{(L+1)}}\sum_{k=1}^{n^{(L+1)}}{c^{(L)}_j c^{(L)}_k \bar{A}_{j,k}^{(L+1)}}] 
-        &= \mathbb{E}[{n^{(L+1)}}^2]+\sum_{j=1}^{n^{(L+1)}}\sum_{k=1}^{n^{(L+1)}}{\mathbb{E}[c^{(L)}_j c^{(L)}_k] \mathbb{E}[\bar{A}_{j,k}^{(L+1)}]} \\
-        &= \mathbb{E}[{n^{(L+1)}}^2]+p\sum_{j=1}^{n^{(L+1)}}\sum_{k=1}^{n^{(L+1)}}{(\mathrm{Cov}[c^{(L)}_j,c^{(L)}_k]+\mathbb{E}[c^{(L)}_j]\mathbb{E}[c^{(L)}_k])} \\
-        &= \mathbb{E}[{n^{(L+1)}}^2]+p(\mathrm{Cov}[\sum_{j=1}^{n^{(L+1)}}{c^{(L)}_j},\sum_{k=1}^{n^{(L+1)}}{c^{(L)}_k}]+\mathbb{E}[\sum_{k=1}^{n^{(L+1)}}{c^{(L)}_k}]^2)\\
-         &= \mathbb{E}[{n^{(L+1)}}^2] +p (\mathbb{V}[n^{(L)}]+\mathbb{E}[n^{(L)}]^2) \\
-          &= \mathbb{E}[{n^{(L+1)}}^2] + p\mathbb{E}[{n^{(L)}}^2]
+        \mathbb{E}\off{{n^{\of{L+1}}}^2 + \sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_j c^{\of{L}}_k \bar{A}_{j,k}^{\of{L+1}}}} 
+        &= \mathbb{E}\off{{n^{\of{L+1}}}^2}+\sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{\mathbb{E}\off{c^{\of{L}}_j c^{\of{L}}_k} \mathbb{E}\off{\bar{A}_{j,k}^{\of{L+1}}}} \\
+        &= \mathbb{E}\off{{n^{\of{L+1}}}^2}+p\sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{\of{\mathrm{Cov}\off{c^{\of{L}}_j,c^{\of{L}}_k}+\mathbb{E}\off{c^{\of{L}}_j}\mathbb{E}\off{c^{\of{L}}_k}}} \\
+        &= \mathbb{E}\off{{n^{\of{L+1}}}^2}+p\of{\mathrm{Cov}\off{\sum_{j=1}^{n^{\of{L+1}}}{c^{\of{L}}_j},\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_k}}+\mathbb{E}\off{\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_k}}^2}\\
+         &= \mathbb{E}\off{{n^{\of{L+1}}}^2} +p \of{\mathbb{V}\off{n^{\of{L}}}+\mathbb{E}\off{n^{\of{L}}}^2} \\
+          &= \mathbb{E}\off{{n^{\of{L+1}}}^2} + p\mathbb{E}\off{{n^{\of{L}}}^2}
     \end{split}
 \end{align}
-For the upper bound, note that always $p \leq 1$ and $n^{(L+1)} \leq n^{(L)}$.
+For the upper bound, note that always $p \leq 1$ and $n^{\of{L+1}} \leq n^{\of{L}}$.
 
-For the lower bound, we know that $p \geq \frac{1}{n^{(L+1)}}$, as in the best case, there will not be a single bipartite to generate, but we always have to sample the communities (the self-loops in the parent). Thus taking the expectation of $p$ w.r.t. $n^{(L)}$ implies: $\mathbb{E}[{n^{(L+1)}}^2] +p\mathbb{E}[{n^{(L)}}^2] \geq \mathbb{E}[{n^{(L+1)}}^2 + \frac{{n^{(L)}}^2}{n^{(L+1)}}]$. Similar to the proof of Proposition \ref{proposition:complexity_distributed}, we find that the minimum of the function $f(K)=K^2+\frac{|V|}{K}$ is $\frac{3}{2}\sqrt[3]{2|V|^2}$ and is achieved when $K=\frac{1}{2}\sqrt[3]{4|V|}$. Plugging in $|V|={n^{(L)}}^2$ and $K=n^{(L+1)}$ yields the result.
+For the lower bound, we know that $p \geq \frac{1}{n^{\of{L+1}}}$, as in the best case, there will not be a single bipartite to generate, but we always have to sample the communities (the self-loops in the parent). Thus taking the expectation of $p$ w.r.t. $n^{\of{L}}$ implies: $\mathbb{E}\off{{n^{\of{L+1}}}^2} +p\mathbb{E}\off{{n^{\of{L}}}^2} \geq \mathbb{E}\off{{n^{\of{L+1}}}^2 + \frac{{n^{\of{L}}}^2}{n^{\of{L+1}}}}$. Similar to the proof of Proposition \ref{proposition:complexity_distributed}, we find that the minimum of the function $f\of{K}=K^2+\frac{\abs{V}}{K}$ is $\frac{3}{2}\sqrt[3]{2\abs{V}^2}$ and is achieved when $K=\frac{1}{2}\sqrt[3]{4\abs{V}}$. Plugging in $\abs{V}={n^{\of{L}}}^2$ and $K=n^{\of{L+1}}$ yields the result.
 \end{proof}
 
 \section{Detailed results}
@@ -747,3 +731,134 @@ Dataset & Model & Bucketized &  &  &  &  \\
 \end{tabular}
 \end{adjustbox}
 \end{table}
+
+\chapter{Appendix for MultiProx}
+
+\section{A principled multi-measurement sampling framework}
+\label{sec:appendix_gibbs}
+\subsection{Multi-measurement model}
+Let $\mathbf{X}_0 \sim p_0$. Let $t>0$ be a fixed noise level. We define $m$, correlated, noisy measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ of $X$, at noise level $t >0$, as
+\begin{equation}
+\mathbf{Y}_i = e^{-t} \mathbf{X} + \sqrt{1 - e^{-2t}} Z_i
+\label{eq:multimeasure}
+\end{equation}
+where $Z_1, \dots, Z_m$ are independent $N\of{\mathbf{0}, \mathbf{I}_F}$ variables. These $m$ measurements are correlated through $\mathbf{X}$. Our method builds on the observation from \cite{saremi_multimeasurement_2021} that denoising from an entire set of correlated noisy measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ is easier than denoising from a single noisy measurement. The multimeasurement sampling framework we analyze in this section consists of generating $\mathbf{X}_0$ by denoising from the $m$ fixed-noise level measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. Unlike DDPMs, this framework does not progressively denoise following an annealing schedule. It consists of two components: a denoising component that produces a sample $\mathbf{X}_0$ from the noisy measurements and an initialization component that generates the noisy measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ to denoise from. We summarize the framework in Algorithm \ref{alg:pipeline} and explain its soundness in detail in what follows.
+
+\begin{algorithm}[H]
+\caption{Gibbs Multi-measurement Sampling Framework}
+\label{alg:pipeline}
+\begin{algorithmic}
+\STATE{\textbf{input} $m,t\geq0$}
+\STATE{$\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m} \sim N\of{\mathbf{0}, \mathbf{I}_{m F}}$}
+\FOR{$i \gets 1 \text{ to } m$}
+\STATE{$\mathbf{Y}_i \sim \mathbf{Y}_i|\mathbf{Y}_{-i}$}
+\ENDFOR
+\RETURN{$\mathbf{X} \sim \mathbf{X}|\mathbf{Y}_{1,\dots,m}$}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Denoising from multiple measurements}
+We first consider the denoising component: the process generating $\mathbf{X}_0$ from $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. This can be achieved by sampling from the conditional distribution $\mathbf{X}_0|\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. Fortunately, for any noise level $t$, the denoising distribution $\mathbf{X}_0|\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ can be made to be unimodal by accumulating enough measurements, i.e., by choosing $m$ large enough. This follows from the simple observation that the average of the $m$ measurements yields
+\begin{equation}
+\frac{1}{m}\sum_{i=1}^m \mathbf{Y}_i \overset{\mathcal{L}}{=}  e^{-t} \mathbf{X} + \sqrt{\frac{1 - e^{-2t}}{m}}Z
+\label{eq:noisereduction}
+\end{equation}
+where $Z \sim N\of{\mathbf{0}, \mathbf{I}_F}$, which reduces the amount of noise by a factor $\sqrt{m}$. The parameter $m$ can thus be set to compensate for a large choice of $t$. Indeed, as discussed in section \ref{sec:background_multiprox}, a large choice of $t$ is necessary in order to be able to initialize $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ before denoising, but the denoising becomes increasingly difficult as multi-modality increases with $t$. With the parameter $m$, we can act on this trade-off to ensure that the denoising stays a unimodal sampling problem. We formally show this in the following theorem. 
+
+\begin{theorem}
+\label{thm:unimodality}
+    Under the assumption that the score $\nabla \log p_0$ is $L$-Lipschitz, for any $t$ and $\mathbf{Y}_1, \dots, \mathbf{Y}_m$ defined as in \eqref{eq:multimeasure}, the Hessian of the conditional distribution $\mathbf{X}|\mathbf{Y}_1, \dots, \mathbf{Y}_m$ satisfies
+    \begin{equation}
+    \nabla ^2 \log p(x|y_1, \dots, y_m) \preceq \off{L - m\frac{e^{-2t}}{1 - e^{-2t}}}\mathbf{I}_F.
+    \label{eq:concave}
+    \end{equation}
+\end{theorem}
+
+According to \eqref{eq:concave}, as long as $m > \of{e^{2t} - 1} L$, the denoising distribution $\mathbf{X}_0|\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ is strongly-log-concave, i.e, unimodal, making the denoising tractable. Consequently, as long as a sample from $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ can be obtained, a sample of $\mathbf{X}_0$ can obtained through sampling from a strongly log-concave distribution.
+
+% \begin{remark}
+%     Our result holds for log-smooth distributions (Assumption \ref{ass:log-smooth}), this assumption is standard in the analysis of denoising diffusions \cite{chen2022sampling, benton2023linear}. A alternative way of obtaining a log-smooth distribution is through Gaussian convolution of a bounded distribution: if $X$ is bounded, then $X + \sqrt{\delta}Z$, with $Z\sim \sN\br{0, I}$ is log-smooth. This convolution trick to obtain log-smooth distributions corresponds to the \emph{early-stopping} criterion assumption in convergence proofs of diffusion samplers.
+% \end{remark}
+
+\subsection{Sampling the noisy measurements}
+We turn our attention to the initialization problem of obtaining a sample from  $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. If $t$ is large, each $\mathbf{Y}_i$ approaches a standard Gaussian according to \eqref{eq:multimeasure}. The individual coordinates approximate standard Gaussians, but they must be appropriately correlated in order to accurately approximate $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. Indeed, the benefit of multiple measurements follows from the correlation of the measurements and is a crucial component as the noise reduction in \eqref{eq:noisereduction} depends on it. 
+
+Instead of sampling each coordinate by sequentially increasing the conditioning as in \cite{saremi_chain_2023}, we propose a Gibbs sampling strategy \cite{casella_explaining_1992, roberts_updating_1997}. Gibbs sampling consists of iteratively sampling each component $\mathbf{Y}_i$ conditioned on all the other $m-1$ measurements, denoted $\mathbf{Y}_{-i}$. Gibbs sampling is guaranteed to converge to the joint distribution \cite{rosenthal_minorization_1995} and is a well-studied strategy for sampling when each conditioned marginal is easy to sample from \cite{koller_probabilistic_2009}. The following theorem will help show that there exists a choice of $t$ such that each conditional marginal $\mathbf{Y}_i|\mathbf{Y}_{-i}$ is easy to sample from. 
+
+\begin{theorem}
+\label{thm:unimodality_conditional}
+    Under the log-smoothness assumption again, for any, $t>0$ and $\mathbf{Y}_1, \dots, \mathbf{Y}_m$ as in \eqref{eq:multimeasure}, we have that for any  $i \in \off{m}$, the hessian of $\log p\of{y_i|y_{-i}}$ is given by
+    \begin{align}
+    \begin{split}
+    \nabla^2_{y_i} \log p\of{y_i|y_{-i}} &= \mathbb{V}_{\mathbf{X}|\mathbf{Y}_1, \dots, \mathbf{Y}_m = (y_1, \dots, y_m)}\off{\frac{e^{-t} \mathbf{X} - y_i}{1 - e^{-2t}}} - \frac{1}{1-e^{-2t}}\mathbf{I}_F \\
+    &= \of{\frac{e^{-t}}{1 - e^{-2t}}}^2\mathbb{V}_{\mathbf{X}|\mathbf{Y}_1, \dots, \mathbf{Y}_m =(y_1, \dots, y_m)}\off{\mathbf{X}} - \frac{1}{1-e^{-2t}}\mathbf{I}_F.
+    \end{split}
+    \end{align}
+    \label{eq:conditionalunimodal}
+\end{theorem}
+In order to use the theorem above to show that the distributions are log-concave, we need to control the variance term in \eqref{eq:conditionalunimodal}. We can upper-bound this variance term using Bakry-Emery's result showing that strongly log-concave measures verify the Poincaré inequality.
+
+\begin{theorem}
+\label{thm:variance}
+    Let $\mathbf{X}$ be an $L$-smooth density, if $m$ is such that $m \geq 2\of{e^{2t} - 1}L$, then it holds that
+    \begin{equation}
+       \mathbb{V}_{\mathbf{X}|\mathbf{Y}_1, \dots, \mathbf{Y}_m =(y_1, \dots, y_m)}\off{\mathbf{X}} \leq \frac{L}{2}.
+    \end{equation}
+\end{theorem}
+
+Equipped with the result above, we can show that, in order for \eqref{eq:conditionalunimodal} to be negative, the noise level should be set such that
+\begin{equation}
+t \geq \frac{1}{2}\log\of{1 + \frac{L}{2}}.
+\end{equation}
+
+With the above conditions, we can show that our sampling framework, detailed in Algorithm \ref{alg:pipeline}, is a fully unimodal sampling pipeline. This was achieved not with annealing but with multiple measurements. Indeed, combining the previous theorems, we have that the following theorem holds for the Gibbs multi-measurement sampler.
+
+\begin{theorem}
+    \label{thm:logconcavepipe}
+    Under the log-smoothness assumption, for $t> \frac{1}{2}\log\of{1 + \frac{L}{2}}$ and $m \geq 2\of{e^{2t} - 1}L$, we have that the framework of Algorithm \ref{alg:pipeline} is a fully log-concave pipeline, where each step only samples from a unimodal distribution.
+\end{theorem}
+
+\section{Additional experiments}
+\label{sec:appendix_multiprox_experiments}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/multiprox/comm20_grid_image_single_noise.png}
+    \includegraphics[width=\linewidth]{figures/multiprox/comm20_grid_image.png}
+    \caption[Best sample chains obtained with MultiProx and MultiProxAn employing a ConGress denoiser trained on Community20.]{Best sample chains obtained with MultiProx and MultiProxAn employing a ConGress denoiser trained on Community20. We set for these chains $n=10$, $m=100$, $t=75$ (15\% of $T$) for MultiProx and $t=200, t'=50$ (40\% and 10\% of $T$) for MultiProxAn.}
+    \label{fig:comm20_extra}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \caption[Sampling metrics for each MultiProxAn noise level hyperparameter configuration tested for the Community20 dataset.]{Sampling metrics for each noise level hyperparameter configuration we tested for the Community20 dataset. Left to right: MultiProxAn fixed noise level $t$ and final output noise level $t' \leq t$ (as percentages of $T$), Maximum Mean Discrepancy (MMD) metrics for node degrees, per-node clustering coefficients, node orbits, and node eigenvalues between sampled and dataset graph distributions, and total execution time of sampling. Arrows indicate whether higher or lower values of a metric are better. Best values per metric are in bold, while second-best values are underlined.}
+    \label{tab:comm20_stats}
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llrrrrr}
+        \toprule
+         $t$ & $t'$ & $\downarrow$ Degree MMD & $\downarrow$ Cluster MMD & $\downarrow$ Orbit MMD & $\downarrow$ Spectral MMD & $\downarrow$ Wall time [s]  \\
+         \midrule
+         \multicolumn{2}{l}{Baseline} & 0.0064 & \textbf{0.0725} & \underline{0.0214} & \textbf{0.0232} & 846 \\
+         40\% & 40\% & 0.1630 & 0.1230 & 0.6954 & 0.0718 & \textbf{139} \\
+         40\% & 20\% & \textbf{0.0022} & 0.1148 & 0.0666 & 0.0633 & 305 \\
+         40\% & 10\% & 0.0037 & 0.0864 & \textbf{0.0051} & 0.1219 & 388 \\
+         40\% & 0.2\% & 0.0150 & \underline{0.0833} & 0.0376 & 0.1965 & 467 \\
+         20\% & 20\% & 0.0527 & 0.1230 & 0.6039 & 0.0456 & \textbf{139} \\
+         20\% & 10\% & 0.0067 & 0.1188 & 0.3760 & 0.0422 & 223 \\
+         20\% & 0.2\% & \underline{0.0023} & 0.1152 & 0.2743 & \underline{0.0394} & 306 \\
+         10\% & 10\% & 0.0734 & 0.1272 & 0.6653 & 0.0752 & \textbf{138} \\
+         10\% & 0.2\% & 0.0699 & 0.1266 & 0.7000 & 0.0458 & \underline{222} \\
+         \bottomrule
+    \end{tabular}}
+\end{table}
+
+\section{Implementation}
+
+For the molecule generation experiments, we extend the implementation of \cite{vignac_digress_2022} (available at \url{https://github.com/cvignac/DiGress}) with code for our novel specific sampling method tailored to the architecture of DiGress. Our experiment code implementation is fully available at \url{https://github.com/ResearchWeasel/multi-prox-diffusion-nips-2025} to facilitate reproducibility.
+
+All code was executed on a single machine with the following specifications:
+\begin{itemize}
+    \item AMD EPYC\textsuperscript{\texttrademark} 7742 64-core CPU @ 2.25GHz;
+    \item NVIDIA A100-SXM4-40GB GPU;
+    \item 1.0TB RAM. 
+\end{itemize}

@@ -60,18 +60,18 @@ Performing knowledge graph inference requires solving link prediction and query 
 
 On the other hand, given a list of logical queries extracted from the knowledge graph, the query answering task requires ranking for \emph{each} query \emph{all} of the entities in the graph according to how likely they are to be its correct answer. Thus compared to link prediction, this task is much more computationally complex, as the largest contributor to the number of model inference calls is the size of the graph. Our work aims to reduce this factor significantly.
 
-%One can observe that the query answering task, even in the simplest, single-hop case, entails evaluating the link prediction model as many times as the size of the entire set of entities, for \emph{every} evaluation data sample. On a single machine, this computationally intensive task will incur time complexity proportional to $O(N |V|)$, the number of node embeddings required to be computed during evaluation, where $N$ is the number of evaluation samples. Other factors are model-dependent, but in all cases, the size of the node set $|V|$, i.e., the graph size, is the largest contributor. Thus, our work aims to reduce this factor significantly.
+%One can observe that the query answering task, even in the simplest, single-hop case, entails evaluating the link prediction model as many times as the size of the entire set of entities, for \emph{every} evaluation data sample. On a single machine, this computationally intensive task will incur time complexity proportional to $O\of{N \abs{V}}$, the number of node embeddings required to be computed during evaluation, where $N$ is the number of evaluation samples. Other factors are model-dependent, but in all cases, the size of the node set $\abs{V}$, i.e., the graph size, is the largest contributor. Thus, our work aims to reduce this factor significantly.
 
-% Given an evaluation knowledge graph triplet $(h, r, t) \in E_R$, the \emph{single-hop query answering task} entails scoring all possible answers $\hat{t} \in V$ to the query $(h, r)$ w.r.t. how probable they are as relations in the knowledge graph, then ranking the answers according to these scores, with the goal that for the best model the true triplet $(h, r, t)$ is scored the highest, i.e. has \emph{rank} equal to 1. For this work, we define the rank of a score as the index of the descending order statistic with a value equal to the score, consistent with previous work. 
+% Given an evaluation knowledge graph triplet $\of{h, r, t} \in E_R$, the \emph{single-hop query answering task} entails scoring all possible answers $\hat{t} \in V$ to the query $\of{h, r}$ w.r.t. how probable they are as relations in the knowledge graph, then ranking the answers according to these scores, with the goal that for the best model the true triplet $\of{h, r, t}$ is scored the highest, i.e. has \emph{rank} equal to 1. For this work, we define the rank of a score as the index of the descending order statistic with a value equal to the score, consistent with previous work. 
 
-% With this classical evaluation procedure, we can easily deduce that on a single machine, this is a computationally intensive task with time complexity proportional to $O(N |V| D)$, where $N$ is the number of evaluation samples and $D$ is the embedding dimension. Other factors are model-dependent, but in all cases, the size of the node set $|V|$, i.e., the graph size, is the largest contributor. Thus, our work aims to reduce this factor significantly.
+% With this classical evaluation procedure, we can easily deduce that on a single machine, this is a computationally intensive task with time complexity proportional to $O\of{N \abs{V} D}$, where $N$ is the number of evaluation samples and $D$ is the embedding dimension. Other factors are model-dependent, but in all cases, the size of the node set $\abs{V}$, i.e., the graph size, is the largest contributor. Thus, our work aims to reduce this factor significantly.
 
 \subsubsection{Preliminaries}
 % \begin{definition}
-% A \textbf{finite graph} $G$ is defined as the ordered pair of two finite sets, $G=(V, E)$ where:
+% A \textbf{finite graph} $G$ is defined as the ordered pair of two finite sets, $G=\of{V, E}$ where:
 % \begin{itemize}
-% \item $V=\{v_1, \dots, v_N\}$ is a finite set of elements, which are referred to as \textbf{nodes};
-% \item $E$ is a finite set of elements referred to as \textbf{edges}, where an edge is defined as an ordered pair of nodes: $E=\{(v_i,v_j)|v_i,v_j \in V\}$.
+% \item $V=\offf{v_1, \dots, v_N}$ is a finite set of elements, which are referred to as \textbf{nodes};
+% \item $E$ is a finite set of elements referred to as \textbf{edges}, where an edge is defined as an ordered pair of nodes: $E=\offf{\of{v_i,v_j} \mid v_i,v_j \in V}$.
 % \end{itemize}
 % For this text, we will accept the terms \textbf{graph} and \textbf{network} to be equivalent.
 % \end{definition}
@@ -79,9 +79,9 @@ On the other hand, given a list of logical queries extracted from the knowledge 
 % \begin{definition}
 % Relevant computable graph properties include:
 %     \begin{itemize}
-%         \item The \textbf{neighbourhood} of a node $v$ is defined as the set of nodes $v$ is directly connected to with an edge: $N(v)=\{u|u\in V, (v,u) \in E \vee (u,v) \in E \}$, while $v$'s \textbf{degree} is the size of its neighbourhood: $deg(v)=|N(v)|$;
-%         \item A \textbf{path} in a graph $G=(V, E)$ is a sequence of nodes $v_1,\dots,v_M \in V$ in which every pair of consecutive nodes are connected by an edge: $\forall i \in \{1,\dots, M-1\},(v_i,v_{i+1})\in E$;
-%         \item Given a graph $G = (V, E)$, a \textbf{random walk} of length $L$ is a realisation of a discrete stochastic process $\{V_i\}_{i=1}^L$ where $V_1$ is a random variable with support $V$ and probability mass function $\lambda$, $\sum_{v \in V}{\lambda(v)}=1$, while $\forall t\in \{2,\dots,L\}$, $V_t$ is a random variable with support $N(V_{t-1})$ and probability mass function $\mu_t$, $\sum_{u \in N(V_{t-1})}{\mu_t(u)}=1$. Sampling random walks from a graph is a way of converting the graph into a set of path sequences, from which much richer information can be extracted, such as multi-hop connections and node-context pairs.
+%         \item The \textbf{neighbourhood} of a node $v$ is defined as the set of nodes $v$ is directly connected to with an edge: $N\of{v}=\offf{u \mid u\in V, \of{v,u} \in E \vee \of{u,v} \in E }$, while $v$'s \textbf{degree} is the size of its neighbourhood: $deg\of{v}=\abs{N\of{v}}$;
+%         \item A \textbf{path} in a graph $G=\of{V, E}$ is a sequence of nodes $v_1,\dots,v_M \in V$ in which every pair of consecutive nodes are connected by an edge: $\forall i \in \offf{1,\dots, M-1},\of{v_i,v_{i+1}}\in E$;
+%         \item Given a graph $G = \of{V, E}$, a \textbf{random walk} of length $L$ is a realisation of a discrete stochastic process $\offf{V_i}_{i=1}^L$ where $V_1$ is a random variable with support $V$ and probability mass function $\lambda$, $\sum_{v \in V}{\lambda\of{v}}=1$, while $\forall t\in \offf{2,\dots,L}$, $V_t$ is a random variable with support $N\of{V_{t-1}}$ and probability mass function $\mu_t$, $\sum_{u \in N\of{V_{t-1}}}{\mu_t\of{u}}=1$. Sampling random walks from a graph is a way of converting the graph into a set of path sequences, from which much richer information can be extracted, such as multi-hop connections and node-context pairs.
 %     \end{itemize}
 % \end{definition}
 
@@ -89,46 +89,46 @@ Mathematically we can represent knowledge graphs with AMHENs:
 \begin{definition}
 An \emph{Attributed Multiplex HEterogeneous Network (AMHEN)} is a graph where each entity (node) in a set $V$ has attributes and each relation (edge) in a set $E$ has a type label~\cite{liu_ahng_2019,cen_representation_2019}. 
 
-Formally, first, a finite set of \emph{relation types} is defined $R = \{r_1,r_2,\dots\}$, and the edge labeling is represented through the mathematical relation $E_R \subseteq V \times R \times V$, called the \emph{set of relation triplets}:  $E_R = \{(h,r,t)|h,t \in V, (h,t) \in E, r \in R\}$. Entity/node attributes can be collected e.g. in a matrix $\mathbf{X} \in \mathbb{R}^{|V| \times F}$, with $F$ as the feature dimension. 
+Formally, first, a finite set of \emph{relation types} is defined $R = \offf{r_1,r_2,\dots}$, and the edge labeling is represented through the mathematical relation $E_R \subseteq V \times R \times V$, called the \emph{set of relation triplets}:  $E_R = \offf{\of{h,r,t} \mid h,t \in V, \of{h,t} \in E, r \in R}$. Entity/node attributes can be collected e.g. in a matrix $\mathbf{X} \in \mathbb{R}^{\abs{V} \times F}$, with $F$ as the feature dimension. 
 
-Usually, the nodes $h$ and $t$ in the triplets are referred to as the \emph{head} and \emph{tail} of the relations, respectively. The attributed multiplex heterogeneous network is the new collection $\left(V, E_R, R, \mathbf{X}\right)$.
+Usually, the nodes $h$ and $t$ in the triplets are referred to as the \emph{head} and \emph{tail} of the relations, respectively. The attributed multiplex heterogeneous network is the new collection $\of{V, E_R, R, \mathbf{X}}$.
 \end{definition}
 
 \begin{definition}
-    A \emph{query} of the knowledge graph $G=(V, E_R, R, \mathbf{X})$ is the collection $q=(\mathcal{A}_q, G_q)$ of a set $\mathcal{A}_q \subseteq V$ of \emph{anchor} (input) entities and $G_q: \mathcal{A}_q \to \mathcal{P}(V)$, a mapping visualized via a \emph{computational graph} in the form of a DAG informing how to obtain \emph{answer} entities to the query starting from the anchors, where during this process all of the nodes in $q$ get labeled with sets of entities from $V$. 
+    A \emph{query} of the knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$ is the collection $q=\of{\mathcal{A}_q, G_q}$ of a set $\mathcal{A}_q \subseteq V$ of \emph{anchor} (input) entities and $G_q: \mathcal{A}_q \to \mathcal{P}\of{V}$, a mapping visualized via a \emph{computational graph} in the form of a DAG informing how to obtain \emph{answer} entities to the query starting from the anchors, where during this process all of the nodes in $q$ get labeled with sets of entities from $V$. 
     
-    In the special case of \emph{conjunctive logical queries}, the edges in $q$ represent either \emph{relation projection} operations $P: \mathcal{P}(V) \times R \to \mathcal{P}(V)$ (map head to tail along a relation) or \emph{intersection} operations $I: \mathcal{P}(\mathcal{P}(V)) \to \mathcal{P}(V)$ (classical $\cap$), specializing the query mapping as $G_q(\mathcal{A}_q;P,I)$~\cite{ren_query2box_2020}.
+    In the special case of \emph{conjunctive logical queries}, the edges in $q$ represent either \emph{relation projection} operations $P: \mathcal{P}\of{V} \times R \to \mathcal{P}\of{V}$ (map head to tail along a relation) or \emph{intersection} operations $I: \mathcal{P}\of{\mathcal{P}\of{V}} \to \mathcal{P}\of{V}$ (classical $\cap$), specializing the query mapping as $G_q\of{\mathcal{A}_q;P,I}$~\cite{ren_query2box_2020}.
     \label{def:query}
 \end{definition}
-Figure~\ref{fig:query_structures} visualizes the computational structures of the conjunctive queries we considered. To give an example of the notation from Definition~\ref{def:query}, the general form of an ip-type conjunctive query $q$ has: $$\mathcal{A}_q=\{v_1,v_2\}, G_q(\{v_1,v_2\})=P(I(\{P(\{v_1\},r_1),P(\{v_2\},r_2)\}),r_3),$$
+Figure~\ref{fig:query_structures} visualizes the computational structures of the conjunctive queries we considered. To give an example of the notation from Definition~\ref{def:query}, the general form of an ip-type conjunctive query $q$ has: $$\mathcal{A}_q=\offf{v_1,v_2}, G_q\of{\offf{v_1,v_2}}=P\of{I\of{\offf{P\of{\offf{v_1},r_1},P\of{\offf{v_2},r_2}}},r_3},$$
 where $v_1,v_2 \in V, r_1,r_2,r_3 \in R$ are any entities and relations from $G$.
 
 Graphs are discrete structures, while the majority of machine learning models work exclusively with real-valued continuous inputs. Therefore, we have to construct a mapping from the graph elements to a numeric vector space, such that the output vectors encode the graph structure in the form of algebraic constraints.
 \begin{definition}
-Given a knowledge graph $G = (V, E_R, R, \mathbf{X})$, in general one defines a \textit{knowledge graph embedding model}~\cite{ji_survey_2022,liang_survey_2024,ren_query2box_2020} as the collection of an entity embedding model $g_V: V \to \mathcal{E}$, relation embedding model $g_R: R \to \mathcal{R}$, relation projection embedding model $g_P: \mathcal{E} \times \mathcal{R} \to \mathcal{E}$, intersection embedding model $g_I: \mathcal{\mathcal{E}}^{\mathbb{N}} \to \mathcal{E}$ and a scoring function $f: \mathcal{E} \times \mathcal{E} \to \mathbb{R}$, all potentially parametrized. Outputs $\mathbf{v} = g_V(v), \mathbf{r} = g_R(r), \mathbf{q}, \mathbf{a}, \dots$ are referred to as \emph{embeddings}. Most often $\mathcal{E}, \mathcal{R} \subseteq \mathbb{R}^D$ or $\mathbb{C}^D$, where $D$ is the \emph{embedding dimension}. 
+Given a knowledge graph $G = \of{V, E_R, R, \mathbf{X}}$, in general one defines a \textit{knowledge graph embedding model}~\cite{ji_survey_2022,liang_survey_2024,ren_query2box_2020} as the collection of an entity embedding model $g_V: V \to \mathcal{E}$, relation embedding model $g_R: R \to \mathcal{R}$, relation projection embedding model $g_P: \mathcal{E} \times \mathcal{R} \to \mathcal{E}$, intersection embedding model $g_I: \mathcal{\mathcal{E}}^{\mathbb{N}} \to \mathcal{E}$ and a scoring function $f: \mathcal{E} \times \mathcal{E} \to \mathbb{R}$, all potentially parametrized. Outputs $\mathbf{v} = g_V\of{v}, \mathbf{r} = g_R\of{r}, \mathbf{q}, \mathbf{a}, \dots$ are referred to as \emph{embeddings}. Most often $\mathcal{E}, \mathcal{R} \subseteq \mathbb{R}^D$ or $\mathbb{C}^D$, where $D$ is the \emph{embedding dimension}. 
 \end{definition}
 
 Most embedding models are optimized using a contrastive modification of the scoring function:
 \begin{definition}
 \label{def:contrastive_loss}
-    Given the model's scoring function $f$ and the embedding representation of a single \emph{positive} query-answer pair $(q, a)$ and a set of $m$ \emph{negative examples} $\{a'_i\}_{i=1}^{m} \subseteq V \setminus \{a\}$ (wrong answers to the query), the \emph{contrastive learning loss} terms and final value take the common form ($\sigma$ denoting the sigmoid function):
+    Given the model's scoring function $f$ and the embedding representation of a single \emph{positive} query-answer pair $\of{q, a}$ and a set of $m$ \emph{negative examples} $\offf{a'_i}_{i=1}^{m} \subseteq V \setminus \offf{a}$ (wrong answers to the query), the \emph{contrastive learning loss} terms and final value take the common form ($\sigma$ denoting the sigmoid function):
     \begin{align}
     \begin{aligned}
     \label{eq:contrastive_loss}
-        \tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, y)&=-\log{\sigma{\left(y \cdot f(\mathbf{q},\mathbf{a})\right)}}\\
-        \mathcal{L}\left(\mathbf{q}, \mathbf{a}, \{\mathbf{a}'_i\}_{i=1}^{m}\right)&=\tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, 1) + \frac{1}{m}\sum_{i=1}^{m}{\tilde{\mathcal{L}}\left(\mathbf{q}, \mathbf{a}'_i, -1\right)}
+        \tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, y}&=-\log{\sigma{\of{y \cdot f\of{\mathbf{q},\mathbf{a}}}}}\\
+        \mathcal{L}\of{\mathbf{q}, \mathbf{a}, \offf{\mathbf{a}'_i}_{i=1}^{m}}&=\tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, 1} + \frac{1}{m}\sum_{i=1}^{m}{\tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}'_i, -1}}
         \end{aligned}
     \end{align}
 \end{definition}
 
 \begin{definition}
-    Given a dataset $\mathcal{D}=\{(h_i, r_i, t_i)\}_{i=1}^{N}$ of head-relation-tail triplets and labels $\{y_i\}_{i=1}^{N}$ indicating whether each triplet was extracted from the knowledge graph or randomly formed, a \emph{link predictor} $\ell: V \times R \times V \to \mathbb{R}$ is a model that aims to predict the label $y_i$ of each triplet $(h_i,r_i,t_i)$ by scoring it according to how likely it is to have originated from the knowledge graph.
+    Given a dataset $\mathcal{D}=\offf{\of{h_i, r_i, t_i}}_{i=1}^{N}$ of head-relation-tail triplets and labels $\offf{y_i}_{i=1}^{N}$ indicating whether each triplet was extracted from the knowledge graph or randomly formed, a \emph{link predictor} $\ell: V \times R \times V \to \mathbb{R}$ is a model that aims to predict the label $y_i$ of each triplet $\of{h_i,r_i,t_i}$ by scoring it according to how likely it is to have originated from the knowledge graph.
 \end{definition}
 
 % Link predictors are commonly composed of entity-relation embedding models, in order to obtain high-quality feature vectors to pass onto a classifier. 
 
 \begin{definition}
-    Given a dataset $\mathcal{D}=\{(q_i, a_i)\}_{i=1}^{N}$ of query-answer pairs extracted from the knowledge graph, \emph{query answering} entails predicting the answer entity $a_i$ given the query information $q_i$ as input. Classically, this is operationalized by forming the set $\hat{\mathcal{D}}_i=\{(q_i, v)\}_{v \in V}$ by combining the query with every possible answer, then the predicted answer is the one that maximizes a scoring model: $\hat{a}_i = \argmax_{v \in V}{S(q_i,v)}$.
+    Given a dataset $\mathcal{D}=\offf{\of{q_i, a_i}}_{i=1}^{N}$ of query-answer pairs extracted from the knowledge graph, \emph{query answering} entails predicting the answer entity $a_i$ given the query information $q_i$ as input. Classically, this is operationalized by forming the set $\hat{\mathcal{D}}_i=\offf{\of{q_i, v}}_{v \in V}$ by combining the query with every possible answer, then the predicted answer is the one that maximizes a scoring model: $\hat{a}_i = \argmax_{v \in V}{S\of{q_i,v}}$.
 \end{definition}
 
 \subsubsection{Contributions}
@@ -137,7 +137,7 @@ Most previous work on knowledge graph inference acceleration~\cite{lerer_pytorch
 
 NodePiece~\cite{galkin_nodepiece_2022} and EARL~\cite{chen_entity-agnostic_2023} propose accelerating knowledge graph prediction tasks by reducing the total number of embedding parameters required. This is done by selecting only certain \enquote{reserved} entities to be a part of a vocabulary $\mathcal{T} \subseteq V$, then only pre-computing the vocabulary embeddings. Embeddings for non-vocabulary entities must be obtained on the spot by selecting for each of them $\tau$ reserved nodes from the vocabulary (via a specific assignment rule) and then re-encoding the sequence of the $\tau$ embeddings. 
 
-Both works thus require at least $|\mathcal{T}| + \tau(|V|-|\mathcal{T}|)N$ embedding computations during evaluation, many times larger than the baseline cost of $|V|N$.
+Both works thus require at least $\abs{\mathcal{T}} + \tau\of{\abs{V}-\abs{\mathcal{T}}}N$ embedding computations during evaluation, many times larger than the baseline cost of $\abs{V}N$.
 
 On the other hand, our contributions can be summarized as follows: %(I) COINs are a \emph{model-based} approach that performs a novel integration of \emph{community structure information} into optimization and inference, to achieve significant acceleration even with limited resources; and (II) The acceleration potential is exactly derived, with theoretical and empirical arguments for which community structures are optimal.
 \begin{enumerate}[I.]
@@ -149,12 +149,12 @@ On the other hand, our contributions can be summarized as follows: %(I) COINs ar
 
 
 \subsubsection{Scalable query answering evaluation}
- Assume that we possess a mapping $c: V \to \mathcal{C}$, assigning knowledge graph entities into one of $|\mathcal{C}| = K \leq |V|$  groups, similar to some previous work~\cite{lerer_pytorch-biggraph_2019,zheng_dgl-ke_2020}. 
+ Assume that we possess a mapping $c: V \to \mathcal{C}$, assigning knowledge graph entities into one of $\abs{\mathcal{C}} = K \leq \abs{V}$  groups, similar to some previous work~\cite{lerer_pytorch-biggraph_2019,zheng_dgl-ke_2020}. 
  % Instead of only distributing the model training according to this mapping, if it has certain desirable properties, one can utilize it to speed up query answering evaluation as well, through an alternative two-step procedure: 
 With $c$ we construct an alternative two-step query answering procedure:
  \begin{enumerate}
-     \item Map the input $(q, a)$ to a group-level query-answer pair $\left(q^{(C)}, c(a)\right)$, and predict $c(a)$ by scoring all $K$ possible answer groups;%, where $q^{(C)} = ([c(v)]_{v \in \mathcal{A}_q},G_q)$;
-     \item Search for the correct answer $a$ only among the entities $\hat{a}$ with $c(\hat{a})=c(a)$.
+     \item Map the input $\of{q, a}$ to a group-level query-answer pair $\of{q^{\of{C}}, c\of{a}}$, and predict $c\of{a}$ by scoring all $K$ possible answer groups;%, where $q^{\of{C}} = \of{\off{c\of{v}}_{v \in \mathcal{A}_q},G_q}$;
+     \item Search for the correct answer $a$ only among the entities $\hat{a}$ with $c\of{\hat{a}}=c\of{a}$.
  \end{enumerate}
  % Note that with this new procedure, two scoring models are required, one for each level of prediction, and the performance of the second prediction depends on the first. 
  % However, we now have the potential to greatly reduce the number of model evaluations required, without a large effect on the original evaluation performance, if the mapping $c$ satisfies conditions that we will motivate in the following paragraphs.
@@ -162,16 +162,16 @@ With $c$ we construct an alternative two-step query answering procedure:
 
 \subsubsection{Optimal partition structure}
 
-First note that the mapping $c$ induces a \emph{disjoint partition} of the entity set $V$. Namely, if we construct the sets $$C_k = \{v \in V|c(v)=k\}, k \in \mathcal{C},$$ then $\bigcup_{k=1}^{K}{C_k}=V$ and $\forall i,j \in \mathcal{C},i \neq j, C_i \cap C_j = \emptyset$. 
+First note that the mapping $c$ induces a \emph{disjoint partition} of the entity set $V$. Namely, if we construct the sets $$C_k = \offf{v \in V \mid c\of{v}=k}, k \in \mathcal{C},$$ then $\bigcup_{k=1}^{K}{C_k}=V$ and $\forall i,j \in \mathcal{C},i \neq j, C_i \cap C_j = \emptyset$. 
 
 By analyzing in detail the computational complexity of our new evaluation method, one can easily assess the quality of any such disjoint partition. Proposition~\ref{proposition:complexity} provides our main result. 
 
 \begin{proposition}
 \label{proposition:complexity}
-Let $|C_k|$ denote the size of node group $k$ and $N_k^{\text{test}}=|\{(q, a) \in \mathcal{D}_{\text{test}}|c(a)=k\}|$ denote the number of evaluation samples with query answers in node group $k$. The number of query embedding vectors computed in total during evaluation has the following form and bounds:
+Let $\abs{C_k}$ denote the size of node group $k$ and $N_k^{\text{test}}=\abs{\offf{\of{q, a} \in \mathcal{D}_{\text{test}} \mid c\of{a}=k}}$ denote the number of evaluation samples with query answers in node group $k$. The number of query embedding vectors computed in total during evaluation has the following form and bounds:
 \begin{equation}
 \label{eq:complexity_and_bounds}
-2 N \sqrt{|V|} \leq \sum_{k=1}^{K}{\left(K+|C_k|\right)N_k^{\text{test}}} \leq N \left(|V| + 1\right) 
+2 N \sqrt{\abs{V}} \leq \sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k^{\text{test}}} \leq N \of{\abs{V} + 1} 
 \end{equation}
 \end{proposition}
 The proof is available in Appendix~\ref{sec:appendix_proofs}.
@@ -179,30 +179,30 @@ The proof is available in Appendix~\ref{sec:appendix_proofs}.
 % We can prove a quick intuitive result about disjoint partitions:
 % \begin{proposition}
 % \label{proposition:average_community_size}
-% Given a graph $G=(V, E)$, assume that a disjoint partitioning of $V$ into $K=O(|V|^p)$, groups was obtained, with naturally $p \in (0, 1)$. Then no matter the partition assignment, the average group size will be $O(|V|^{1-p})$.
+% Given a graph $G=\of{V, E}$, assume that a disjoint partitioning of $V$ into $K=O\of{\abs{V}^p}$, groups was obtained, with naturally $p \in \of{0, 1}$. Then no matter the partition assignment, the average group size will be $O\of{\abs{V}^{1-p}}$.
 % \end{proposition}
 % \begin{proof}
-%     Observe that simply: $\frac{1}{K}\sum_{k=1}^{K}{C_k} = \frac{1}{K}|V|=O(|V|^{-p} \cdot |V|)=O(|V|^{1-p})$.
+%     Observe that simply: $\frac{1}{K}\sum_{k=1}^{K}{C_k} = \frac{1}{K}\abs{V}=O\of{\abs{V}^{-p} \cdot \abs{V}}=O\of{\abs{V}^{1-p}}$.
 % \end{proof}
 
-% Now, the time complexity of the first, node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of model evaluation steps required, and therefore it is on the order of $\Theta(|V|^{p} D)$. On the other hand, the second step on average requires as many model evaluations as the average group size. 
-% From proposition~\ref{proposition:average_community_size} however, we know that for this disjoint partitioning of the node set the average group size will be on the order of $O(|V|^{1-p})$, thus the complexity of the second step amounts to $\Theta(|V|^{1-p} D)$ and the total cost of the new evaluation procedure is thus: $\Theta(N [|V|^{p} + |V|^{1-p}] D)$. 
-% From Proposition~\ref{proposition:average_community_size} however, we know the expected average group size, and thus the complexity of the second step amounts to $\Theta(|V|^{1-p} D)$ and the total cost of the new evaluation procedure is thus: $\Theta(N [|V|^{p} + |V|^{1-p}] D)$. 
+% Now, the time complexity of the first, node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of model evaluation steps required, and therefore it is on the order of $\Theta\of{\abs{V}^{p} D}$. On the other hand, the second step on average requires as many model evaluations as the average group size. 
+% From proposition~\ref{proposition:average_community_size} however, we know that for this disjoint partitioning of the node set the average group size will be on the order of $O\of{\abs{V}^{1-p}}$, thus the complexity of the second step amounts to $\Theta\of{\abs{V}^{1-p} D}$ and the total cost of the new evaluation procedure is thus: $\Theta\of{N \off{\abs{V}^{p} + \abs{V}^{1-p}} D}$. 
+% From Proposition~\ref{proposition:average_community_size} however, we know the expected average group size, and thus the complexity of the second step amounts to $\Theta\of{\abs{V}^{1-p} D}$ and the total cost of the new evaluation procedure is thus: $\Theta\of{N \off{\abs{V}^{p} + \abs{V}^{1-p}} D}$. 
 % But, by choosing a different $c$, one has the option to optimize the value of $p$, and the following Proposition~\ref{proposition:min_evaluation_cost} argues which value minimizes our overall cost:
 % \begin{proposition}
 %     \label{proposition:min_evaluation_cost}
-%     With $p=\frac{1}{2}$, one achieves the minimal evaluation cost of $\Theta(N \sqrt{|V|} D)$.
+%     With $p=\frac{1}{2}$, one achieves the minimal evaluation cost of $\Theta\of{N \sqrt{\abs{V}} D}$.
 % \end{proposition}
 % \begin{proof}
-%     Let $g(p) = |V|^{p} + |V|^{1-p}$. Then note that $g'(p) = \log{|V|}(|V|^{p} - |V|^{1-p})$. From this, we find the only critical point of $g$ in $(0, 1)$: $|V|^{p} - |V|^{1-p} = 0 \Leftrightarrow p = 1-p \Leftrightarrow p = \frac{1}{2}$. As $g''(\frac{1}{2}) = 2\log^{2}{|V|}\sqrt{|V|} > 0$, $p^* = \frac{1}{2}$ indeed is the minimizer.
+%     Let $g\of{p} = \abs{V}^{p} + \abs{V}^{1-p}$. Then note that $g'\of{p} = \log{\abs{V}}\of{\abs{V}^{p} - \abs{V}^{1-p}}$. From this, we find the only critical point of $g$ in $\of{0, 1}$: $\abs{V}^{p} - \abs{V}^{1-p} = 0 \Leftrightarrow p = 1-p \Leftrightarrow p = \frac{1}{2}$. As $g''\of{\frac{1}{2}} = 2\log^{2}{\abs{V}}\sqrt{\abs{V}} > 0$, $p^* = \frac{1}{2}$ indeed is the minimizer.
 % \end{proof}
 
 \subsubsection{Query locality}
-The lower bound of equation \eqref{eq:complexity_and_bounds} above states that it is possible to achieve a $\sqrt{|V|}$ dependence in evaluations while the scalable approaches we have discussed so far have a linear dependence on ${|V|}$. 
-%The possibility of quadratically reducing the overall computation time is grounds for sufficient motivation to obtain a partitioning that splits the node set into $K=O(\sqrt{|V|})$ equally sized pieces, as its first important property. 
+The lower bound of equation \eqref{eq:complexity_and_bounds} above states that it is possible to achieve a $\sqrt{\abs{V}}$ dependence in evaluations while the scalable approaches we have discussed so far have a linear dependence on ${\abs{V}}$. 
+%The possibility of quadratically reducing the overall computation time is grounds for sufficient motivation to obtain a partitioning that splits the node set into $K=O\of{\sqrt{\abs{V}}}$ equally sized pieces, as its first important property. 
 However, to minimally affect the baseline performance, we must consider the partitioning quality from the perspective of preserving the relational structure. 
 
-What previous works often fail to consider is that an arbitrary assignment might be \emph{arbitrarily non-local}. Formally, if we construct the set $$V^*(c)=\{v \in V|\exists (u,r), E_R \cap \{(v,r,u), (u, r, v)\} \neq \emptyset, c(u) \neq c(v)\}$$ of entities that participate in between-group relations, then we must have both minimal $|V^*(c)|$ as well as minimal total evaluation cost (Proposition~\ref{proposition:complexity}). 
+What previous works often fail to consider is that an arbitrary assignment might be \emph{arbitrarily non-local}. Formally, if we construct the set $$V^*\of{c}=\offf{v \in V \mid \exists \of{u,r}, E_R \cap \offf{\of{v,r,u}, \of{u, r, v}} \neq \emptyset, c\of{u} \neq c\of{v}}$$ of entities that participate in between-group relations, then we must have both minimal $\abs{V^*\of{c}}$ as well as minimal total evaluation cost (Proposition~\ref{proposition:complexity}). 
 
 In this case, the search for the true answer to a query will be most often localized to a small neighborhood in the knowledge graph, a significantly easier problem. Equivalently, one prefers a mapping $c$ such that more relations are present \emph{within} the entity sets $C_k$ than \emph{between} the sets. 
 
@@ -217,27 +217,27 @@ On the other hand, the METIS algorithm for graph partitioning~\cite{karypis_fast
 
 \subsubsection{Community detection}
 
-Given a knowledge graph $(V, E_R, R, \mathbf{X})$, the first step we employ is to execute the Leiden community detection algorithm to obtain a good node-to-community mapping $c: V \to \mathcal{C}$. 
+Given a knowledge graph $\of{V, E_R, R, \mathbf{X}}$, the first step we employ is to execute the Leiden community detection algorithm to obtain a good node-to-community mapping $c: V \to \mathcal{C}$. 
 
-% We observed that, in practice, if the graph is sufficiently sparse, i.e., $|E_R| \ll |R| \cdot |V|^2$, with the resolution parameter of the algorithm simply set to $\frac{1}{|V|}$ one achieves decent performance without the need for further validation. Obtaining quality community assignments for dense graphs, however, is very challenging, and validation of the resolution hyperparameter is recommended. Additionally, one can merge very small weakly connected components into larger communities to achieve a better balance of community sizes. 
+% We observed that, in practice, if the graph is sufficiently sparse, i.e., $\abs{E_R} \ll \abs{R} \cdot \abs{V}^2$, with the resolution parameter of the algorithm simply set to $\frac{1}{\abs{V}}$ one achieves decent performance without the need for further validation. Obtaining quality community assignments for dense graphs, however, is very challenging, and validation of the resolution hyperparameter is recommended. Additionally, one can merge very small weakly connected components into larger communities to achieve a better balance of community sizes. 
 
-For our COINs technique, based on the obtained community assignment map $c$ we extract further discrete information of great utility for efficient training and evaluation. $c$ coarsens $(V, E_R)$ into a \emph{community-level interaction graph}: $$V^{(C)} = \mathcal{C}, E^{(C)}_R = \{(c(u),r,c(v))|(u,r,v) \in E_R\}.$$%
+For our COINs technique, based on the obtained community assignment map $c$ we extract further discrete information of great utility for efficient training and evaluation. $c$ coarsens $\of{V, E_R}$ into a \emph{community-level interaction graph}: $$V^{\of{C}} = \mathcal{C}, E^{\of{C}}_R = \offf{\of{c\of{u},r,c\of{v}} \mid \of{u,r,v} \in E_R}.$$%
 In addition, one can compute the \emph{inter-community mapping} $z^*: V \to V_{\omega}^*$:
-$$z^*(v)=\begin{cases} v, & \text{ if } v \in V^* \\ \omega, & \text{ otherwise} \end{cases}$$where $V_{\omega}^* = V^* \cup \{\omega\}$ and $\omega$ is a padding node representing all nodes in $V \setminus V^*$.
+$$z^*\of{v}=\begin{cases} v, & \text{ if } v \in V^* \\ \omega, & \text{ otherwise} \end{cases}$$where $V_{\omega}^* = V^* \cup \offf{\omega}$ and $\omega$ is a padding node representing all nodes in $V \setminus V^*$.
 
 \subsubsection{COINs training \& evaluation}
 
 % As we introduced previously, state-of-the-art knowledge graph embedding models and methods for achieving better scalability are inapplicable for all scenarios, either since node partitions are sub-optimal or intermediate computation variables are unoptimized for single-machine computation. As such, in the following paragraphs, the proposed COINs knowledge graph representation technique is presented, facilitating the community-based graph data augmentations to their fullest.
 
-Let $\mathcal{F}$ denote the class of knowledge graph embedding models whose scalability we wish to improve, and $\tilde{\mathcal{L}}: \mathcal{E} \times \mathcal{E} \times \{-1,1\} \to \mathbb{R}$ be the per-sample contrastive loss term minimized during training such models (eq. \eqref{eq:contrastive_loss}). 
+Let $\mathcal{F}$ denote the class of knowledge graph embedding models whose scalability we wish to improve, and $\tilde{\mathcal{L}}: \mathcal{E} \times \mathcal{E} \times \offf{-1,1} \to \mathbb{R}$ be the per-sample contrastive loss term minimized during training such models (eq. \eqref{eq:contrastive_loss}). 
 % \newpage
 
 COINs requires the optimization of the following models sampled from $\mathcal{F}$:
 \begin{itemize}
     \item {Community-level embedders} 
     
-    $g_V^{(C)}: \mathcal{C} \to \mathcal{E}, g_R^{(C)}: R \to \mathcal{R}, g_P^{(C)}: \mathcal{E} \times \mathcal{R} \to \mathcal{E}, g_I^{(C)}: \mathcal{E}^{\mathbb{N}} \to \mathcal{E}$;
-    \item {Intra-community entity embedders} $g_V^{(k)}: C_k \to \mathcal{E}, \forall k \in \mathcal{C}$;
+    $g_V^{\of{C}}: \mathcal{C} \to \mathcal{E}, g_R^{\of{C}}: R \to \mathcal{R}, g_P^{\of{C}}: \mathcal{E} \times \mathcal{R} \to \mathcal{E}, g_I^{\of{C}}: \mathcal{E}^{\mathbb{N}} \to \mathcal{E}$;
+    \item {Intra-community entity embedders} $g_V^{\of{k}}: C_k \to \mathcal{E}, \forall k \in \mathcal{C}$;
     \item {Inter-community entity embedder} $g_V^{*}: V_{\omega}^* \to \mathcal{E}$. 
     \item {Node-level relation and query embedders} 
     
@@ -250,11 +250,11 @@ Additional parameters are: a {node feature embedding matrix} $\mathbf{W} \in \ma
     \caption{Base knowledge graph representation}
     \label{algorithm:baseline}
     \begin{algorithmic}[1]
-    \STATE{\textbf{input} $(q, a)$, $y \in \{-1,1\}$}
-    \STATE{$\mathbf{R}=[g_R(r)]_{r \in R}$}
-    \STATE{$\mathbf{a}=g_V(a), \mathbf{A}=[g_V(v)]_{v \in \mathcal{A}_{q}}$}
-    \STATE{$\mathbf{q}=G_{q}(\mathbf{A};(\mathbf{R},g_P),g_I)$}
-    \STATE{\textbf{return} $\tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, y)$}
+    \STATE{\textbf{input} $\of{q, a}$, $y \in \offf{-1,1}$}
+    \STATE{$\mathbf{R}=\off{g_R\of{r}}_{r \in R}$}
+    \STATE{$\mathbf{a}=g_V\of{a}, \mathbf{A}=\off{g_V\of{v}}_{v \in \mathcal{A}_{q}}$}
+    \STATE{$\mathbf{q}=G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
+    \STATE{\textbf{return} $\tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, y}$}
     \end{algorithmic}
 \end{algorithm}
 
@@ -263,7 +263,7 @@ Additional parameters are: a {node feature embedding matrix} $\mathbf{W} \in \ma
 This new construction has several desirable properties unlike the baseline: 
 \begin{enumerate}
     \item Queries spanning multiple communities are treated differently, allowing for greater generalization; 
-    \item $K + \max{(\max_{k=1}^{K}{|C_k|},|V^{*}| + 1)}$ will be the maximum number of entity embeddings to compute for each training iteration instead of the baseline $|V|$, an overall lower time and memory cost;
+    \item $K + \max{\of{\max_{k=1}^{K}{\abs{C_k}},\abs{V^{*}} + 1}}$ will be the maximum number of entity embeddings to compute for each training iteration instead of the baseline $\abs{V}$, an overall lower time and memory cost;
     \item The community representation learning will be performed jointly with the node-level, due to the softmax-weighted embedding refinement linking them both, allowing for greater adaptivity;
     % \item The final embedding refinement will preserve the convexity of the base model, if it has that property.
 \end{enumerate}
@@ -278,20 +278,20 @@ This new construction has several desirable properties unlike the baseline:
 \caption{COINs knowledge graph representation}
 \label{algorithm:coins}
 \begin{algorithmic}[1]
-\STATE{\textbf{input} $(q, a)$, $y \in \{-1,1\}$, $c:V \to \mathcal{C}$, $z^*: V \to V_{\omega}^*$, $\alpha \in (0,1)$}
-\STATE{$\mathbf{R}^{(C)}=[g^{(C)}_R(r)]_{r \in R}, \tilde{\mathbf{R}}=[g_R(r)]_{r \in R}$}
-\STATE{$\mathbf{R} = \langle \mathrm{Softmax}(\mathbf{w}_R), [\mathbf{R}^{(C)}, \tilde{\mathbf{R}}] \rangle$}
-\STATE{$q^{(C)} = ([c(v)]_{v \in \mathcal{A}_q},G_q)$}
-\STATE{$\mathbf{a}^{(C)}=g^{(C)}_V(c(a)), \mathbf{A}^{(C)}=[g^{(C)}_V(k)]_{k \in \mathcal{A}^{(C)}_{q}}$}
-\STATE{$\mathbf{q}^{(C)}=G_{q}(\mathbf{A}^{(C)};(\mathbf{R}^{(C)},g_P^{(C)}),g_I^{(C)})$}
-\IF{$\forall v \in q, c(v)=c(a)$}
-\STATE{$\tilde{\mathbf{a}}=g^{(c(a))}_V(a), \tilde{\mathbf{A}}=[g^{(c(a))}_V(v)]_{v \in \mathcal{A}_{q}}$}
+\STATE{\textbf{input} $\of{q, a}$, $y \in \offf{-1,1}$, $c:V \to \mathcal{C}$, $z^*: V \to V_{\omega}^*$, $\alpha \in \of{0,1}$}
+\STATE{$\mathbf{R}^{\of{C}}=\off{g^{\of{C}}_R\of{r}}_{r \in R}, \tilde{\mathbf{R}}=\off{g_R\of{r}}_{r \in R}$}
+\STATE{$\mathbf{R} = \ang{ \mathrm{Softmax}\of{\mathbf{w}_R}, \off{\mathbf{R}^{\of{C}}, \tilde{\mathbf{R}}} }$}
+\STATE{$q^{\of{C}} = \of{\off{c\of{v}}_{v \in \mathcal{A}_q},G_q}$}
+\STATE{$\mathbf{a}^{\of{C}}=g^{\of{C}}_V\of{c\of{a}}, \mathbf{A}^{\of{C}}=\off{g^{\of{C}}_V\of{k}}_{k \in \mathcal{A}^{\of{C}}_{q}}$}
+\STATE{$\mathbf{q}^{\of{C}}=G_{q}\of{\mathbf{A}^{\of{C}};\of{\mathbf{R}^{\of{C}},g_P^{\of{C}}},g_I^{\of{C}}}$}
+\IF{$\forall v \in q, c\of{v}=c\of{a}$}
+\STATE{$\tilde{\mathbf{a}}=g^{\of{c\of{a}}}_V\of{a}, \tilde{\mathbf{A}}=\off{g^{\of{c\of{a}}}_V\of{v}}_{v \in \mathcal{A}_{q}}$}
 \ELSE
-\STATE{$\tilde{\mathbf{a}}=g^{*}_V(z^*(a)), \tilde{\mathbf{A}}=[g^{*}_V(z^*(v))]_{v \in \mathcal{A}_{q}}$}
+\STATE{$\tilde{\mathbf{a}}=g^{*}_V\of{z^*\of{a}}, \tilde{\mathbf{A}}=\off{g^{*}_V\of{z^*\of{v}}}_{v \in \mathcal{A}_{q}}$}
 \ENDIF
-\STATE{$\mathbf{a} = \langle \mathrm{Softmax}(\mathbf{w}), [\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{(C)}, \tilde{\mathbf{a}}] \rangle, \mathbf{A}=\langle \mathrm{Softmax}(\mathbf{w}), [\mathbf{W} \mathbf{x}_{v}]_{v \in \mathcal{A}_{q}}, \mathbf{A}^{(C)}, \tilde{\mathbf{A}} \rangle$}
-\STATE{$\mathbf{q}=G_{q}(\mathbf{A};(\mathbf{R},g_P),g_I)$}
-\STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}(\mathbf{q}, \mathbf{a}, y)=(1-\alpha) \tilde{\mathcal{L}}(\mathbf{q}^{(C)}, \mathbf{a}^{(C)}, y) + \alpha \tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, y) $}
+\STATE{$\mathbf{a} = \ang{\mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{\of{C}}, \tilde{\mathbf{a}}}}, \mathbf{A}=\ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{v}}_{v \in \mathcal{A}_{q}}, \mathbf{A}^{\of{C}}, \tilde{\mathbf{A}} }$}
+\STATE{$\mathbf{q}=G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
+\STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}\of{\mathbf{q}, \mathbf{a}, y}=\of{1-\alpha} \tilde{\mathcal{L}}\of{\mathbf{q}^{\of{C}}, \mathbf{a}^{\of{C}}, y} + \alpha \tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, y} $}
 \end{algorithmic}
 \end{algorithm} 
 % \end{minipage}
@@ -301,11 +301,11 @@ This new construction has several desirable properties unlike the baseline:
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{figures/coins/coins.pdf}
-    \caption[Example of a preprocessed knowledge graph and the COINs representation process on an example query.]{Left: example of a preprocessed knowledge graph, showing its transformation into a community-level graph, with $|V|=6, |E_R|=7, T=2, |R|=2, K=2, |V^*|=2$. Right: the COINs representation process on an example inter-community 2p-query of the graph on the left.}
+    \caption[Example of a preprocessed knowledge graph and the COINs representation process on an example query.]{Left: example of a preprocessed knowledge graph, showing its transformation into a community-level graph, with $\abs{V}=6, \abs{E_R}=7, T=2, \abs{R}=2, K=2, \abs{V^*}=2$. Right: the COINs representation process on an example inter-community 2p-query of the graph on the left.}
     \label{fig:community_preprocessing}
 \end{figure}
 
-Observe that the total number of COINs node embeddings for a graph is $K + \sum_{k=1}^{K}{|C_k|} + |V^*| + 1 = K + |V| + |V^*| + 1$, compared to just $|V|$ node embeddings in the baseline. Thus, using a partitioning that keeps $|V^*| \ll |V|$ has benefits in limiting model size as well. 
+Observe that the total number of COINs node embeddings for a graph is $K + \sum_{k=1}^{K}{\abs{C_k}} + \abs{V^*} + 1 = K + \abs{V} + \abs{V^*} + 1$, compared to just $\abs{V}$ node embeddings in the baseline. Thus, using a partitioning that keeps $\abs{V^*} \ll \abs{V}$ has benefits in limiting model size as well. 
 
 Let now $S_C$ denote a learned scoring model for community-level query-answer pairs, obtained after extending the community-level COINs sub-models into a classifier, with $S_V$ the analog for the final node-level query answer scoring. Then, one can implement the proposed novel scalable query answering procedure via Algorithm~\ref{algorithm:scalable_query_answering}. %Note that, all query answering evaluation metrics are aggregates of the predicted \emph{ranks} of the evaluation triplets. %, defined as the index of the descending order statistic of the predicted link scores equal to the score of the true answer triplet. 
 % Thus, our evaluation algorithm also must efficiently compute these ranks while taking into account that the node ranking is performed in two steps. 
@@ -317,17 +317,17 @@ Let now $S_C$ denote a learned scoring model for community-level query-answer pa
 \caption{COINs query answering evaluation}
 \label{algorithm:scalable_query_answering}
 \begin{algorithmic}[1]
-\STATE{\textbf{input} test set $\mathcal{D}_{\text{test}}=\{(q_i, a_i)\}_{i=1}^{N}$, scorers $S_C, S_V$}
+\STATE{\textbf{input} test set $\mathcal{D}_{\text{test}}=\offf{\of{q_i, a_i}}_{i=1}^{N}$, scorers $S_C, S_V$}
 \FOR{$i \gets 1$ to $N$}
-\STATE{$q^{(C)}_i = ([c(v)]_{v \in \mathcal{A}_{q_i}},G_{q_i})$}
-\STATE{$s_C = [S_C(q^{(C)}_i, k)]_{k \in \mathcal{C}}$}
-\STATE{$\rho^{(i)}_{C} = \mathrm{Rank}(c(a_i),s_C)$}
-\STATE{$F_i=\sum_{1 \leq j < \rho^{(i)}_{C}}{|C_{\mathrm{IndexRank}(j,s_C)}|}$}
-\STATE{$s_V = [S_V(q_i, v)]_{v \in C_{c(a_i)}}$}
-\STATE{$\tilde{\rho}^{(i)} = \mathrm{Rank}(a_i,s_V)$}
-\STATE{$\rho^{(i)} = F_i + \tilde{\rho}^{(i)}$}
+\STATE{$q^{\of{C}}_i = \of{\off{c\of{v}}_{v \in \mathcal{A}_{q_i}},G_{q_i}}$}
+\STATE{$s_C = \off{S_C\of{q^{\of{C}}_i, k}}_{k \in \mathcal{C}}$}
+\STATE{$\rho^{\of{i}}_{C} = \mathrm{Rank}\of{c\of{a_i},s_C}$}
+\STATE{$F_i=\sum_{1 \leq j < \rho^{\of{i}}_{C}}{\abs{C_{\mathrm{IndexRank}\of{j,s_C}}}}$}
+\STATE{$s_V = \off{S_V\of{q_i, v}}_{v \in C_{c\of{a_i}}}$}
+\STATE{$\tilde{\rho}^{\of{i}} = \mathrm{Rank}\of{a_i,s_V}$}
+\STATE{$\rho^{\of{i}} = F_i + \tilde{\rho}^{\of{i}}$}
 \ENDFOR
-\STATE{\textbf{return} $[\rho^{(i)}]_{i=1}^{N}$}
+\STATE{\textbf{return} $\off{\rho^{\of{i}}}_{i=1}^{N}$}
 \end{algorithmic}
 \end{algorithm} 
 % \end{minipage}
@@ -350,7 +350,7 @@ As previously mentioned, previous work mainly solves the problem of query answer
 Namely, the COINs submodel structure naturally permits partial model parallelism in addition to the acceleration incurred from the two-step inference process. The intra-community and inter-community models used during step 2 of the process are by design independent. This is due to the fact that each of those models trains and predicts over a disjoint subset of the knowledge graph edges. As such, Step 2 can be completely parallelized across multiple machines, by assigning for each intra-community or inter-community model a dedicated compute unit. The only unavoidable bottleneck is having to sequentially wait for the community prediction of Step 1 to finish, in order to have the information to which machine a data point needs to be communicated.
 
 The distributed COINs architecture is proposed to be as follows. Let $U$ be a finite set of compute units available to the application, and let $\mathcal{M} \subset \mathcal{F}$ be the full set of COINs submodels. The assignment of COINs models to units will be represented through the mapping $u: \mathcal{M} \to U$. First, select a machine $u^* \in U$ to serve as the \emph{leader} node. The leader performs Step 1, sends and receives data between itself and the other machines to orchestrate Step 2 and perfoms the final aggregation steps. Formally, we fix these assignments:
-$$u(g_V^{(C)})=u(g_R^{(C)})=u(g_P^{(C)})=u(g_I^{(C)})=u(g_R)=u(g_P)=u(g_I)=u(\mathbf{W})=u(\mathbf{w})=u(\mathbf{w}_R)=u^*.$$
+$$u\of{g_V^{\of{C}}}=u\of{g_R^{\of{C}}}=u\of{g_P^{\of{C}}}=u\of{g_I^{\of{C}}}=u\of{g_R}=u\of{g_P}=u\of{g_I}=u\of{\mathbf{W}}=u\of{\mathbf{w}}=u\of{\mathbf{w}_R}=u^*.$$
 Then with this setup, Algorithm \ref{algorithm:coins_distributed} details the distributed version of Algorithms \ref{algorithm:coins}. For easier comparison, I color-highlight the required changes for the distributed extension.
 
 \begin{algorithm}[H]
@@ -360,28 +360,28 @@ Then with this setup, Algorithm \ref{algorithm:coins_distributed} details the di
 \label{algorithm:coins_distributed}
 \begin{algorithmic}[1]
 \STATE{\textcolor{blue}{\textbf{on} $u^*$:}}
-\STATE{\textbf{input} $(q, a)$, $y \in \{-1,1\}$, $c:V \to \mathcal{C}$, $z^*: V \to V_{\omega}^*$, $\alpha \in (0,1)$}
-\STATE{$\mathbf{R}^{(C)}=[g^{(C)}_R(r)]_{r \in R}, \tilde{\mathbf{R}}=[g_R(r)]_{r \in R}$}
-\STATE{$\mathbf{R} = \langle \mathrm{Softmax}(\mathbf{w}_R), [\mathbf{R}^{(C)}, \tilde{\mathbf{R}}] \rangle$}
-\STATE{$q^{(C)} = ([c(v)]_{v \in \mathcal{A}_q},G_q)$}
-\STATE{$\mathbf{a}^{(C)}=g^{(C)}_V(c(a)), \mathbf{A}^{(C)}=[g^{(C)}_V(k)]_{k \in \mathcal{A}^{(C)}_{q}}$}
-\STATE{$\mathbf{q}^{(C)}=G_{q}(\mathbf{A}^{(C)};(\mathbf{R}^{(C)},g_P^{(C)}),g_I^{(C)})$}
-\IF{$\forall v \in q, c(v)=c(a)$}
-\STATE{\textcolor{blue}{\textbf{async send} $(\mathcal{A}_q, a) \to u(g_V^{c(a)})$}}
-\STATE{\textcolor{blue}{\textbf{on } $u(g_V^{c(a)})$:}}
-\STATE{$\tilde{\mathbf{a}}=g^{(c(a))}_V(a), \tilde{\mathbf{A}}=[g^{(c(a))}_V(v)]_{v \in \mathcal{A}_{q}}$}
-\STATE{\textcolor{blue}{\textbf{async send} $(\tilde{\mathbf{A}}, \tilde{\mathbf{a}}) \to u^*$}}
+\STATE{\textbf{input} $\of{q, a}$, $y \in \offf{-1,1}$, $c:V \to \mathcal{C}$, $z^*: V \to V_{\omega}^*$, $\alpha \in \of{0,1}$}
+\STATE{$\mathbf{R}^{\of{C}}=\off{g^{\of{C}}_R\of{r}}_{r \in R}, \tilde{\mathbf{R}}=\off{g_R\of{r}}_{r \in R}$}
+\STATE{$\mathbf{R} = \ang{ \mathrm{Softmax}\of{\mathbf{w}_R}, \off{\mathbf{R}^{\of{C}}, \tilde{\mathbf{R}}} }$}
+\STATE{$q^{\of{C}} = \of{\off{c\of{v}}_{v \in \mathcal{A}_q},G_q}$}
+\STATE{$\mathbf{a}^{\of{C}}=g^{\of{C}}_V\of{c\of{a}}, \mathbf{A}^{\of{C}}=\off{g^{\of{C}}_V\of{k}}_{k \in \mathcal{A}^{\of{C}}_{q}}$}
+\STATE{$\mathbf{q}^{\of{C}}=G_{q}\of{\mathbf{A}^{\of{C}};\of{\mathbf{R}^{\of{C}},g_P^{\of{C}}},g_I^{\of{C}}}$}
+\IF{$\forall v \in q, c\of{v}=c\of{a}$}
+\STATE{\textcolor{blue}{\textbf{async send} $\of{\mathcal{A}_q, a} \to u\of{g_V^{c\of{a}}}$}}
+\STATE{\textcolor{blue}{\textbf{on } $u\of{g_V^{c\of{a}}}$:}}
+\STATE{$\tilde{\mathbf{a}}=g^{\of{c\of{a}}}_V\of{a}, \tilde{\mathbf{A}}=\off{g^{\of{c\of{a}}}_V\of{v}}_{v \in \mathcal{A}_{q}}$}
+\STATE{\textcolor{blue}{\textbf{async send} $\of{\tilde{\mathbf{A}}, \tilde{\mathbf{a}}} \to u^*$}}
 \ELSE
-\STATE{\textcolor{blue}{\textbf{async send} $(\mathcal{A}_q, a) \to u(g_V^{*})$}}
-\STATE{\textcolor{blue}{\textbf{on } $u(g_V^{*})$:}}
-\STATE{$\tilde{\mathbf{a}}=g^{*}_V(z^*(a)), \tilde{\mathbf{A}}=[g^{*}_V(z^*(v))]_{v \in \mathcal{A}_{q}}$}
-\STATE{\textcolor{blue}{\textbf{async send} $(\tilde{\mathbf{A}}, \tilde{\mathbf{a}}) \to u^*$}}
+\STATE{\textcolor{blue}{\textbf{async send} $\of{\mathcal{A}_q, a} \to u\of{g_V^{*}}$}}
+\STATE{\textcolor{blue}{\textbf{on } $u\of{g_V^{*}}$:}}
+\STATE{$\tilde{\mathbf{a}}=g^{*}_V\of{z^*\of{a}}, \tilde{\mathbf{A}}=\off{g^{*}_V\of{z^*\of{v}}}_{v \in \mathcal{A}_{q}}$}
+\STATE{\textcolor{blue}{\textbf{async send} $\of{\tilde{\mathbf{A}}, \tilde{\mathbf{a}}} \to u^*$}}
 \ENDIF
 \STATE{\textcolor{blue}{\textbf{on} $u^*$:}}
-\STATE{\textcolor{blue}{\textbf{sync wait} $(\tilde{\mathbf{A}}, \tilde{\mathbf{a}})$}}
-\STATE{$\mathbf{a} = \langle \mathrm{Softmax}(\mathbf{w}), [\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{(C)}, \tilde{\mathbf{a}}] \rangle, \mathbf{A}=\langle \mathrm{Softmax}(\mathbf{w}), [\mathbf{W} \mathbf{x}_{v}]_{v \in \mathcal{A}_{q}}, \mathbf{A}^{(C)}, \tilde{\mathbf{A}} \rangle$}
-\STATE{$\mathbf{q}=G_{q}(\mathbf{A};(\mathbf{R},g_P),g_I)$}
-\STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}(\mathbf{q}, \mathbf{a}, y)=(1-\alpha) \tilde{\mathcal{L}}(\mathbf{q}^{(C)}, \mathbf{a}^{(C)}, y) + \alpha \tilde{\mathcal{L}}(\mathbf{q}, \mathbf{a}, y) $}
+\STATE{\textcolor{blue}{\textbf{sync wait} $\of{\tilde{\mathbf{A}}, \tilde{\mathbf{a}}}$}}
+\STATE{$\mathbf{a} = \ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{\of{C}}, \tilde{\mathbf{a}}}}, \mathbf{A}=\ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{v}}_{v \in \mathcal{A}_{q}}, \mathbf{A}^{\of{C}}, \tilde{\mathbf{A}} }$}
+\STATE{$\mathbf{q}=G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
+\STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}\of{\mathbf{q}, \mathbf{a}, y}=\of{1-\alpha} \tilde{\mathcal{L}}\of{\mathbf{q}^{\of{C}}, \mathbf{a}^{\of{C}}, y} + \alpha \tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, y} $}
 \end{algorithmic}
 \end{algorithm} 
 
@@ -389,16 +389,16 @@ The choice on which machine to assign to the inter-community model and each intr
 
 \begin{proposition}
 \label{proposition:complexity_distributed}
-    Let $N_{k,k}^{\text{test}}=|\{(q, a) \in \mathcal{D}_{\text{test}}|\forall v \in q, c(v)=c(a)=k\}|$ denote the number of intra-community evaluation samples with query nodes and answers in node group $k$. The largest number of query embedding vectors computed in parallel during distributed evaluation has the following form and bounds:
+    Let $N_{k,k}^{\text{test}}=\abs{\offf{\of{q, a} \in \mathcal{D}_{\text{test}} \mid \forall v \in q, c\of{v}=c\of{a}=k}}$ denote the number of intra-community evaluation samples with query nodes and answers in node group $k$. The largest number of query embedding vectors computed in parallel during distributed evaluation has the following form and bounds:
 \begin{equation}
 \label{eq:complexity_and_bounds_distributed}
-\frac{3}{2} N \sqrt[3]{2|V|} \leq KN+\textcolor{blue}{\max_{l=1}^{|U|}}{\left(\sum_{k=1}^{K}{|C_k|[N_{k,k}^{\text{test}}\textcolor{blue}{\mathbb{I}(u(g_V^k)=u_l)} + (N_k^{\text{test}}-N_{k,k}^{\text{test}})\textcolor{blue}{\mathbb{I}(u(g_V^*)=u_l)}]}\right)} \leq N \left(|V| + 1\right) 
+\frac{3}{2} N \sqrt[3]{2\abs{V}} \leq KN+\textcolor{blue}{\max_{l=1}^{\abs{U}}}{\of{\sum_{k=1}^{K}{\abs{C_k}\off{N_{k,k}^{\text{test}}\textcolor{blue}{\mathbb{I}\of{u\of{g_V^k}=u_l}} + \of{N_k^{\text{test}}-N_{k,k}^{\text{test}}}\textcolor{blue}{\mathbb{I}\of{u\of{g_V^*}=u_l}}}}}} \leq N \of{\abs{V} + 1} 
 \end{equation}
 \end{proposition}
 
 The proof of the previous results explains that to achieve the best possible cost after parallelization of COINs, we must distribute equally the amount of work each machine will do for Step 2. With integer packet sizes however, this is called the \emph{balanced partition} problem, a known NP-hard variant of the 0-1 Knapsack problem. 
 
-In our case, we have an array of costs $\{p_k\}_{k=1}^{K+1}=\{|C_k|N_{k,k}^{\text{test}}\}_{k=1}^{K}\cup\{\sum_{k=1}^{K}{|C_k|(N_{k}^{\text{test}}-N_{k,k}^{\text{test}})}\}$ that have to be assigned to $|U|$ knapsacks, such that the maximal total amount in one knapsack is minimal. A brute-force algorithm checking all possible assignments would have a worst case cost of $O(|U|^{K+1})$, which is infeasible. There exists an alternative dynamic programming solution with the pseudo-polynomial complexity of $O((K+1)S^{|U|-1})$, where $S$ is the number of unique subset sums in $\{p_k\}_{k=1}^{K+1}$. However, in practice it is also often infeasible to run for $|U|\geq 3$. Thus, for this problem an inexact greedy algorithm can be preferred, as by simply assigning one-by-one the biggest packet to the least-filled knapsack one very closely approximates the optimal solution, with the much lower computation cost of $O((K+1)\log_2{(|U|(K+1)}))$. For completeness, in Appendix \ref{sec:appendix_balanced_partition_algs} we provide the pseudocode for the two assignment algorithms.
+In our case, we have an array of costs $\offf{p_k}_{k=1}^{K+1}=\offf{\abs{C_k}N_{k,k}^{\text{test}}}_{k=1}^{K}\cup\offf{\sum_{k=1}^{K}{\abs{C_k}\of{N_{k}^{\text{test}}-N_{k,k}^{\text{test}}}}}$ that have to be assigned to $\abs{U}$ knapsacks, such that the maximal total amount in one knapsack is minimal. A brute-force algorithm checking all possible assignments would have a worst case cost of $O\of{\abs{U}^{K+1}}$, which is infeasible. There exists an alternative dynamic programming solution with the pseudo-polynomial complexity of $O\of{\of{K+1}S^{\abs{U}-1}}$, where $S$ is the number of unique subset sums in $\offf{p_k}_{k=1}^{K+1}$. However, in practice it is also often infeasible to run for $\abs{U}\geq 3$. Thus, for this problem an inexact greedy algorithm can be preferred, as by simply assigning one-by-one the biggest packet to the least-filled knapsack one very closely approximates the optimal solution, with the much lower computation cost of $O\of{\of{K+1}\log_2{\of{\abs{U}\of{K+1}}}}$. For completeness, in Appendix \ref{sec:appendix_balanced_partition_algs} we provide the pseudocode for the two assignment algorithms.
 
 \subsubsection{Experiment setup}
 
@@ -411,30 +411,30 @@ Due to the universality of our COINs technique for scaling up knowledge graph mo
 \begin{adjustbox}{width=\textwidth}
 \begin{tabular}{lcccccc}
 \toprule
-Model & $\mathcal{E}$ & $\mathcal{R}$ & Constraints & $g_P(\mathbf{v}, \mathbf{r})$ & $g_I([\mathbf{v}])$ & $f(\mathbf{q}, \mathbf{a})$ \\
+Model & $\mathcal{E}$ & $\mathcal{R}$ & Constraints & $g_P\of{\mathbf{v}, \mathbf{r}}$ & $g_I\of{\off{\mathbf{v}}}$ & $f\of{\mathbf{q}, \mathbf{a}}$ \\
 \midrule
-\textbf{TransE}~\cite{bordes_translating_2013} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $||\mathbf{v}||=1$ & $\mathbf{v} + \mathbf{r}$ & \textemdash & $\gamma - ||\mathbf{q} - \mathbf{a}||$ \\
-\textbf{DistMult}~\cite{yang_embedding_2014} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $||\mathbf{v}||=1$ & $\mathbf{v} \odot \mathbf{r}$ & \textemdash & $\langle \mathbf{q}, \mathbf{a} \rangle$ \\
-\textbf{ComplEx}~\cite{trouillon_ComplEx_2016} & $\mathbb{C}^D$ & $\mathbb{C}^D$ & \textemdash & $\mathbf{v} \cdot \mathbf{r}$ & \textemdash & $\text{Re}{(\langle \mathbf{q}, \bar{\mathbf{a}} \rangle)}$ \\
-\textbf{RotatE}~\cite{sun_rotate_2019} & $\mathbb{C}^D$ & $\mathbb{C}^D$ & $\forall d, \left|\mathbf{r}^{(d)}\right|=1$ & $\mathbf{v} \cdot \mathbf{r}$ & \textemdash & $\gamma - ||\mathbf{q} - \mathbf{a}||$ \\
- \textbf{KBGAT}~\cite{nathani_learning_2019} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $||\mathbf{v}||=1$ & GAT$_r$~\cite{velickovic_graph_2018} & \textemdash & ConvKB~\cite{nguyen_novel_2018} \\
- \multirow{2}{*}{\textbf{Query2Box}~\cite{ren_query2box_2020}} & \multirow{2}{*}{$\mathbb{R}^{2D}$} & \multirow{2}{*}{$\mathbb{R}^{2D}$} & $\mathbf{v}=[\mathbf{v}^{(c)}, \mathbf{v}^{(o)}]$, & \multirow{2}{*}{$\mathbf{v} + \mathbf{r}$} & $[\text{Att}([\mathbf{v}^{(c)}]),$ & $\gamma - f_{\text{out}}(\mathbf{q},\mathbf{a})  $\\
-  &  &  & $\mathbf{v}^{(o)} \geq 0$ & & $\text{MinDS}([\mathbf{v}^{(o)}])]$  & $-\beta f_{\text{in}}(\mathbf{q},\mathbf{a})$  \\
+\textbf{TransE}~\cite{bordes_translating_2013} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $\abs{\abs{\mathbf{v}}}=1$ & $\mathbf{v} + \mathbf{r}$ & \textemdash & $\gamma - \abs{\abs{\mathbf{q} - \mathbf{a}}}$ \\
+\textbf{DistMult}~\cite{yang_embedding_2014} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $\abs{\abs{\mathbf{v}}}=1$ & $\mathbf{v} \odot \mathbf{r}$ & \textemdash & $\ang{ \mathbf{q}, \mathbf{a} }$ \\
+\textbf{ComplEx}~\cite{trouillon_ComplEx_2016} & $\mathbb{C}^D$ & $\mathbb{C}^D$ & \textemdash & $\mathbf{v} \cdot \mathbf{r}$ & \textemdash & $\text{Re}{\of{\ang{ \mathbf{q}, \bar{\mathbf{a}} }}}$ \\
+\textbf{RotatE}~\cite{sun_rotate_2019} & $\mathbb{C}^D$ & $\mathbb{C}^D$ & $\forall d, \abs{\mathbf{r}^{\of{d}}}=1$ & $\mathbf{v} \cdot \mathbf{r}$ & \textemdash & $\gamma - \abs{\abs{\mathbf{q} - \mathbf{a}}}$ \\
+ \textbf{KBGAT}~\cite{nathani_learning_2019} & $\mathbb{R}^D$ & $\mathbb{R}^D$ & $\abs{\abs{\mathbf{v}}}=1$ & GAT$_r$~\cite{velickovic_graph_2018} & \textemdash & ConvKB~\cite{nguyen_novel_2018} \\
+ \multirow{2}{*}{\textbf{Query2Box}~\cite{ren_query2box_2020}} & \multirow{2}{*}{$\mathbb{R}^{2D}$} & \multirow{2}{*}{$\mathbb{R}^{2D}$} & $\mathbf{v}=\off{\mathbf{v}^{\of{c}}, \mathbf{v}^{\of{o}}}$, & \multirow{2}{*}{$\mathbf{v} + \mathbf{r}$} & $\text{Att}\of{\off{\mathbf{v}^{\of{c}}}},$ & $\gamma - f_{\text{out}}\of{\mathbf{q},\mathbf{a}}  $\\
+  &  &  & $\mathbf{v}^{\of{o}} \geq 0$ & & $\text{MinDS}\of{\off{\mathbf{v}^{\of{o}}}}$  & $-\beta f_{\text{in}}\of{\mathbf{q},\mathbf{a}}$  \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-$\text{Att}([\mathbf{v}^{(c)}])=\langle \text{Softmax}(\text{MLP}([\mathbf{v}])), [\mathbf{v}^{(c)}] \rangle$, \\$\text{MinDS}([\mathbf{v}^{(o)}]) = \min_{\mathbf{u}}{[\mathbf{u}^{(o)}]} \odot \sigma(\text{DeepSets}([\mathbf{v}]))$~\cite{zaheer_deep_2017,hamilton_embedding_2018}, \\
-$f_{\text{out}}(\mathbf{q},\mathbf{a}) = ||\text{ReLU}(\mathbf{a}^{(c)} - \mathbf{q}^{(c)} - \mathbf{q}^{(o)}) + \text{ReLU}(\mathbf{q}^{(c)} - \mathbf{q}^{(o)} - \mathbf{a}^{(c)})||$,\\
-$f_{\text{in}}(\mathbf{q},\mathbf{a}) = ||\mathbf{q}^{(c)} - \min(\mathbf{q}^{(c)} + \mathbf{q}^{(o)}, \max(\mathbf{q}^{(c)} - \mathbf{q}^{(o)},\mathbf{a}^{(c)}))||$
+$\text{Att}\of{\off{\mathbf{v}^{\of{c}}}}=\ang{ \text{Softmax}\of{\text{MLP}\of{\off{\mathbf{v}}}}, \off{\mathbf{v}^{\of{c}}} }$, \\$\text{MinDS}\of{\off{\mathbf{v}^{\of{o}}}} = \min_{\mathbf{u}}{\off{\mathbf{u}^{\of{o}}}} \odot \sigma\of{\text{DeepSets}\of{\off{\mathbf{v}}}}$~\cite{zaheer_deep_2017,hamilton_embedding_2018}, \\
+$f_{\text{out}}\of{\mathbf{q},\mathbf{a}} = \abs{\abs{\text{ReLU}\of{\mathbf{a}^{\of{c}} - \mathbf{q}^{\of{c}} - \mathbf{q}^{\of{o}}} + \text{ReLU}\of{\mathbf{q}^{\of{c}} - \mathbf{q}^{\of{o}} - \mathbf{a}^{\of{c}}}}}$,\\
+$f_{\text{in}}\of{\mathbf{q},\mathbf{a}} = \abs{\abs{\mathbf{q}^{\of{c}} - \min\of{\mathbf{q}^{\of{c}} + \mathbf{q}^{\of{o}}, \max\of{\mathbf{q}^{\of{c}} - \mathbf{q}^{\of{o}},\mathbf{a}^{\of{c}}}}}}$
 \end{table}
 %\begin{itemize}
-%    \item \textbf{TransE}~\cite{bordes_translating_2013}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ with $||e_h||=||e_t||=1$, and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}(e_h, \mathbf{r}, e_t) = \gamma - ||e_h + \mathbf{r} - e_t||$, $\gamma \in (0, \infty)$ (minimization of \eqref{eq:contrastive_loss});
-%    \item \textbf{DistMult}~\cite{yang_embedding_2014}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ with $||e_h||=||e_t||=1$, and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}(e_h, \mathbf{r}, e_t) = \langle e_h \odot \mathbf{r}, e_t \rangle$;
-%    \item \textbf{ComplEx}~\cite{trouillon_ComplEx_2016}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{C}^D$, and relation embeddings $\mathbf{r} \in \mathbb{C}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}(e_h, \mathbf{r}, e_t) = \text{Re}{(\langle e_h \cdot \mathbf{r}, \bar{e}_t \rangle)}$;
-%    \item \textbf{RotatE}~\cite{sun_RotatE_2019}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{C}^D$, and relation embeddings $\mathbf{r} \in \mathbb{C}^D$ with $\forall d, \left|\mathbf{r}^{(d)}\right|=1$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}(e_h, \mathbf{r}, e_t) = \gamma - ||e_h \cdot \mathbf{r} - e_t||$, $\gamma \in (0, \infty)$.
-%    % \item \textbf{GATNE}~\cite{cen_representation_2019}: Given a triplet $(h, r, t)$ obtained from a random walk, relation-dependent entity embeddings $e_{h,r},e_{t,r} \in \mathbb{R}^{D}$ are obtained from an attention mechanism between base embeddings and embeddings of neighboring nodes. Model parameters are learned via contrastive learning and scoring function $\mathcal{S}(e_{h_r}, e_{t_r}) = -\langle e_{h_r} \cdot e_{t_r}\rangle$;
-%    % \item \textbf{SACN}~\cite{shang_end--end_2019}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ are obtained from a two-layer Graph Convolutional Network (GCN), while relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters. $\mathcal{S}$ is a learnable CNN, optimized jointly with the embedder via binary cross-entropy minimization.
-%    % \item \textbf{KBGAT}~\cite{nathani-etal-2019-learning}: Given $(h, r, t)$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are obtained after applying two heterogeneous graph attention layers (GAT). $\mathcal{S}$ is a learnable CNN optimized via the soft margin loss.
+%    \item \textbf{TransE}~\cite{bordes_translating_2013}: Given $\of{h, r, t}$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ with $\abs{\abs{e_h}}=\abs{\abs{e_t}}=1$, and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}\of{e_h, \mathbf{r}, e_t} = \gamma - \abs{\abs{e_h + \mathbf{r} - e_t}}$, $\gamma \in \of{0, \infty}$ (minimization of \eqref{eq:contrastive_loss});
+%    \item \textbf{DistMult}~\cite{yang_embedding_2014}: Given $\of{h, r, t}$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ with $\abs{\abs{e_h}}=\abs{\abs{e_t}}=1$, and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}\of{e_h, \mathbf{r}, e_t} = \ang{ e_h \odot \mathbf{r}, e_t }$;
+%    \item \textbf{ComplEx}~\cite{trouillon_ComplEx_2016}: Given $\of{h, r, t}$, entity embeddings $e_h, e_t \in \mathbb{C}^D$, and relation embeddings $\mathbf{r} \in \mathbb{C}^D$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}\of{e_h, \mathbf{r}, e_t} = \text{Re}{\of{\ang{ e_h \cdot \mathbf{r}, \bar{e}_t }}}$;
+%    \item \textbf{RotatE}~\cite{sun_RotatE_2019}: Given $\of{h, r, t}$, entity embeddings $e_h, e_t \in \mathbb{C}^D$, and relation embeddings $\mathbf{r} \in \mathbb{C}^D$ with $\forall d, \abs{\mathbf{r}^{\of{d}}}=1$ are direct model parameters, optimized through contrastive learning of $\mathcal{S}\of{e_h, \mathbf{r}, e_t} = \gamma - \abs{\abs{e_h \cdot \mathbf{r} - e_t}}$, $\gamma \in \of{0, \infty}$.
+%    % \item \textbf{GATNE}~\cite{cen_representation_2019}: Given a triplet $\of{h, r, t}$ obtained from a random walk, relation-dependent entity embeddings $e_{h,r},e_{t,r} \in \mathbb{R}^{D}$ are obtained from an attention mechanism between base embeddings and embeddings of neighboring nodes. Model parameters are learned via contrastive learning and scoring function $\mathcal{S}\of{e_{h_r}, e_{t_r}} = -\ang{ e_{h_r} \cdot e_{t_r}}$;
+%    % \item \textbf{SACN}~\cite{shang_end--end_2019}: Given $\of{h, r, t}$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ are obtained from a two-layer Graph Convolutional Network (GCN), while relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are direct model parameters. $\mathcal{S}$ is a learnable CNN, optimized jointly with the embedder via binary cross-entropy minimization.
+%    % \item \textbf{KBGAT}~\cite{nathani-etal-2019-learning}: Given $\of{h, r, t}$, entity embeddings $e_h, e_t \in \mathbb{R}^D$ and relation embeddings $\mathbf{r} \in \mathbb{R}^D$ are obtained after applying two heterogeneous graph attention layers (GAT). $\mathcal{S}$ is a learnable CNN optimized via the soft margin loss.
 %\end{itemize}
 
 \paragraph{Data}
@@ -449,17 +449,17 @@ Our approach was tested on three knowledge graph datasets used classically for k
 \paragraph{Training and evaluation}
 We ran the COINs training and evaluation procedures on all combinations of knowledge graph datasets and embedding algorithms, starting from at least 3 random seeds. 
 
-Query-answer pairs and negative examples are obtained online from the training graph to form mini-batches for both community and node representation, but for COINs training node-level negative examples must only come from the same community as the answer ($\{a'_i\}_{i=1}^m \subseteq C_{c(a)}\setminus\{a\}$ for Definition~\ref{def:contrastive_loss}). 
+Query-answer pairs and negative examples are obtained online from the training graph to form mini-batches for both community and node representation, but for COINs training node-level negative examples must only come from the same community as the answer ($\offf{a'_i}_{i=1}^m \subseteq C_{c\of{a}}\setminus\offf{a}$ for Definition~\ref{def:contrastive_loss}). 
 
 Fixed validation and testing datasets are built by obtaining queries such that to reach their answers at least one non-training edge must be followed. Pre-selected sets of single-hop (1p-type) train-val-test queries are provided in each dataset, thus we make sure not to bootstrap them. The efficient bi-directional rejection sampling algorithm of SMORE~\cite{ren_smore_2021} is applied for both the training and evaluation query sampling. 
 
 The parameter optimization is performed via the Adam optimization algorithm~\cite{kingma_adam_2015}, with $\ell_2$ parameter regularization. Training loss reduction checks and a patience counter based on validation metrics are employed as early stopping criteria.
 
-Binary classification evaluation metrics are utilized for the link prediction task. On the other hand, after obtaining the predicted ranks $[\rho^{(i)}]_{i=1}^{N}$ of the evaluation query-answer scores (in the \emph{filtered} setting, same as in the baselines), one computes query answering aggregate metrics:
+Binary classification evaluation metrics are utilized for the link prediction task. On the other hand, after obtaining the predicted ranks $\off{\rho^{\of{i}}}_{i=1}^{N}$ of the evaluation query-answer scores (in the \emph{filtered} setting, same as in the baselines), one computes query answering aggregate metrics:
 \begin{itemize}
-    \item \textbf{Hits@k} $= \frac{1}{N}\sum_{i=1}^{N}{\mathbb{I}(\rho^{(i)} \leq k)}$;
-    \item \textbf{MR} $= \bar{\rho} = \frac{1}{N}\sum_{i=1}^{N}{\rho^{(i)}}$, called the mean rank;
-    \item \textbf{MRR} $= \frac{1}{N}\sum_{i=1}^{N}{\frac{1}{\rho^{(i)}}}$, called the mean reciprocal rank.
+    \item \textbf{Hits@k} $= \frac{1}{N}\sum_{i=1}^{N}{\mathbb{I}\of{\rho^{\of{i}} \leq k}}$;
+    \item \textbf{MR} $= \bar{\rho} = \frac{1}{N}\sum_{i=1}^{N}{\rho^{\of{i}}}$, called the mean rank;
+    \item \textbf{MRR} $= \frac{1}{N}\sum_{i=1}^{N}{\frac{1}{\rho^{\of{i}}}}$, called the mean reciprocal rank.
 \end{itemize}
 
 %
@@ -479,7 +479,7 @@ Table~\ref{tab:datasets} summarizes the three knowledge graphs via their basic s
   \begin{adjustbox}{width=\textwidth}
   \begin{tabular}{lccccrrrr}
     \toprule
-    Dataset & $|V|$ & $|E_R|$ & $F$ & $|R|$ & $K$ & $|V^*|$ & Acceleration $\uparrow$ & Overparametr. $\downarrow$ \\ %& $\frac{N |V|}{\sum_{k=1}^{K}{(K+|C_k|)N_k^{\text{test}}}}$ & $\frac{|V| + K + |V^*| + 1}{|V|}$ \\
+    Dataset & $\abs{V}$ & $\abs{E_R}$ & $F$ & $\abs{R}$ & $K$ & $\abs{V^*}$ & Acceleration $\uparrow$ & Overparametr. $\downarrow$ \\ %& $\frac{N \abs{V}}{\sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k^{\text{test}}}}$ & $\frac{\abs{V} + K + \abs{V^*} + 1}{\abs{V}}$ \\
     \midrule
     FB15k-237 & 14,541 & 310,116 & 1 & 237 & 1,025 & 13,407 & x 4.366 & x 1.993 \\
     WN18RR & 41,105 & 93,003 & 5 & 11 & 88 & 6,323 & x 4.583 & x 1.156 \\
@@ -489,7 +489,7 @@ Table~\ref{tab:datasets} summarizes the three knowledge graphs via their basic s
   \end{adjustbox}
 \end{table}
 
-We note the inability to bring down $K$ and $|V^*|$ further for the FB15k-237 graph due to its higher edge density, yielding the worst scalability effects. Nevertheless, we provide evidence that through elementary validation of the resolution hyperparameter one can optimize the scalability according to desired preferences, due to a surprisingly strong correlation of the factors with the resolution value. Figure~\ref{fig:scalability_resolution} illustrates this through a joint plot of both factors, and one can notice the common pattern across the datasets: there's a critical point for optimal acceleration, while overparametrization simply increases with the resolution.
+We note the inability to bring down $K$ and $\abs{V^*}$ further for the FB15k-237 graph due to its higher edge density, yielding the worst scalability effects. Nevertheless, we provide evidence that through elementary validation of the resolution hyperparameter one can optimize the scalability according to desired preferences, due to a surprisingly strong correlation of the factors with the resolution value. Figure~\ref{fig:scalability_resolution} illustrates this through a joint plot of both factors, and one can notice the common pattern across the datasets: there's a critical point for optimal acceleration, while overparametrization simply increases with the resolution.
 
 \begin{figure}[H]
 \begin{center}
