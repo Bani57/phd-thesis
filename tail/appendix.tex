@@ -162,46 +162,46 @@ Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the
 \label{algorithm:balanced_partition}
 \begin{algorithmic}[1]
 \STATE{\textbf{input} $\offf{p_k}_{k=1}^{K+1}$, $U=\offf{u_1,u_2,\dots}$}
-\STATE{$S=\sum_{k=1}^{K+1}{p_k}$}
-\STATE{MEMO$=\offf{}$}
+\STATE{$S \gets \sum_{k=1}^{K+1}{p_k}$}
+\STATE{MEMO$\gets\offf{}$}
 \STATE{\textbf{function} $\text{MinCost}\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}$:}
 % \bindent
 \IF{$\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}\notin$ MEMO}
 % \bindent
 \IF{$k=K+2$}
 % \bindent
-\STATE{$\mu=\max\of{\max_{j=1}^{\abs{U}-1}{s_j},S-\sum_{j=1}^{\abs{U}-1}{s_j}}$}
+\STATE{$\mu\gets\max\of{\max_{j=1}^{\abs{U}-1}{s_j},S-\sum_{j=1}^{\abs{U}-1}{s_j}}$}
 % \eindent
 \ELSE
 % \bindent
-\STATE{$\mu=\text{MinCost}\of{k+1,\offf{s_j}_{j=1}^{\abs{U}-1}}$}
+\STATE{$\mu\gets\text{MinCost}\of{k+1,\offf{s_j}_{j=1}^{\abs{U}-1}}$}
 \FOR{$i \leftarrow 1$ to $\abs{U}-1$}
 % \bindent
-\STATE{$\mu=\min\of{\mu, \text{MinCost}\of{k+1,\offf{s_j}_{j=1}^{i-1}\cup\offf{s_i+p_k}\cup\offf{s_j}_{j=i+1}^{\abs{U}-1}}}$}
+\STATE{$\mu\gets\min\of{\mu, \text{MinCost}\of{k+1,\offf{s_j}_{j=1}^{i-1}\cup\offf{s_i+p_k}\cup\offf{s_j}_{j=i+1}^{\abs{U}-1}}}$}
 % \eindent
 \ENDFOR
 % \eindent
 \ENDIF
 % \eindent
-\STATE{MEMO$\off{\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}}=\mu$}
+\STATE{MEMO$\off{\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}}\gets\mu$}
 \ENDIF
 \RETURN{MEMO$\off{\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}}$}
 % \eindent
 \STATE{\textbf{end} MinCost}
-\STATE{$\mu^*=$MinCost$\of{1, \offf{0}_{j=1}^{\abs{U}-1}}$}
-\STATE{$\offf{s^*_j}_{j=1}^{\abs{U}-1}=\offf{0}_{j=1}^{\abs{U}-1}$}
+\STATE{$\mu^*\gets$MinCost$\of{1, \offf{0}_{j=1}^{\abs{U}-1}}$}
+\STATE{$\offf{s^*_j}_{j=1}^{\abs{U}-1}\gets\offf{0}_{j=1}^{\abs{U}-1}$}
 \FOR{$k \leftarrow 1$ to $K+1$}
-\STATE{$i^*=\abs{U}$}
+\STATE{$i^*\gets\abs{U}$}
 \FOR{$i \leftarrow 1$ to $\abs{U}-1$}
 \IF{MEMO$\off{\of{k+1, \offf{s^*_j}_{j=1}^{i-1}\cup\offf{s^*_j+p_k}\cup\offf{s^*_j}_{j=i+1}^{\abs{U}-1}}}=\mu^*$}
-\STATE{$i^*=i$}
+\STATE{$i^*\gets i$}
 \ENDIF
 \ENDFOR
-\STATE{$s_{i^*}^*=s_{i^*}^*+p_k$}
+\STATE{$s_{i^*}^*\gets s_{i^*}^*+p_k$}
 \IF{$k=K+1$}
-\STATE{$u\of{g_V^*}=u_{i^*}$}
+\STATE{$u\of{g_V^*}\gets u_{i^*}$}
 \ELSE
-\STATE{$u\of{g_V^k}=u_{i^*}$}
+\STATE{$u\of{g_V^k}\gets u_{i^*}$}
 \ENDIF
 \ENDFOR
 \end{algorithmic}
@@ -214,15 +214,15 @@ Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the
 \label{algorithm:balanced_partition_greedy}
 \begin{algorithmic}[1]
 \STATE{\textbf{input} $\offf{p_k}_{k=1}^{K+1}$, $U=\offf{u_1,u_2,\dots}$}
-\STATE{$h_C=\text{MaxHeap}\of{\offf{\of{p_k,k}}_{k=1}^{K+1}}$}
-\STATE{$h_U=\text{MinHeap}\of{\offf{\of{0,j}}_{j=1}^{\abs{U}-1}}$}
+\STATE{$h_C\gets\text{MaxHeap}\of{\offf{\of{p_k,k}}_{k=1}^{K+1}}$}
+\STATE{$h_U\gets\text{MinHeap}\of{\offf{\of{0,j}}_{j=1}^{\abs{U}}}$}
 \FOR{$l \leftarrow 1$ to $K+1$}
-\STATE{$\of{p_k^*,k^*}=\text{HeapPop}\of{h_C}$}
-\STATE{$\of{s_i^*,i^*}=\text{HeapPop}\of{h_U}$}
+\STATE{$\of{p_k^*,k^*}\gets\text{HeapPop}\of{h_C}$}
+\STATE{$\of{s_i^*,i^*}\gets\text{HeapPop}\of{h_U}$}
 \IF{$k^*=K+1$}
-\STATE{$u\of{g_V^*}=u_{i^*}$}
+\STATE{$u\of{g_V^*}\gets u_{i^*}$}
 \ELSE
-\STATE{$u\of{g_V^{k^*}}=u_{i^*}$}
+\STATE{$u\of{g_V^{k^*}}\gets u_{i^*}$}
 \ENDIF
 \STATE{$\text{HeapPush}\of{h_U,\of{s_i^*+p_k^*,i^*}}$}
 \ENDFOR

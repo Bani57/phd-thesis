@@ -111,25 +111,25 @@ More intricate algorithms for computing node importance in network science histo
 \label{algorithm:hits}
 \begin{algorithmic}
 \STATE{\textbf{input} graph $G = \of{V, E}$}
-\STATE{\textbf{initialize} $\forall v \in V, \pmb{h}_0\of{v} = \pmb{a}_0\of{v} = \frac{1}{\abs{V}^2}$}
+\STATE{\textbf{initialize} $\forall v \in V, \pmb{h}_0\of{v} \gets \pmb{a}_0\of{v} \gets \frac{1}{\abs{V}^2}$}
 \WHILE{convergence criteria not reached}
-\STATE{\textbf{update} $\forall v \in V, \pmb{h}_{t}\of{v} = \sum_{u \in N_{\text{out}}\of{v}}{\pmb{a}_{t-1}\of{u}}$}
-\STATE{\textbf{update} $\forall v \in V, \pmb{a}_{t}\of{v} = \sum_{u \in N_{\text{in}}\of{v}}{\pmb{h}_{t-1}\of{u}}$}
-\STATE{\textbf{normalize} $\forall v \in V, \pmb{h}_t\of{v} = \frac{\pmb{h}_t\of{v}}{\abs{\abs{\pmb{h}_t}}_2}, \pmb{a}_t\of{v} = \frac{\pmb{a}_t\of{v}}{\abs{\abs{\pmb{a}_t}}_2}$}
+\STATE{\textbf{update} $\forall v \in V, \pmb{h}_{t}\of{v} \gets \sum_{u \in N_{\text{out}}\of{v}}{\pmb{a}_{t-1}\of{u}}$}
+\STATE{\textbf{update} $\forall v \in V, \pmb{a}_{t}\of{v} \gets \sum_{u \in N_{\text{in}}\of{v}}{\pmb{h}_{t-1}\of{u}}$}
+\STATE{\textbf{normalize} $\forall v \in V, \pmb{h}_t\of{v} \gets \frac{\pmb{h}_t\of{v}}{\abs{\abs{\pmb{h}_t}}_2}, \pmb{a}_t\of{v} \gets \frac{\pmb{a}_t\of{v}}{\abs{\abs{\pmb{a}_t}}_2}$}
 \ENDWHILE
 \RETURN{final hub scores $\pmb{h} \in \mathbb{R}^{\abs{V}}$, final authority scores $\pmb{a} \in \mathbb{R}^{\abs{V}}$}
 \end{algorithmic}
 \end{algorithm}
 
-\paragraph{PageRank} Brin and Page published in \cite{brin_anatomy_1998} how their novel search engine works. They describe the PageRank algorithm for ranking Web pages, a technique for obtaining node importances extremely widespread in use even today. The underlying assumption employed by PageRank is that more important websites/nodes are likely to receive more links/edges from other important websites/nodes. Expressly, PageRank scores for nodes represent probabilities that a random walker (Web crawler) will end up at the nodes while also considering that this walker can teleport to a random node when reaching a dead end. Implementation-independent pseudocode for the process is given in Algorithm \ref{algorithm:pagerank}.
+\paragraph{PageRank} Brin and Page published in \cite{brin_anatomy_1998} how their novel search engine works. They describe the PageRank algorithm for ranking Web pages, a technique for obtaining node importances extremely widespread in use even today. The underlying assumption employed by PageRank is that more important websites/nodes are likely to receive more links/edges from other important websites/nodes. Explicitly, PageRank scores for nodes represent probabilities that a random walker (Web crawler) will end up at the nodes while also considering that this walker can teleport to a random node when reaching a dead end. Implementation-independent pseudocode for the process is given in Algorithm \ref{algorithm:pagerank}.
 
 \begin{algorithm}[H]
 \caption{PageRank}
 \label{algorithm:pagerank}
 \begin{algorithmic}
 \STATE{\textbf{input} adjacency matrix $A \in \mathbb{R}^{\abs{V} \times \abs{V}}$, teleportation probability $p \in \off{0,1}$}
-\STATE{\textbf{compute} $\forall i,j \in \offf{1,\dots,\abs{V}}, R_{ij} = \frac{A_{ji}}{\sum_{k=1}^{\abs{V}}{A_{jk}}}$}
-\STATE{\textbf{compute} $M = \of{1-p}R + p \frac{1}{\abs{V}}$}
+\STATE{\textbf{compute} $\forall i,j \in \offf{1,\dots,\abs{V}}, R_{ij} \gets \frac{A_{ji}}{\sum_{k=1}^{\abs{V}}{A_{jk}}}$}
+\STATE{\textbf{compute} $M \gets \of{1-p}R + p \frac{1}{\abs{V}}$}
 \STATE{\textbf{compute} $\pmb{r}$, eigenvector of $M$ associated to the largest eigenvalue}
 \RETURN{PageRank scores $\pmb{r} \in \mathbb{R}^{\abs{V}}$}
 \end{algorithmic}
@@ -233,10 +233,10 @@ The starting point for all developed loss optimization algorithms is the Gradien
 \label{algorithm:gd}
 \begin{algorithmic}
 \STATE{\textbf{input} model function $f$, initial parameter values $\pmb{\theta}_0$, learning rate $\gamma \in \mathbb{R}^{+}$}
-\STATE{\textbf{set} $t = 0$}
+\STATE{\textbf{set} $t \gets 0$}
 \WHILE{convergence criteria not reached}
-\STATE{\textbf{update} $\pmb{\theta}_{t+1} = \pmb{\theta}_{t} - \gamma \nabla_{\pmb{\theta}}\mathcal{L}\of{\pmb{D}, \pmb{\theta}_{t}, f}$}
-\STATE{\textbf{update} $t = t+1$}
+\STATE{\textbf{update} $\pmb{\theta}_{t+1} \gets \pmb{\theta}_{t} - \gamma \nabla_{\pmb{\theta}}\mathcal{L}\of{\pmb{D}, \pmb{\theta}_{t}, f}$}
+\STATE{\textbf{update} $t \gets t+1$}
 \ENDWHILE
 \RETURN final parameter values $\pmb{\theta}_{t}$
 \end{algorithmic}
@@ -247,11 +247,11 @@ The starting point for all developed loss optimization algorithms is the Gradien
 \label{algorithm:sgd}
 \begin{algorithmic}
 \STATE{\textbf{input} model function $f$, initial parameter values $\pmb{\theta}_0$, learning rate $\gamma \in \mathbb{R}^{+}$}
-\STATE{\textbf{set} $t = 0$}
+\STATE{\textbf{set} $t \gets 0$}
 \WHILE{convergence criteria not reached}
 \STATE{\textbf{sample} $i \in \offf{1,\dots,N}$ uniformly at random}
-\STATE{\textbf{update} $\pmb{\theta}_{t+1} = \pmb{\theta}_{t} - \gamma \nabla_{\pmb{\theta}}\mathcal{L}_i\of{y_i, f\of{\pmb{x}_i, \pmb{\theta}_{t}}}$}
-\STATE{\textbf{update} $t = t+1$}
+\STATE{\textbf{update} $\pmb{\theta}_{t+1} \gets \pmb{\theta}_{t} - \gamma \nabla_{\pmb{\theta}}\mathcal{L}_i\of{y_i, f\of{\pmb{x}_i, \pmb{\theta}_{t}}}$}
+\STATE{\textbf{update} $t \gets t+1$}
 \ENDWHILE
 \RETURN final parameter values $\pmb{\theta}_{t}$
 \end{algorithmic}

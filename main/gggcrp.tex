@@ -168,11 +168,11 @@ The pseudocode of the full meta-variable sampling algorithm for GGG-CRP is given
 \FOR{cardinality $j \gets 1$ to $k_{\max}$}
 \STATE{\textbf{sample} number of communities for cardinality: $K_{i,j} \sim \hat{\mathcal{F}}_{n_i, K^c_i, N^c_{i,j}, K_j}$}
 \STATE{\textbf{sample} overlapping region sizes: $O_{i,j} \sim \text{PartitionDistribution}\of{j \cdot N^c_{i,j}, K_{i,j}, \hat{\mathcal{F}}_{n_i, K^c_i, N^c_{i,j}, K_{i,j}, O_j}}$}
-\STATE{\textbf{assign} nodes with cardinality: $\mathcal{N}_{i,j} = \offf{\sum_{k=1}^{j-1}{N^c_{i,k}},\dots,\sum_{k=1}^{j}{N^c_{i,k}}} \subseteq \mathbb{N}_{n_{\max}}$}
+\STATE{\textbf{assign} nodes with cardinality: $\mathcal{N}_{i,j} \gets \offf{\sum_{k=1}^{j-1}{N^c_{i,k}},\dots,\sum_{k=1}^{j}{N^c_{i,k}}} \subseteq \mathbb{N}_{n_{\max}}$}
 \STATE{\textbf{sample} membership: $M_{i,\mathcal{N}_{i,j}} \sim \text{BipartiteGraphDistribution}\of{j \cdot 1_{N^c_{i,j}},O_{i,j}}$}
 \ENDFOR
-\STATE{\textbf{compute} number of communities: $K_i = \max_{j=1}^{k_{\max}}{K_{i, j}}$}
-\STATE{\textbf{compute} community sizes: $c_i = O^T_i \cdot 1_{k_{\max}}$}
+\STATE{\textbf{compute} number of communities: $K_i \gets \max_{j=1}^{k_{\max}}{K_{i, j}}$}
+\STATE{\textbf{compute} community sizes: $c_i \gets O^T_i \cdot 1_{k_{\max}}$}
 \RETURN{$n_i, K_i, c_i, O_i, M_i$}
 \end{algorithmic}
 \end{algorithm} 
@@ -201,11 +201,11 @@ With this setup in mind, GGG-CRP's generator pipeline design is given in Algorit
 \caption{GGG-CRP graph generation}
 \label{algorithm:crp_generator}
 \begin{algorithmic}
-\STATE{\textbf{initialize} first graph: $A_{i}^{\of{1}} = r\of{t\of{R_{i}^{\of{1}}}}$}
-\STATE{\textbf{initialize} prior: $\hat{\mathbf{X}}_{i}^{\of{1}} = R_{i}^{\of{1}}$}
+\STATE{\textbf{initialize} first graph: $A_{i}^{\of{1}} \gets r\of{t\of{R_{i}^{\of{1}}}}$}
+\STATE{\textbf{initialize} prior: $\hat{\mathbf{X}}_{i}^{\of{1}} \gets R_{i}^{\of{1}}$}
 \FOR{round $k \gets 2$ to $k_{\max}$}
-\STATE{\textbf{update} graph: $A_{i}^{\of{k}} = r'\of{t\of{R_{i}^{\of{k}}},\hat{\mathbf{X}}_{i}^{\of{k-1}}}$}
-\STATE{\textbf{update} prior: $\hat{\mathbf{X}}_{i}^{\of{k}} = d_f\of{A_{i}^{\of{k}}}$}
+\STATE{\textbf{update} graph: $A_{i}^{\of{k}} \gets r'\of{t\of{R_{i}^{\of{k}}},\hat{\mathbf{X}}_{i}^{\of{k-1}}}$}
+\STATE{\textbf{update} prior: $\hat{\mathbf{X}}_{i}^{\of{k}} \gets d_f\of{A_{i}^{\of{k}}}$}
 \ENDFOR
 \RETURN{final generated graph $A_i = A_{i}^{\of{k_{\max}}}$}
 \end{algorithmic}

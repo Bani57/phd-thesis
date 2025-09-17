@@ -251,9 +251,9 @@ Additional parameters are: a {node feature embedding matrix} $\mathbf{W} \in \ma
     \label{algorithm:baseline}
     \begin{algorithmic}[1]
     \STATE{\textbf{input} $\of{q, a}$, $y \in \offf{-1,1}$}
-    \STATE{$\mathbf{R}=\off{g_R\of{r}}_{r \in R}$}
-    \STATE{$\mathbf{a}=g_V\of{a}, \mathbf{A}=\off{g_V\of{v}}_{v \in \mathcal{A}_{q}}$}
-    \STATE{$\mathbf{q}=G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
+    \STATE{$\mathbf{R}\gets\off{g_R\of{r}}_{r \in R}$}
+    \STATE{$\mathbf{a} \gets g_V\of{a}, \mathbf{A}\gets\off{g_V\of{v}}_{v \in \mathcal{A}_{q}}$}
+    \STATE{$\mathbf{q} \gets G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
     \STATE{\textbf{return} $\tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, y}$}
     \end{algorithmic}
 \end{algorithm}
@@ -279,18 +279,18 @@ This new construction has several desirable properties unlike the baseline:
 \label{algorithm:coins}
 \begin{algorithmic}[1]
 \STATE{\textbf{input} $\of{q, a}$, $y \in \offf{-1,1}$, $c:V \to \mathcal{C}$, $z^*: V \to V_{\omega}^*$, $\alpha \in \of{0,1}$}
-\STATE{$\mathbf{R}^{\of{C}}=\off{g^{\of{C}}_R\of{r}}_{r \in R}, \tilde{\mathbf{R}}=\off{g_R\of{r}}_{r \in R}$}
-\STATE{$\mathbf{R} = \ang{ \mathrm{Softmax}\of{\mathbf{w}_R}, \off{\mathbf{R}^{\of{C}}, \tilde{\mathbf{R}}} }$}
-\STATE{$q^{\of{C}} = \of{\off{c\of{v}}_{v \in \mathcal{A}_q},G_q}$}
-\STATE{$\mathbf{a}^{\of{C}}=g^{\of{C}}_V\of{c\of{a}}, \mathbf{A}^{\of{C}}=\off{g^{\of{C}}_V\of{k}}_{k \in \mathcal{A}^{\of{C}}_{q}}$}
-\STATE{$\mathbf{q}^{\of{C}}=G_{q}\of{\mathbf{A}^{\of{C}};\of{\mathbf{R}^{\of{C}},g_P^{\of{C}}},g_I^{\of{C}}}$}
+\STATE{$\mathbf{R}^{\of{C}} \gets \off{g^{\of{C}}_R\of{r}}_{r \in R}, \tilde{\mathbf{R}} \gets \off{g_R\of{r}}_{r \in R}$}
+\STATE{$\mathbf{R} \gets \ang{ \mathrm{Softmax}\of{\mathbf{w}_R}, \off{\mathbf{R}^{\of{C}}, \tilde{\mathbf{R}}} }$}
+\STATE{$q^{\of{C}} \gets \of{\off{c\of{v}}_{v \in \mathcal{A}_q},G_q}$}
+\STATE{$\mathbf{a}^{\of{C}} \gets g^{\of{C}}_V\of{c\of{a}}, \mathbf{A}^{\of{C}} \gets \off{g^{\of{C}}_V\of{k}}_{k \in \mathcal{A}^{\of{C}}_{q}}$}
+\STATE{$\mathbf{q}^{\of{C}} \gets G_{q}\of{\mathbf{A}^{\of{C}};\of{\mathbf{R}^{\of{C}},g_P^{\of{C}}},g_I^{\of{C}}}$}
 \IF{$\forall v \in q, c\of{v}=c\of{a}$}
-\STATE{$\tilde{\mathbf{a}}=g^{\of{c\of{a}}}_V\of{a}, \tilde{\mathbf{A}}=\off{g^{\of{c\of{a}}}_V\of{v}}_{v \in \mathcal{A}_{q}}$}
+\STATE{$\tilde{\mathbf{a}} \gets g^{\of{c\of{a}}}_V\of{a}, \tilde{\mathbf{A}} \gets \off{g^{\of{c\of{a}}}_V\of{v}}_{v \in \mathcal{A}_{q}}$}
 \ELSE
-\STATE{$\tilde{\mathbf{a}}=g^{*}_V\of{z^*\of{a}}, \tilde{\mathbf{A}}=\off{g^{*}_V\of{z^*\of{v}}}_{v \in \mathcal{A}_{q}}$}
+\STATE{$\tilde{\mathbf{a}} \gets g^{*}_V\of{z^*\of{a}}, \tilde{\mathbf{A}}\gets\off{g^{*}_V\of{z^*\of{v}}}_{v \in \mathcal{A}_{q}}$}
 \ENDIF
-\STATE{$\mathbf{a} = \ang{\mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{\of{C}}, \tilde{\mathbf{a}}}}, \mathbf{A}=\ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{v}}_{v \in \mathcal{A}_{q}}, \mathbf{A}^{\of{C}}, \tilde{\mathbf{A}} }$}
-\STATE{$\mathbf{q}=G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
+\STATE{$\mathbf{a} \gets \ang{\mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{\of{C}}, \tilde{\mathbf{a}}}}, \mathbf{A} \gets \ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{v}}_{v \in \mathcal{A}_{q}}, \mathbf{A}^{\of{C}}, \tilde{\mathbf{A}} }$}
+\STATE{$\mathbf{q}\gets G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
 \STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}\of{\mathbf{q}, \mathbf{a}, y}=\of{1-\alpha} \tilde{\mathcal{L}}\of{\mathbf{q}^{\of{C}}, \mathbf{a}^{\of{C}}, y} + \alpha \tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, y} $}
 \end{algorithmic}
 \end{algorithm} 
@@ -319,13 +319,13 @@ Let now $S_C$ denote a learned scoring model for community-level query-answer pa
 \begin{algorithmic}[1]
 \STATE{\textbf{input} test set $\mathcal{D}_{\text{test}}=\offf{\of{q_i, a_i}}_{i=1}^{N}$, scorers $S_C, S_V$}
 \FOR{$i \gets 1$ to $N$}
-\STATE{$q^{\of{C}}_i = \of{\off{c\of{v}}_{v \in \mathcal{A}_{q_i}},G_{q_i}}$}
-\STATE{$s_C = \off{S_C\of{q^{\of{C}}_i, k}}_{k \in \mathcal{C}}$}
-\STATE{$\rho^{\of{i}}_{C} = \mathrm{Rank}\of{c\of{a_i},s_C}$}
-\STATE{$F_i=\sum_{1 \leq j < \rho^{\of{i}}_{C}}{\abs{C_{\mathrm{IndexRank}\of{j,s_C}}}}$}
-\STATE{$s_V = \off{S_V\of{q_i, v}}_{v \in C_{c\of{a_i}}}$}
-\STATE{$\tilde{\rho}^{\of{i}} = \mathrm{Rank}\of{a_i,s_V}$}
-\STATE{$\rho^{\of{i}} = F_i + \tilde{\rho}^{\of{i}}$}
+\STATE{$q^{\of{C}}_i \gets \of{\off{c\of{v}}_{v \in \mathcal{A}_{q_i}},G_{q_i}}$}
+\STATE{$s_C \gets \off{S_C\of{q^{\of{C}}_i, k}}_{k \in \mathcal{C}}$}
+\STATE{$\rho^{\of{i}}_{C} \gets \mathrm{Rank}\of{c\of{a_i},s_C}$}
+\STATE{$F_i \gets \sum_{1 \leq j < \rho^{\of{i}}_{C}}{\abs{C_{\mathrm{IndexRank}\of{j,s_C}}}}$}
+\STATE{$s_V \gets \off{S_V\of{q_i, v}}_{v \in C_{c\of{a_i}}}$}
+\STATE{$\tilde{\rho}^{\of{i}} \gets \mathrm{Rank}\of{a_i,s_V}$}
+\STATE{$\rho^{\of{i}} \gets F_i + \tilde{\rho}^{\of{i}}$}
 \ENDFOR
 \STATE{\textbf{return} $\off{\rho^{\of{i}}}_{i=1}^{N}$}
 \end{algorithmic}
@@ -361,27 +361,27 @@ Then with this setup, Algorithm \ref{algorithm:coins_distributed} details the di
 \begin{algorithmic}[1]
 \STATE{\textcolor{blue}{\textbf{on} $u^*$:}}
 \STATE{\textbf{input} $\of{q, a}$, $y \in \offf{-1,1}$, $c:V \to \mathcal{C}$, $z^*: V \to V_{\omega}^*$, $\alpha \in \of{0,1}$}
-\STATE{$\mathbf{R}^{\of{C}}=\off{g^{\of{C}}_R\of{r}}_{r \in R}, \tilde{\mathbf{R}}=\off{g_R\of{r}}_{r \in R}$}
-\STATE{$\mathbf{R} = \ang{ \mathrm{Softmax}\of{\mathbf{w}_R}, \off{\mathbf{R}^{\of{C}}, \tilde{\mathbf{R}}} }$}
-\STATE{$q^{\of{C}} = \of{\off{c\of{v}}_{v \in \mathcal{A}_q},G_q}$}
-\STATE{$\mathbf{a}^{\of{C}}=g^{\of{C}}_V\of{c\of{a}}, \mathbf{A}^{\of{C}}=\off{g^{\of{C}}_V\of{k}}_{k \in \mathcal{A}^{\of{C}}_{q}}$}
-\STATE{$\mathbf{q}^{\of{C}}=G_{q}\of{\mathbf{A}^{\of{C}};\of{\mathbf{R}^{\of{C}},g_P^{\of{C}}},g_I^{\of{C}}}$}
+\STATE{$\mathbf{R}^{\of{C}} \gets \off{g^{\of{C}}_R\of{r}}_{r \in R}, \tilde{\mathbf{R}} \gets \off{g_R\of{r}}_{r \in R}$}
+\STATE{$\mathbf{R} \gets \ang{ \mathrm{Softmax}\of{\mathbf{w}_R}, \off{\mathbf{R}^{\of{C}}, \tilde{\mathbf{R}}} }$}
+\STATE{$q^{\of{C}} \gets \of{\off{c\of{v}}_{v \in \mathcal{A}_q},G_q}$}
+\STATE{$\mathbf{a}^{\of{C}} \gets g^{\of{C}}_V\of{c\of{a}}, \mathbf{A}^{\of{C}} \gets \off{g^{\of{C}}_V\of{k}}_{k \in \mathcal{A}^{\of{C}}_{q}}$}
+\STATE{$\mathbf{q}^{\of{C}} \gets G_{q}\of{\mathbf{A}^{\of{C}};\of{\mathbf{R}^{\of{C}},g_P^{\of{C}}},g_I^{\of{C}}}$}
 \IF{$\forall v \in q, c\of{v}=c\of{a}$}
 \STATE{\textcolor{blue}{\textbf{async send} $\of{\mathcal{A}_q, a} \to u\of{g_V^{c\of{a}}}$}}
 \STATE{\textcolor{blue}{\textbf{on } $u\of{g_V^{c\of{a}}}$:}}
-\STATE{$\tilde{\mathbf{a}}=g^{\of{c\of{a}}}_V\of{a}, \tilde{\mathbf{A}}=\off{g^{\of{c\of{a}}}_V\of{v}}_{v \in \mathcal{A}_{q}}$}
+\STATE{$\tilde{\mathbf{a}}\gets g^{\of{c\of{a}}}_V\of{a}, \tilde{\mathbf{A}} \gets \off{g^{\of{c\of{a}}}_V\of{v}}_{v \in \mathcal{A}_{q}}$}
 \STATE{\textcolor{blue}{\textbf{async send} $\of{\tilde{\mathbf{A}}, \tilde{\mathbf{a}}} \to u^*$}}
 \ELSE
 \STATE{\textcolor{blue}{\textbf{async send} $\of{\mathcal{A}_q, a} \to u\of{g_V^{*}}$}}
 \STATE{\textcolor{blue}{\textbf{on } $u\of{g_V^{*}}$:}}
-\STATE{$\tilde{\mathbf{a}}=g^{*}_V\of{z^*\of{a}}, \tilde{\mathbf{A}}=\off{g^{*}_V\of{z^*\of{v}}}_{v \in \mathcal{A}_{q}}$}
+\STATE{$\tilde{\mathbf{a}} \gets g^{*}_V\of{z^*\of{a}}, \tilde{\mathbf{A}} \gets \off{g^{*}_V\of{z^*\of{v}}}_{v \in \mathcal{A}_{q}}$}
 \STATE{\textcolor{blue}{\textbf{async send} $\of{\tilde{\mathbf{A}}, \tilde{\mathbf{a}}} \to u^*$}}
 \ENDIF
 \STATE{\textcolor{blue}{\textbf{on} $u^*$:}}
 \STATE{\textcolor{blue}{\textbf{sync wait} $\of{\tilde{\mathbf{A}}, \tilde{\mathbf{a}}}$}}
-\STATE{$\mathbf{a} = \ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{\of{C}}, \tilde{\mathbf{a}}}}, \mathbf{A}=\ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{v}}_{v \in \mathcal{A}_{q}}, \mathbf{A}^{\of{C}}, \tilde{\mathbf{A}} }$}
-\STATE{$\mathbf{q}=G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
-\STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}\of{\mathbf{q}, \mathbf{a}, y}=\of{1-\alpha} \tilde{\mathcal{L}}\of{\mathbf{q}^{\of{C}}, \mathbf{a}^{\of{C}}, y} + \alpha \tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, y} $}
+\STATE{$\mathbf{a} \gets \ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{a}, \mathbf{a}^{\of{C}}, \tilde{\mathbf{a}}}}, \mathbf{A} \gets \ang{ \mathrm{Softmax}\of{\mathbf{w}}, \off{\mathbf{W} \mathbf{x}_{v}}_{v \in \mathcal{A}_{q}}, \mathbf{A}^{\of{C}}, \tilde{\mathbf{A}} }$}
+\STATE{$\mathbf{q} \gets G_{q}\of{\mathbf{A};\of{\mathbf{R},g_P},g_I}$}
+\STATE{\textbf{return} $\tilde{\mathcal{L}}_{\text{COINs}}\of{\mathbf{q}, \mathbf{a}, y}= \of{1-\alpha} \tilde{\mathcal{L}}\of{\mathbf{q}^{\of{C}}, \mathbf{a}^{\of{C}}, y} + \alpha \tilde{\mathcal{L}}\of{\mathbf{q}, \mathbf{a}, y} $}
 \end{algorithmic}
 \end{algorithm} 
 
@@ -614,4 +614,6 @@ In this section we introduced COINs, a method for accelerating link prediction a
 % This first answer localization step was found to be very impactful on overall model performance. 
 We theoretically and empirically elaborated that the quality of the community structure of the knowledge graph has a broad-reaching influence on the possible scalability improvements provided by our method, as well as its prediction performance compared to baselines. As such, one can conclude that before selecting COINs to accelerate the embedding of a knowledge graph, it is important to study and evaluate its community structure. 
 
-The achieved impressive accuracy and acceleration benefits motivate strongly modeling and predicting over both the community-level coarsened version of a knowledge graph in addition to the local structures, no matter the task. We would in such a way apply both holistic and reductionist techniques to solve a knowledge graph problem perhaps otherwise computationally intractable.
+The achieved impressive accuracy and acceleration benefits strongly motivate modeling and predicting over both the community-level coarsened version of a knowledge graph in addition to the local structures, no matter the task. We would in such a way, apply both holistic and reductionist techniques to solve a knowledge graph problem, perhaps otherwise computationally intractable.
+
+As relevant future work in scalable knowledge graph reasoning, we propose attempting the integration of COINs with algorithms for general first-order logical knowledge graph query answering, like BetaE~\cite{ren_beta_2020}, and obtaining comparisons to baseline models on larger non-standard knowledge graphs.
