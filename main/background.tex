@@ -12,8 +12,8 @@ The field of \emph{network science} studies methods for analysing specific prope
 \begin{definition}
 A \emph{finite graph} $G$ is defined as the ordered pair of two finite sets, $G=\of{V,E}$ where:
 \begin{itemize}
-\item $V=\offf{v_1, \dots, v_N}$ is a finite set of elements, which are referred to as \emph{nodes} (or \emph{vertices}, \emph{points} etc.);
-\item $E$ is a set of elements referred to as \emph{edges} (or \emph{links}, \emph{lines} etc.), where an edge is defined as an ordered pair of nodes: $E=\offf{\of{v_i,v_j}\mid v_i,v_j \in V}$.
+\item $V=\offf{v_1, \dots, v_N}$ is a finite set of elements, which are referred to as \emph{nodes} (or \emph{vertices}, \emph{points}, etc.);
+\item $E$ is a set of elements referred to as \emph{edges} (or \emph{links}, \emph{lines}, etc.), where an edge is defined as an ordered pair of nodes: $E=\offf{\of{v_i,v_j}\mid v_i,v_j \in V}$.
 \end{itemize}
 \end{definition}
 For the purpose of this text, we will accept the terms \emph{graph} and \emph{network} to be equivalent, even though in some contexts, this might not be the case.
@@ -27,7 +27,7 @@ Graphs can be of two main types: \emph{directed} or \emph{undirected}.
 \end{definition}
 
 \begin{definition}
-The \emph{adjacency matrix} of a graph $G=\of{V, E}$ is defined as the matrix $A \in \offf{0,1}^{\abs{V} \times \abs{V}}$, whose elements are computed as follows:
+The \emph{adjacency matrix} of a graph $G=\of{V, E}$ is defined as the binary matrix $A \in \offf{0,1}^{\abs{V} \times \abs{V}}$, whose elements are computed as follows:
 \begin{equation}
 \forall i,j \in \offf{1, \dots, \abs{V}}, A_{ij} = \begin{cases}1 &\text{, if }\of{v_i, v_j} \in E \\ 0 & \text{, otherwise} \end{cases}
 \end{equation}
@@ -50,11 +50,11 @@ For directed graphs, due to the asymmetry of edges, the separate notions of \emp
 Given a graph $G=\of{V, E}$, the \emph{neighbourhood} of a node $v \in V$ is the defined as the set of nodes $v$ is directly connected to with an edge: \begin{equation}
 N\of{v}=\offf{u \mid u\in V, \of{v,u} \in E \vee \of{u,v} \in E }
 \end{equation} 
-Analogously as for node degree, the notions of \emph{in-neighbourhood} and \emph{out-neighbourhood} can be defined. Observe that $d\of{v}=\abs{N\of{v}}$.
+Analogously to node degree, the notions of \emph{in-neighbourhood} and \emph{out-neighbourhood} can be defined. Observe that $d\of{v}=\abs{N\of{v}}$.
 \end{definition}
 
 \begin{definition}
-A \emph{path} in a graph $G=\of{V, E}$ is a sequence of nodes $v_1,\dots,v_n \in V$ in which every pair of consecutive nodes are connected by an edge:\\ $\forall i \in \offf{1,\dots,n-1},\of{v_i,v_{i+1}}\in E$. A \emph{cycle} is a path where $v_1=v_n$.
+A \emph{path} in a graph $G=\of{V, E}$ is a sequence of nodes $v_1,\dots,v_n \in V$ in which every pair of consecutive nodes are connected by an edge: $\forall i \in \offf{1,\dots,n-1},\of{v_i,v_{i+1}}\in E$. A \emph{cycle} is a path where $v_1=v_n$.
 \end{definition}
 
 \begin{definition}
@@ -66,7 +66,7 @@ Between a pair of nodes in a graph, there might be more than one or no paths, de
 \end{definition}
 
 \begin{definition}
-A directed graph is \emph{strongly connected} if a path exists between all pairs of nodes in the graph. A directed graph is \emph{weakly connected} if a path exists between all pairs of nodes in the undirected graph obtained by converting all of the edges of the original directed graph in undirected form. If a whole directed graph is not strongly/weekly connected, but a subgraph is, this subgraph is called a \emph{strongly/weakly connected component} of the original graph, respectively.
+A directed graph is \emph{strongly connected} if a path exists between all pairs of nodes in the graph. A directed graph is \emph{weakly connected} if a path exists between all pairs of nodes in the undirected graph obtained by converting all of the edges of the original directed graph into undirected form. If a whole directed graph is not strongly/weakly connected, but a subgraph is, this subgraph is called a \emph{strongly/weakly connected component} of the original graph, respectively.
 \end{definition}
 
 \begin{definition}
@@ -94,7 +94,7 @@ For example, there exist several so-called \emph{centrality} indices that attemp
 The \emph{betweenness centrality} of an edge is defined as the number of shortest paths in the graph that pass through (contain) that edge in ratio with the total number of shortest paths.
 \end{definition}
 
-The clustering coefficient scores vertices on the number of connections present in their neighbourhood in ratio with the number of total possible. This measure is essential when comparing networks w.r.t. average local connectivity and gauging a rich community structure.
+The clustering coefficient scores vertices on the number of connections present in their neighbourhood in relation to the total number of possible connections. This measure is essential when comparing networks w.r.t. average local connectivity and gauging a rich community structure.
 
 \begin{definition}
 Given a graph $G=\of{V, E}$, the \emph{clustering coefficient} $cc\of{v}$ is computed as: \begin{equation}
@@ -102,11 +102,11 @@ cc\of{v}=\frac{\abs{E'\of{v}}}{{\abs{N\of{v}} \choose 2}} = \frac{2\abs{E'\of{v}
 where $\abs{E'\of{v}}$ is the number of edges in the subgraph $G'\of{v}=\of{N\of{v}, E'\of{v}}$ formed out of the neighbourhood of $v$, $N\of{v}$.
 \end{definition}
 
-More intricate algorithms for computing node importance in network science historically were devised by viewing the problem as a form of \enquote{edge flow}: for example, the flow of current in the context of physics or in the context of page ranking on the World Wide Web, traffic through hyperlinks. These algorithms have in common the idea that nodes start with an equal \enquote{amount of importance} in regards to some context, but this importance can continuously flow through the edges of the network. Depending on the network connectivity, in the end, the process will converge to some steady state, where each node has the correct amount of true importance. We will elaborate on two such well-established algorithms in computer science that were considered for this work.
+More intricate algorithms for computing node importance in network science historically were devised by viewing the problem as a form of \enquote{edge flow}: for example, the flow of current in the context of physics or in the context of page ranking on the World Wide Web, traffic through hyperlinks. These algorithms have in common the idea that nodes start with an equal \enquote{amount of importance} in regard to some context, but this importance can continuously flow through the edges of the network. Depending on the network connectivity, in the end, the process will converge to some steady state, where each node has the correct amount of true importance. We will elaborate on two such well-established algorithms in computer science that were considered for this work.
 
-\paragraph{HITS} In 1999 \cite{kleinberg_authoritative_1999} described the Hyperlink-Induced Topic Search (HITS) algorithm for rating Web pages. The idea behind HITS stemmed from insight into creating web pages when the Internet was initially forming. The author defined two notions: a good \emph{hub} represents a page that points to many other pages, while a good \emph{authority} represents a page that is linked by many different hubs. By modelling the pages as nodes and the possible hyperlinks between them as edges, one can use the hubs and authorities scheme to construct an algorithm for computing two importance measures for the graph nodes: hub and authority values. Implementation-independent pseudocode for the process is given in Algorithm \ref{algorithm:hits}.
+\paragraph{HITS} In 1999~\cite{kleinberg_authoritative_1999} described the Hyperlink-Induced Topic Search (HITS) algorithm for rating Web pages. The idea behind HITS stemmed from insight into creating web pages when the Internet was initially forming. The author defined two notions: a good \emph{hub} represents a page that points to many other pages, while a good \emph{authority} represents a page that is linked by many different hubs. By modelling the pages as nodes and the possible hyperlinks between them as edges, one can use the hubs and authorities scheme to construct an algorithm for computing two importance measures for the graph nodes: hub and authority values. Implementation-independent pseudocode for the process is given in Algorithm~\ref{algorithm:hits}.
 
-\begin{algorithm}[H]
+\begin{algorithm}%[H]
 \caption{Hubs and authorities}
 \label{algorithm:hits}
 \begin{algorithmic}
@@ -121,9 +121,9 @@ More intricate algorithms for computing node importance in network science histo
 \end{algorithmic}
 \end{algorithm}
 
-\paragraph{PageRank} Brin and Page published in \cite{brin_anatomy_1998} how their novel search engine works. They describe the PageRank algorithm for ranking Web pages, a technique for obtaining node importances extremely widespread in use even today. The underlying assumption employed by PageRank is that more important websites/nodes are likely to receive more links/edges from other important websites/nodes. Explicitly, PageRank scores for nodes represent probabilities that a random walker (Web crawler) will end up at the nodes while also considering that this walker can teleport to a random node when reaching a dead end. Implementation-independent pseudocode for the process is given in Algorithm \ref{algorithm:pagerank}.
+\paragraph{PageRank} Brin and Page published in~\cite{brin_anatomy_1998} how their novel search engine works. They describe the PageRank algorithm for ranking Web pages, a technique for obtaining node importances extremely widespread in use even today. The underlying assumption employed by PageRank is that more important websites/nodes are likely to receive more links/edges from other important websites/nodes. Explicitly, PageRank scores for nodes represent probabilities that a random walker (Web crawler) will end up at the nodes while also considering that this walker can teleport to a random node when reaching a dead end. Implementation-independent pseudocode for the process is given in Algorithm~\ref{algorithm:pagerank}.
 
-\begin{algorithm}[H]
+\begin{algorithm}%[H]
 \caption{PageRank}
 \label{algorithm:pagerank}
 \begin{algorithmic}
@@ -177,9 +177,9 @@ Machine learning (ML) is the computer science study of algorithms that build a \
 We define a \emph{model} as the pair $M = \of{\pmb{\theta}, f}$, where:
 \begin{itemize}
 \item $\pmb{\theta} \in \Theta$ is referred to as the set of \emph{parameters}, belonging to the \emph{parameter space} $\Theta$;
-\item The function $f: \mathcal{X} \times \Theta \to \mathcal{Y}$ accepts values from the \emph{input space} $\mathcal{X}$ and based on the current parameter values produces elements from the \emph{output space} $\mathcal{Y}$.
+\item The function $f: \mathcal{X} \times \Theta \to \mathcal{Y}$ accepts values from the \emph{input space} $\mathcal{X}$ and based on the current parameter values, produces elements from the \emph{output space} $\mathcal{Y}$.
 \end{itemize}
-Usually the application of a model is denoted through the shorthand notation:\\ $y = f\of{\pmb{x}, \pmb{\theta}}$, where $\pmb{x} \in \mathcal{X}$, $y \in \mathcal{Y}$.
+Usually, the application of a model is denoted through the shorthand notation:\\ $y = f\of{\pmb{x}, \pmb{\theta}}$, where $\pmb{x} \in \mathcal{X}$, $y \in \mathcal{Y}$.
 \end{definition}
 
 Every model with parameters is applied to a set of sampled data.
@@ -195,7 +195,7 @@ A \emph{dataset} $\pmb{D}$ is a finite collection of datapoints $\pmb{d}_1,\dots
 In order to evaluate how well a model performs on a task, we define a loss function.
 
 \begin{definition}
-For each datapoint $\pmb{d}_i=\of{\pmb{x}_i, y_i}$ of a dataset, a \emph{loss} function $\mathcal{L}_{i}$, $\mathcal{L}_{i}: \mathcal{Y} \times \mathcal{Y} \to \mathbb{R} $ outputs a numeric value scoring how closely a model $M = \of{\pmb{\theta}, f}$ represents the output sample $y_i$ as the function of the input sample $\pmb{x}_i$. We will denote the application of the loss function with $\mathcal{L}_{i}\of{y_i, f\of{\pmb{x}_i, \pmb{\theta}}}$.
+For each datapoint $\pmb{d}_i=\of{\pmb{x}_i, y_i}$ of a dataset, a \emph{loss} function $\mathcal{L}_{i}: \mathcal{Y} \times \mathcal{Y} \to \mathbb{R} $ outputs a numeric value scoring how closely a model $M = \of{\pmb{\theta}, f}$ represents the output sample $y_i$ as the function of the input sample $\pmb{x}_i$. We will denote the application of the loss function with $\mathcal{L}_{i}\of{y_i, f\of{\pmb{x}_i, \pmb{\theta}}}$.
 
 We can define the loss function on the level of the whole dataset as the expected per-datapoint loss over the dataset. This expectation cannot be computed as the underlying data distribution is not known, so we use an empirical estimate: \begin{equation}
 \mathcal{L}\of{\pmb{D}, \pmb{\theta}, f} = \frac{1}{N}\sum_{i=1}^{N}{\mathcal{L}_{i}\of{y_i, f\of{\pmb{x}_i, \pmb{\theta}}}}
@@ -207,7 +207,7 @@ Before delving further, we will give an example. One of the simplest models we c
 \item $\mathcal{X} = \mathbb{R}^D$, $\mathcal{Y}=\mathbb{R}$;
 \item $\pmb{\theta} = \of{\pmb{w}, b}$, where $\pmb{w} \in \mathbb{R}^D$ are referred to as the \emph{weights} and $b \in \mathbb{R}$ is called the \emph{bias} value;
 \item $f\of{\pmb{x}, \pmb{\theta}} = \sum_{j=1}^{D}{w_j x_j} + b$, i.e. the output is modelled as a linear combination of the input;
-\item The loss function is most often the so called Mean Squared Error (MSE): \begin{equation}
+\item The loss function is most often the so-called Mean Squared Error (MSE): \begin{equation}
 \mathcal{L}\of{\pmb{D}, \pmb{\theta}, f} = \frac{1}{2N}\sum_{i=1}^{N}{\of{y_i - f\of{\pmb{x}_i, \pmb{\theta}}}^2}
 \end{equation}
 \end{itemize}
@@ -226,9 +226,9 @@ Model \emph{training} consists of finding the optimal parameter values $\pmb{\th
 
 However, as the loss function can be arbitrarily complex, in very few scenarios can the minimization problem be analytically solved in exact form. As such, iterative numeric algorithms called \emph{optimizers} are applied. These are based on low-degree local approximations of the loss function to obtain simple update formulas for the parameters. In order to give strict theoretical convergence guarantees, optimization algorithms usually assume that the loss function has particular desirable properties, such as convexity and smoothness.
 
-The starting point for all developed loss optimization algorithms is the Gradient Descent (GD) technique and its probabilistic variant Stochastic Gradient Descent (SGD). These methods rely on a first-order Taylor expansion of the loss. Therefore it is required to compute the gradient (vector of first derivatives) of the loss function w.r.t. the model parameters in every iteration. Pseudocode for GD and SGD is given in Algorithm \ref{algorithm:gd} and \ref{algorithm:sgd}, respectively.
+The starting point for all developed loss optimization algorithms is the Gradient Descent (GD) technique and its probabilistic variant, Stochastic Gradient Descent (SGD). These methods rely on a first-order Taylor expansion of the loss. Therefore, it is required to compute the gradient (vector of first derivatives) of the loss function w.r.t. the model parameters in every iteration. Pseudocode for GD and SGD is given in Algorithm~\ref{algorithm:gd} and~\ref{algorithm:sgd}, respectively.
 
-\begin{algorithm}
+\begin{algorithm}%[H]
 \caption{Gradient Descent}
 \label{algorithm:gd}
 \begin{algorithmic}
@@ -242,7 +242,7 @@ The starting point for all developed loss optimization algorithms is the Gradien
 \end{algorithmic}
 \end{algorithm} 
 
-\begin{algorithm}
+\begin{algorithm}%[H]
 \caption{Stochastic Gradient Descent}
 \label{algorithm:sgd}
 \begin{algorithmic}
@@ -267,16 +267,16 @@ A \emph{neuron} is the model obtained when a non-linear function $\phi$ is appli
 \end{definition}
 
 \begin{definition}
-A neural network \emph{layer} $\ell$ is the model $M = \of{\pmb{\theta}_{\ell}, f_{\ell}}$ for which $\pmb{\theta}_{\ell} = \offf{\pmb{\theta}_1, \dots, \pmb{\theta}_K}$ and $f_{\ell}: \mathcal{X} \to \mathcal{Y}^K$ is defined as $f_{\ell}\of{\pmb{x}, \pmb{\theta}} = \off{f\of{\pmb{x}, \pmb{\theta}_1},\dots,f\of{\pmb{x}, \pmb{\theta}_K}}$, where $M_1=\of{\pmb{\theta}_1, f},\dots,M_K=\of{\pmb{\theta}_K, f}$ are the constituting sub-models, each of same type but with possibly different parameters. Note that the layer accepts inputs from the same input space as every sub-model and just collects the outputs from each together.
+A neural network \emph{layer} $\ell$ is the model $M = \of{\pmb{\theta}_{\ell}, f_{\ell}}$ for which $\pmb{\theta}_{\ell} = \offf{\pmb{\theta}_1, \dots, \pmb{\theta}_K}$ and $f_{\ell}: \mathcal{X} \to \mathcal{Y}^K$ is defined as $f_{\ell}\of{\pmb{x}, \pmb{\theta}} = \off{f\of{\pmb{x}, \pmb{\theta}_1},\dots,f\of{\pmb{x}, \pmb{\theta}_K}}$, where $\offf{M_k}_{k=1}^K=\offf{\of{\pmb{\theta}_k, f}}_{k=1}^K$ are the constituting sub-models, each of same type but with possibly different parameters. Note that the layer accepts inputs from the same input space as every sub-model and just collects the outputs from each together.
 \end{definition}
 
 The simplest example of a neural network layer is the so-called \emph{fully-connected layer}, which is just a collection of multiple neurons: $\pmb{\theta}=\of{W, \pmb{b}}, f_{\ell}\of{\pmb{x}, \pmb{\theta}} = \phi\of{W\pmb{x} + \pmb{b}}$, where $W \in \mathbb{R}^{K \times D}$ is a matrix whose rows are the weights of each neuron and the vector $\pmb{b} \in \mathbb{R}^K$ contains the bias values.
 
 \begin{definition}
-A \emph{neural network} is a model defined as a composition of a finite number of layers: $\pmb{\theta}=\offf{\pmb{\theta}_{\ell}^{\of{1}},\dots,\pmb{\theta}_{\ell}^{\of{L}}}$ and $f = f_{\ell}^{\of{1}} \circ \dots \circ f_{\ell}^{\of{L}}$. Commonly the first layer of a neural network is referred to as the \emph{input layer}, the final one the \emph{output layer} and all layers in between as \emph{hidden layers}. 
+A \emph{neural network} is a model defined as a composition of a finite number of layers: $\pmb{\theta}=\offf{\pmb{\theta}_{\ell}^{\of{1}},\dots,\pmb{\theta}_{\ell}^{\of{L}}}$ and $f = f_{\ell}^{\of{1}} \circ \dots \circ f_{\ell}^{\of{L}}$. Commonly, the first layer of a neural network is referred to as the \emph{input layer}, the final one the \emph{output layer} and all layers in between as \emph{hidden layers}. 
 \end{definition}
 
-When all neural network layers are fully connected, we call this type of neural network a Multi-Layer Perceptron (MLP). Figure \ref{fig:mlp_example} gives a visual example of a MLP. A surprising fact that can be proven about MLPs is that given that the number of neurons is large enough, an MLP with a single hidden layer can approximate almost all classes of functions with any desired accuracy. This fact, proven by \cite{hornik_multilayer_1989} is referred to as the \enquote{Universal Approximation Theorem}. For this reason, neural networks have seen an understandable amount of popularity in computer science research.
+When all neural network layers are fully connected, we call this type of neural network a Multi-Layer Perceptron (MLP). Figure~\ref{fig:mlp_example} gives a visual example of an MLP. A surprising fact that can be proven about MLPs is that, given that the number of neurons is large enough, an MLP with a single hidden layer can approximate almost all classes of functions with any desired accuracy. This fact, proven by~\cite{hornik_multilayer_1989}, is referred to as the \enquote{Universal Approximation Theorem}. For this reason, neural networks have seen an understandable amount of popularity in computer science research.
 
 \begin{figure}[H]
 \centering
@@ -285,24 +285,36 @@ When all neural network layers are fully connected, we call this type of neural 
 \label{fig:mlp_example}
 \end{figure}
 
-However, research by \cite{telgarsky_representation_2015, telgarsky_benefits_2016} and other works have shown that by increasing the number of neurons per layer, we only obtain a linear increase in the representation power of neural networks. However, by adding more layers, the benefits are \emph{exponential}. In the past decade, this has led to a massive explosion of research in the development of \emph{deep} neural network models with multi-layer architectures. The field had been coined \emph{deep learning} accordingly. Results that models with specific combinations of layers with many different structures perform better than the general MLP are frequent insights obtained from this field of research. In the following paragraphs, we will briefly describe the most common types of layers present in models related to and utilized in this work.
+However, research by~\cite{telgarsky_representation_2015, telgarsky_benefits_2016} and other works have shown that by increasing the number of neurons per layer, we only obtain a linear increase in the representation power of neural networks. However, by adding more layers, the benefits are \emph{exponential}. In the past decade, this has led to a massive explosion of research in the development of \emph{deep} neural network models with multi-layer architectures. The field had been coined \emph{deep learning} accordingly. Results that models with specific combinations of layers with many different structures perform better than the general MLP are frequent insights obtained from this field of research. In the following paragraphs, we will briefly describe the most common types of layers present in models related to and utilized in this work.
 
-\paragraph{Embeddings} \emph{Embedding layers} are used purely to store embedding vectors and function as a simple lookup table. Their input values denote indices of the columns of a matrix in which the embeddings are stored. In order to obtain the embeddings through matrix multiplication, the indices are \emph{one-hot encoded}: $\pmb{\theta}_{\ell} = W \in \mathbb{R}^{D \times N}$, $f_{\ell}: \offf{1,\dots,N} \to \mathbb{R}^D$, $\forall x \in \offf{1,\dots,N}, f_{\ell}\of{x, \pmb{\theta}_{\ell}} = W \tilde{\pmb{x}}$, where $\tilde{\pmb{x}} \in \mathbb{R}^N, \tilde{x}_i = \mathbb{I}\of{i = x}$ is the one-hot encoded input, $D$ is the \emph{embedding dimension} and $N$ is the \emph{input dimension} (number of embeddings to store).
-
-\paragraph{Convolution} Unlike for fully-connected layers, where the whole input is linearly combined with the weights, convolutional layers apply a smaller set of weights, called the \emph{filter} or \emph{kernel}, to each smaller section of the input of equal size, using the \emph{discrete convolution operation} in order to obtain the list of outputs. In this manner the model is more robust to \emph{translations} of the input. The form of this type of layer for one-dimensional input would be: 
+\paragraph{Embeddings} \emph{Embedding layers} are used purely to store embedding vectors and function as a simple lookup table. Their input values denote indices of the columns of a matrix in which the embeddings are stored. In order to obtain the embeddings through matrix multiplication, the indices are \emph{one-hot encoded}: 
 \begin{align}
-\pmb{\theta}_{\ell} &= \of{\pmb{w} \in \mathbb{R}^{S}, b \in \mathbb{R}}, f_{\ell}: \mathbb{R}^{D} \to \mathbb{R}^{D-S+1}, \nonumber \\
-\forall i &\in \offf{1,\dots,D-S+1}, y_i = b + \sum_{j=1}^{S}{x_{i+j-1}w_j}    
+    \begin{split}
+        \pmb{\theta}_{\ell} = W \in \mathbb{R}^{D \times N}&, f_{\ell}: \offf{1,\dots,N} \to \mathbb{R}^D, \\
+        \forall x \in \offf{1,\dots,N}&, f_{\ell}\of{x, \pmb{\theta}_{\ell}} = W \tilde{\pmb{x}}
+    \end{split}
+\end{align}
+where $\tilde{\pmb{x}} \in \mathbb{R}^N, \tilde{x}_i = \mathbb{I}\of{i = x}$ is the one-hot encoded input, $D$ is the \emph{embedding dimension} and $N$ is the \emph{input dimension} (number of embeddings to store).
+
+\paragraph{Convolution} Unlike for fully-connected layers, where the whole input is linearly combined with the weights, convolutional layers apply a smaller set of weights, called the \emph{filter} or \emph{kernel}, to each smaller section of the input of equal size, using the \emph{discrete convolution operation} in order to obtain the list of outputs. In this manner, the model is more robust to \emph{translations} of the input. The form of this type of layer for one-dimensional input would be: 
+\begin{align}
+\begin{split}
+\pmb{\theta}_{\ell} &= \of{\pmb{w} \in \mathbb{R}^{S}, b \in \mathbb{R}}, f_{\ell}: \mathbb{R}^{D} \to \mathbb{R}^{D-S+1}, \\
+\forall i &\in \offf{1,\dots,D-S+1}, y_i = b + \sum_{j=1}^{S}{x_{i+j-1}w_j} 
+\end{split}
 \end{align}
 
-\paragraph{BatchNorm} \emph{Batch normalization layers} were proposed by \cite{ioffe_batch_2015} in order to control the statistics (mean/variance) of the neural network activations during training and avoiding issues such as parameter gradients decaying to $0$. BatchNorm layers are models that achieve this by learning how to re-normalize their inputs: $\pmb{\theta}_{\ell} = \of{\gamma, \beta}$, $f_{\ell}\of{\pmb{x}, \pmb{\theta}_{\ell}} = \gamma \odot \frac{\pmb{x}-\hat{\mu}\of{\pmb{x}}}{\sqrt{\hat{\sigma}^2\of{\pmb{x}} + \varepsilon}} + \beta$, $\varepsilon << 1$.
+\paragraph{BatchNorm} \emph{Batch normalization layers} were proposed by~\cite{ioffe_batch_2015} in order to control the statistics (mean/variance) of the neural network activations during training and avoid issues such as parameter gradients decaying to $0$. BatchNorm layers are models that achieve this by learning how to re-normalize their inputs: 
+\begin{equation}
+\pmb{\theta}_{\ell} = \of{\gamma, \beta}, f_{\ell}\of{\pmb{x}, \pmb{\theta}_{\ell}} = \gamma \odot \frac{\pmb{x}-\hat{\mu}\of{\pmb{x}}}{\sqrt{\hat{\sigma}^2\of{\pmb{x}} + \varepsilon}} + \beta, \varepsilon << 1.
+\end{equation}
 
-\paragraph{Dropout} \emph{Dropout layers} were proposed by \cite{hinton_improving_2012} as a form of regularization for deep neural networks, i.e., they control parameter values in order to avoid the model over-fitting the data. The effect is achieved by randomly selecting input values to be set to $0$ according to a $\text{Bernoulli}\of{p}$ distribution, where the probability $p$ is a hyperparameter.
+\paragraph{Dropout} \emph{Dropout layers} were proposed by~\cite{hinton_improving_2012} as a form of regularization for deep neural networks, i.e., they control parameter values in order to avoid the model over-fitting the data. The effect is achieved by randomly selecting input values to be set to $0$ according to a $\text{Bernoulli}\of{p}$ distribution, where the probability $p$ is a hyperparameter.
  
 \subsection{Attention}
 Attention mechanisms are a particular type of model that can also be used as a neural network layer. The technique is inspired by cognitive attention: the power to focus on only what is essential. Attention layers can be viewed as a generalization of fully connected and convolutional layers. Instead of manually setting which parts of the input should influence which parts of the target, as these two types of layers do, we allow the model to specify this \emph{dynamically}, by assigning \emph{attention weights} for all input-target pairs. Historically, different pathways to calculate the weights have been proposed, but all attention mechanisms follow the same general idea.
 
-To define the general attention mechanism, we will utilize the query-key-value terminology of \cite{graves_neural_2014} and \cite{vaswani_attention_2017}, as well as current standards on how to compute the components required for the attention weights. The definition will be given below, while Figure \ref{fig:attention} provides a visual representation as a summary.
+To define the general attention mechanism, we will utilize the query-key-value terminology of~\cite{graves_neural_2014} and~\cite{vaswani_attention_2017}, as well as current standards on how to compute the components required for the attention weights. The definition will be given below, while Figure~\ref{fig:attention} provides a visual representation as a summary.
 
 \begin{definition}
 An \emph{attention mechanism} is a model $M=\of{\pmb{\theta}, f}$ with the following properties:
@@ -314,8 +326,10 @@ An \emph{attention mechanism} is a model $M=\of{\pmb{\theta}, f}$ with the follo
 \item $f\of{\of{X, Y}, \pmb{\theta}} = A V$, where $A \in \mathbb{R}^{N \times N'}$ is called the \emph{attention matrix} and contains the attention weights;
 \item The attention matrix is computed using the queries and keys: 
 \begin{align}
-\forall i &\in \offf{1,\dots,N}, j \in \offf{1,\dots,N'}, \nonumber \\
+\begin{split}
+\forall i &\in \offf{1,\dots,N}, j \in \offf{1,\dots,N'}, \\
 A_{ij}&=\text{Softmax}_j\of{a\of{Q_i,K_j}}=\frac{e^{a\of{Q_i,K_j}}}{\sum_{r=1}^{N'}{e^{a\of{Q_i,K_r}}}},
+\end{split}
 \end{align}
 where $a: \mathbb{R}^D \times \mathbb{R}^D \to \mathbb{R}$ is some expression that can also be parametrized;
 \item Attention mechanisms differ in the choice of $a$, but the simplest commonly used form is \emph{dot-product attention} (\cite{luong_effective_2015}): $a\of{q, k}=q^T k$.
@@ -324,19 +338,17 @@ where $a: \mathbb{R}^D \times \mathbb{R}^D \to \mathbb{R}$ is some expression th
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.5\textwidth]{figures/background/attention.pdf}
+\includegraphics[width=0.75\textwidth]{figures/background/attention.pdf}
 \caption[Visualization of a general attention mechanism.]{Visualization of a general attention mechanism.}
 \label{fig:attention}
 \end{figure}
 
 \subsection{Graph Neural Networks}
-Historically, neural network models have seen tremendous success when applied to a highly diverse selection of challenges arising in various scientific disciplines, and graphs are no exception. For more than a decade up until today, research in developing robust neural networks for graph-related tasks has been progressing in parallel with purely graph-embedding-based approaches. However, it is incorrect that these two ideas are disconnected, neural networks for graphs can be generalized beyond the simple single-embedding-layer architecture. Despite the high variety in introduced model design, leading to many model sub-classes, all are usually referred to together with Graph Neural Networks (GNNs).
+Historically, neural network models have seen tremendous success when applied to a highly diverse selection of challenges arising in various scientific disciplines, and graphs are no exception. For more than a decade up until today, research in developing robust neural networks for graph-related tasks has been progressing in parallel with purely graph-embedding-based approaches. However, it is incorrect that these two ideas are disconnected; neural networks for graphs can be generalized beyond the simple single-embedding-layer architecture. Despite the high variety in introduced model design, leading to many model sub-classes, all are usually referred to together with Graph Neural Networks (GNNs).
 
-\cite{battaglia_relational_2018} successfully attempt to aggregate a decade of previous research in graph representation learning using network models into the most general framework that can be used to describe and comprehend the plethora of model designs from a higher-level perspective. 
+\cite{battaglia_relational_2018} successfully attempts to aggregate a decade of previous research in graph representation learning using network models into the most general framework that can be used to describe and comprehend the plethora of model designs from a higher-level perspective. The authors explain that the general GNN architecture can be viewed as a composition of a finite number of generalized graph processing models, coined GN blocks. Each GN block receives a graph representation as input and outputs a \emph{refined} representation of the graph, such that the representations evolve from the original discrete entity and relation sets into several layers of improvements to some initial embeddings. 
 
-The authors explain that the general GNN architecture can be viewed as a composition of a finite number of generalized graph processing models, coined GN blocks. Each GN block receives a graph representation as input and outputs a \emph{refined} representation of the graph, such that the representations evolve from the original discrete entity and relation sets into several layers of improvements to some initial embeddings. 
-
-In order to generalize the structure of GN blocks and the operations that need to be performed, the authors allow the generality of the graph definition as well. Graph nodes and edges are allowed to have a whole collection of \emph{attributes} not only single type labels, possibly global attributes attached to the whole graph present as well. For a graph $G=\of{V, E}$, let $\pmb{v}_i$ denote the attributes of node $v_i \in V$, $\pmb{e}_{ij}$ the attributes of edge $\of{v_i,v_j}\in E$ and $\pmb{u}$ the global graph attributes. The sequence of operations a general GN block thus has to perform in order to obtain a representation of such rich graphs is visually represented in Figure \ref{fig:general_gn_block} and formally defined below:
+In order to generalize the structure of GN blocks and the operations that need to be performed, the authors allow the generality of the graph definition as well. Graph nodes and edges are allowed to have a whole collection of \emph{attributes}, not only single type labels, possibly global attributes attached to the whole graph present as well. For a graph $G=\of{V, E}$, let $\pmb{v}_i$ denote the attributes of node $v_i \in V$, $\pmb{e}_{ij}$ the attributes of edge $\of{v_i,v_j}\in E$ and $\pmb{u}$ the global graph attributes. The sequence of operations a general GN block thus has to perform in order to obtain a representation of such rich graphs is visually represented in Figure~\ref{fig:general_gn_block} and formally defined below:
 \begin{enumerate}
 \item Update edge attributes by applying a mapping model per edge: 
 
@@ -353,13 +365,13 @@ $\forall v_i \in V, \pmb{v}'_i = \phi^v\of{\bar{\pmb{e}}'_i, \pmb{v}_i, \pmb{u}}
 \item Output the new graph representation: $G'=\of{V', E', \pmb{u}'}$.
 \end{enumerate}
 
-\begin{figure}[H]
+\begin{figure}%[H]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/background/general_gn_block}
-\caption[Visualization of the general GN block pipeline.]{Visualization of the general GN block pipeline. \\Courtesy of \cite{battaglia_relational_2018}.}
+\includegraphics[width=\textwidth]{figures/background/general_gn_block}
+\caption[Visualization of the general GN block pipeline.]{Visualization of the general GN block pipeline. Courtesy of~\cite{battaglia_relational_2018}.}
 \label{fig:general_gn_block}
 \end{figure}
 
-The mapping models $\phi^e, \phi^v, \phi^u$ can potentially be neural networks of any architecture, while for the aggregation functions $\rho^{e \to v},\rho^{e \to u},\rho^{v \to u}$ usually a mean, sum or max is used.
+The mapping models $\phi^e, \phi^v, \phi^u$ can potentially be neural networks of any architecture, while for the aggregation functions $\rho^{e \to v},\rho^{e \to u},\rho^{v \to u}$, usually a mean, sum, or max is used.
 
 The proposed framework is helpful in structuring and organizing graph network ideas that can be applied to the most attribute-rich graph.
