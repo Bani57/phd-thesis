@@ -77,7 +77,7 @@
 
 % If you use the hyperref package, please uncomment the following two lines
 % to display URLs in blue roman font according to Springer's eBook style:
-\usepackage[breaklinks]{hyperref}
+\usepackage[breaklinks=true]{hyperref}
 \hypersetup{pdfborder={0 0 0},
 	colorlinks=true,
     citecolor=darkred,
@@ -143,17 +143,4 @@
 \newcommand{\ang}[1]{\mathopen{}\left\langle#1\right\rangle}
 \newcommand{\abs}[1]{\mathopen{}\left|#1\right|}
 
-\usepackage{tikz}
-\usepackage{environ}
-\makeatletter
-\newsavebox{\measure@tikzpicture}
-\NewEnviron{scaletikzpicturetowidth}[1]{%
-  \def\tikz@width{#1}%
-  \def\tikzscale{1}\begin{lrbox}{\measure@tikzpicture}%
-  \BODY
-  \end{lrbox}%
-  \pgfmathparse{#1/\wd\measure@tikzpicture}%
-  \edef\tikzscale{\pgfmathresult}%
-  \BODY
-}
-\makeatother
+%\usepackage{tempora}

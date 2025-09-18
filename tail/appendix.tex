@@ -5,16 +5,16 @@
 \label{sec:appendix_proofs}
 
 \begin{proof}[Proposition~\ref{proposition:complexity}]
-    The time complexity of the first node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of embeddings required. On the other hand, the second step requires as many model evaluations as the number of nodes in the group, $\abs{C_k}$. For each sample, the total is thus $K+\abs{C_k}$, while each node group is represented by $N_k^{\text{test}}$ samples in the test data. By summing over all groups $k$ one obtains the provided exact complexity.
+    The time complexity of the first node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of embeddings required. On the other hand, the second step requires as many model evaluations as the number of nodes in the group, $\abs{C_k}$. For each sample, the total is thus $K+\abs{C_k}$, while each node group is represented by $N_k$ samples in the test data. By summing over all groups $k$ one obtains the provided exact complexity.
 
-    Regarding the expression $\sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k^{\text{test}}}$, let us first assume that we have fixed the number of groups $K$ to some value in $\offf{1,\dots,\abs{V}}$ and we are aiming to optimize the distribution of nodes and evaluation samples across groups for this fixed $K$. Using the KKT theorem, one can prove that extremal configurations only occur when all groups are of equal size and/or all groups are represented with an equal amount of samples in the evaluation set. Lemma~\ref{lemma:kkt_evaluation_cost} gives the details. It is easier to strive towards $\abs{C_k} \approx \frac{\abs{V}}{K}$, however, in any case, the number of node embedding computations will then equal $N\of{K + \frac{\abs{V}}{K}}$. 
+    Regarding the expression $\sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k}$, let us first assume that we have fixed the number of groups $K$ to some value in $\offf{1,\dots,\abs{V}}$ and we are aiming to optimize the distribution of nodes and evaluation samples across groups for this fixed $K$. Using the KKT theorem, one can prove that extremal configurations only occur when all groups are of equal size and/or all groups are represented with an equal amount of samples in the evaluation set. Lemma~\ref{lemma:kkt_evaluation_cost} gives the details. It is easier to strive towards $\abs{C_k} \approx \frac{\abs{V}}{K}$, however, in any case, the number of node embedding computations will then equal $N\of{K + \frac{\abs{V}}{K}}$. 
     
     To conclude, we prove that the value of $K$ is what decides whether the lower or upper bound stated above is achieved: $K=\sqrt{V}$ gives the motivating lower bound, while $K \in \offf{1, \abs{V}}$ produces the worst performance, which is in the same order as the baseline $N \abs{V}$. Lemma~\ref{lemma:min_max_evaluation_cost} gives the details.
 \end{proof}
 
 \begin{lemma}
     \label{lemma:kkt_evaluation_cost}
-    Let $\offf{a_k}_{k=1}^{K}=\offf{\abs{C_k}}_{k=1}^{K}$ and $\offf{b_k}_{k=1}^{K}=\offf{N_k^{\text{test}}}_{k=1}^{K}$ denote the learnable parameters. Then with the constraints $$\sum_{k=1}^{K}{a_k}=\abs{V}, \sum_{k=1}^{K}{b_k}=N, \forall k, a_k > 0, b_k \geq 0,$$ the only extremal points of $g\of{\offf{a_k},\offf{b_k}}=\sum_{k=1}^{K}{\of{K + a_k}b_k}$ are $\forall k, a^*_k = \frac{\abs{V}}{K}$ and/or $\forall k, b^*_k = \frac{N}{K}$, with the extreme value of $g\of{\offf{a^*_k},\offf{b^*_k}}=N\of{K + \frac{\abs{V}}{K}}$.
+    Let $\offf{a_k}_{k=1}^{K}=\offf{\abs{C_k}}_{k=1}^{K}$ and $\offf{b_k}_{k=1}^{K}=\offf{N_k}_{k=1}^{K}$ denote the learnable parameters. Then with the constraints $$\sum_{k=1}^{K}{a_k}=\abs{V}, \sum_{k=1}^{K}{b_k}=N, \forall k, a_k > 0, b_k \geq 0,$$ the only extremal points of $g\of{\offf{a_k},\offf{b_k}}=\sum_{k=1}^{K}{\of{K + a_k}b_k}$ are $\forall k, a^*_k = \frac{\abs{V}}{K}$ and/or $\forall k, b^*_k = \frac{N}{K}$, with the extreme value of $g\of{\offf{a^*_k},\offf{b^*_k}}=N\of{K + \frac{\abs{V}}{K}}$.
 \end{lemma}
     \begin{proof}
         The Lagrangian of the optimization problem is the following:
@@ -67,28 +67,28 @@
     
     Then, if we assume that:
     \begin{itemize}
-        \item $\forall k, \mathbb{P}\of{C=k}=\frac{N_k^{\text{test}}}{N}$, and
+        \item $\forall k, \mathbb{P}\of{C=k}=\frac{N_k}{N}$, and
         \item $\forall j \in \offf{1,\dots\,\abs{C_k}}, \mathbb{P}\of{H_k \leq j}=\of{\text{Hits@j}}_k$,
     \end{itemize}
      the application of COINs is justified if:
     \begin{equation}
         \label{eq:condition_applicability}
-        \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1 + \varepsilon_k}{A_k}} < 1
+        \sum_{k=1}^{K}{\frac{N_k}{N} \frac{1 + \varepsilon_k}{A_k}} < 1
     \end{equation}
 \end{proposition}
 \begin{proof}
 The better model is deemed the one with lower overall expected cost up until a correct hit:
     \begin{align*}
         \mathbb{E}\off{T' H'} &< \mathbb{E}\off{T H} \\
-        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T'_k \bar{\rho}'_k} &< T \bar{\rho}, & \text{ by Lemma~\ref{lemma:expected_evaluations}} \\
-        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1 + \varepsilon_k}{A_k}} &< 1, & \text{ after dividing by RHS}
+        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k}{N} T'_k \bar{\rho}'_k} &< T \bar{\rho}, & \text{ by Lemma~\ref{lemma:expected_evaluations}} \\
+        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k}{N} \frac{1 + \varepsilon_k}{A_k}} &< 1, & \text{ after dividing by RHS}
     \end{align*}
 \end{proof}%
 
 \begin{lemma}
     \label{lemma:expected_evaluations}
     Let $C \in \offf{1,\dots,K}$ be a r.v. storing from which community a sample belongs. Let $H$ be the r.v. counting how many queries were evaluated before a correct hit is achieved and let $F$ denote the r.v. counting the number of embedding computations required for evaluating a sample. Then:
-    $$\mathbb{E}\off{T H} = \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \bar{\rho}_k}$$
+    $$\mathbb{E}\off{T H} = \sum_{k=1}^{K}{\frac{N_k}{N} T_k \bar{\rho}_k}$$
 \end{lemma}
 \begin{proof}
     \begin{align*}
@@ -106,23 +106,23 @@ The better model is deemed the one with lower overall expected cost up until a c
         \\
         &= \sum_{k=1}^{K}{\mathbb{P}\of{C=k} T_k \off{\abs{C_k}- \sum_{j=1}^{\abs{C_k}-1}{\mathbb{P}\of{H_k \leq j}}}}%, & \text{ after cancelling out the telescoping} 
         \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \sum_{j=1}^{\abs{C_k}-1}{\of{\text{Hits@j}}_k}}}%, & \text{ by the assumptions} 
+        &= \sum_{k=1}^{K}{\frac{N_k}{N} T_k \off{\abs{C_k}- \sum_{j=1}^{\abs{C_k}-1}{\of{\text{Hits@j}}_k}}}%, & \text{ by the assumptions} 
         \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \sum_{j=1}^{\abs{C_k}-1}{\frac{1}{N_k^{\text{test}}}\sum_{i \mid c\of{a_i}=k}{\mathbb{I}\of{\rho^{\of{i}} \leq j}}}}}%, & \text{ by definition} 
+        &= \sum_{k=1}^{K}{\frac{N_k}{N} T_k \off{\abs{C_k}- \sum_{j=1}^{\abs{C_k}-1}{\frac{1}{N_k}\sum_{i \mid c\of{a_i}=k}{\mathbb{I}\of{\rho^{\of{i}} \leq j}}}}}%, & \text{ by definition} 
         \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \frac{1}{N_k^{\text{test}}}\sum_{i \mid c\of{a_i}=k}{\of{\abs{C_k}- \rho^{\of{i}}}}}}%, & \text{ after switching sum order} 
+        &= \sum_{k=1}^{K}{\frac{N_k}{N} T_k \off{\abs{C_k}- \frac{1}{N_k}\sum_{i \mid c\of{a_i}=k}{\of{\abs{C_k}- \rho^{\of{i}}}}}}%, & \text{ after switching sum order} 
         \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \abs{C_k} + \frac{1}{N_k^{\text{test}}}\sum_{i \mid c\of{a_i}=k}{\rho^{\of{i}}}}}%, & \text{ after distributing} 
+        &= \sum_{k=1}^{K}{\frac{N_k}{N} T_k \off{\abs{C_k}- \abs{C_k} + \frac{1}{N_k}\sum_{i \mid c\of{a_i}=k}{\rho^{\of{i}}}}}%, & \text{ after distributing} 
         \\
-        % &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \off{\abs{C_k}- \abs{C_k} + \bar{\rho}_k }}, & \text{ by definition} \\
-        &= \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} T_k \bar{\rho}_k}%, & \text{ by definition}
+        % &= \sum_{k=1}^{K}{\frac{N_k}{N} T_k \off{\abs{C_k}- \abs{C_k} + \bar{\rho}_k }}, & \text{ by definition} \\
+        &= \sum_{k=1}^{K}{\frac{N_k}{N} T_k \bar{\rho}_k}%, & \text{ by definition}
     \end{align*}
     If $\forall k, T_k = T$ like for the baseline models, then:
     \begin{align*}
-        \mathbb{E}\off{T H} &= T \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \bar{\rho}_k}%, & \text{ by linearity of expectation and everything before} 
+        \mathbb{E}\off{T H} &= T \sum_{k=1}^{K}{\frac{N_k}{N} \bar{\rho}_k}%, & \text{ by linearity of expectation and everything before} 
         %\\ 
         %&
-        = T \sum_{k=1}^{K}{\frac{N_k^{\text{test}}}{N} \frac{1}{N_k^{\text{test}}}\sum_{i \mid c\of{a_i}=k}{\rho^{\of{i}}}}%, & \text{ by definition} 
+        = T \sum_{k=1}^{K}{\frac{N_k}{N} \frac{1}{N_k}\sum_{i \mid c\of{a_i}=k}{\rho^{\of{i}}}}%, & \text{ by definition} 
         \\
         &= T \frac{1}{N} \sum_{i=1}^{N}{\rho^{\of{i}}}%, & \text{ after cancelling and combining the sums} 
         %\\
@@ -136,7 +136,7 @@ The better model is deemed the one with lower overall expected cost up until a c
 
     The largest overall cost is naturally achieved when $\abs{U}=1$, i.e. we fall back to the single-machine setting without parallelization, thus the upper bound is the same as before.
 
-    The lower bound requires a new argument based on calculus. To start, the obvious lower bound to the maximum cost across machines is the minimum cost. We would achieve this lower bound when the max and min are equal, i.e. only when each machine does the same amount of work. In our case, this quantity is $\textcolor{blue}{\frac{1}{\abs{U}}}\sum_{k=1}^{K}{\abs{C_k}N_k^{\text{test}}}$. If we keep $\abs{U}$ and $K$ fixed as constants, we can use the KKT result from the proof of Proposition \ref{proposition:complexity} and deduce that now the only extremal points will have the form $N\of{K+\frac{\abs{V}}{K\textcolor{blue}{\abs{U}}}}$. Note that we have the constraints $1 \leq K \leq \abs{V}$ and $1 \leq \abs{U} \leq K$ (having more machines than communities is useless).
+    The lower bound requires a new argument based on calculus. To start, the obvious lower bound to the maximum cost across machines is the minimum cost. We would achieve this lower bound when the max and min are equal, i.e. only when each machine does the same amount of work. In our case, this quantity is $\textcolor{blue}{\frac{1}{\abs{U}}}\sum_{k=1}^{K}{\abs{C_k}N_k}$. If we keep $\abs{U}$ and $K$ fixed as constants, we can use the KKT result from the proof of Proposition \ref{proposition:complexity} and deduce that now the only extremal points will have the form $N\of{K+\frac{\abs{V}}{K\textcolor{blue}{\abs{U}}}}$. Note that we have the constraints $1 \leq K \leq \abs{V}$ and $1 \leq \abs{U} \leq K$ (having more machines than communities is useless).
 
     Let $f\of{K, \abs{U}}=N\of{K+\frac{\abs{V}}{K\abs{U}}}$. Then $\nabla f \of{K, \abs{U}}=\of{\frac{\partial f}{\partial K},\frac{\partial f}{\partial \abs{U}}}=\of{N\of{1-\frac{\abs{V}}{K^2\abs{U}}}, -N\frac{\abs{V}}{K\abs{U}^2}})$.
 
@@ -825,7 +825,7 @@ With the above conditions, we can show that our sampling framework, detailed in 
     \centering
     \includegraphics[width=\linewidth]{figures/multiprox/comm20_grid_image_single_noise.png}
     \includegraphics[width=\linewidth]{figures/multiprox/comm20_grid_image.png}
-    \caption[Best sample chains obtained with MultiProx and MultiProxAn employing a ConGress denoiser trained on Community20.]{Best sample chains obtained with MultiProx and MultiProxAn employing a ConGress denoiser trained on Community20. We set for these chains $n=10$, $m=100$, $t=75$ (15\% of $T$) for MultiProx and $t=200, t'=50$ (40\% and 10\% of $T$) for MultiProxAn.}
+    \caption[Best sample chains obtained with MultiProx and MultiProxAn on Community20.]{Best sample chains obtained with MultiProx and MultiProxAn employing a ConGress denoiser trained on Community20. We set for these chains $n=10$, $m=100$, $t=75$ (15\% of $T$) for MultiProx and $t=200, t'=50$ (40\% and 10\% of $T$) for MultiProxAn.}
     \label{fig:comm20_extra}
 \end{figure}
 
