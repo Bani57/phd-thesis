@@ -5,7 +5,7 @@ In the previous section, we discussed how HiGenDiff can reduce the number of edg
 
 This part of the thesis will argue that it is possible to reduce the number of denoising steps required, while also preserving baseline performance. Multi-measurement sampling theory is the key knowledge we must apply to achieve those effects. The content presented in this section is published as \cite{dadi_improving_2025} and is also discussed in \cite{dadi_noisy_2025}.
 
-\subsection{Motivation}
+\subsection{The One True Step}
 
 As we have seen before, denoising diffusion models generate samples by first training a sequence of denoisers at various noise levels and cleverly chaining them to transform unstructured random noise into a sample from a target distribution \cite{ho_denoising_2020, dhariwal_diffusion_2021}. The different noise levels, the methods in which the denoisers are chained, and the balancing of the loss for different noise levels all require careful tuning \cite{karras_elucidating_2022}. So much so that one might ask why we must sample using different noise levels and not simply just one? Why is the annealing (i.e., the gradual decrease of noise) during the sampling stage necessary? 
 

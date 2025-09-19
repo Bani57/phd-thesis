@@ -1,11 +1,11 @@
 \section{Community Informed Graph Embeddings}
 \label{sec: coins}
 
-In this section, we present a new method, called COINs for \textbf{CO}mmunity \textbf{IN}formed graph embedding\textbf{s}, to enhance the efficiency of knowledge graph models for link prediction and conjunctive query answering. COINs uses a community-detection-based graph data augmentation and a two-step prediction pipeline: we first achieve node localization through community prediction, and subsequently, we further localize within the predicted community. We establish theoretical criteria to evaluate our method in our specific context and establish a direct expression of the reduction in time complexity. We empirically demonstrate an important scalability-performance trade-off where for the median evaluation sample we preserve 97.18\% of the baseline accuracy in single-hop query answering, for only 7.52\% of the original computational cost on a single-CPU-GPU machine. 
+In this section, we present a new method, called COINs for \textbf{CO}mmunity \textbf{IN}formed graph embedding\textbf{s}, to enhance the efficiency of knowledge graph models for link prediction and conjunctive query answering. COINs uses a community-detection-based graph data augmentation and a two-step prediction pipeline: we first achieve node localization through community prediction, and subsequently, we further localize within the predicted community. We establish theoretical criteria to evaluate our method in our specific context and establish a direct expression of the reduction in time complexity. We empirically demonstrate an important scalability-performance trade-off where, for the median evaluation sample, we preserve 97.18\% of the baseline accuracy in single-hop query answering, for only 7.52\% of the original computational cost on a single-CPU-GPU machine. 
 
 The work described in this section has been accepted for publication as~\cite{janchevski_coins_2025}.
 
-\subsection{Motivation}
+\subsection{Big Data with Small Compute}
 Knowledge graphs are a type of database where the general structure is a \emph{network} of \emph{entities}, their semantic \emph{types}, \emph{properties}, and \emph{relationships}; relations are \emph{flexible} through the use of \emph{abstract classes} to represent real-world data from potentially multiple topical domains~\cite{ehrlinger_towards_2016,hogan_knowledge_2020}. Organizations often use knowledge graphs to catalog and analyze relational data. However, scalability becomes a challenge as the graphs can become very large and require significant computational resources.
 
 Almost all existing scaling approaches involve \emph{splitting the enormous graph into disjoint subsets}, followed by distributed training.
@@ -141,7 +141,7 @@ On the other hand, the METIS algorithm for graph partitioning~\cite{karypis_fast
 
 Given a knowledge graph $\of{V, E_R, R, \mathbf{X}}$, the first step we employ is to execute the Leiden community detection algorithm to obtain a good node-to-community mapping $c: V \to \mathcal{C}$. 
 
-For our COINs technique, based on the obtained community assignment map $c$ we extract further discrete information of great utility for efficient training and evaluation. $c$ coarsens $\of{V, E_R}$ into a \emph{community-level interaction graph}: 
+For our COINs technique, based on the obtained community assignment map $c$, we extract further discrete information of great utility for efficient training and evaluation. $c$ coarsens $\of{V, E_R}$ into a \emph{community-level interaction graph}: 
 \begin{equation}
 V^{\of{C}} = \mathcal{C}, E^{\of{C}}_R = \offf{\of{c\of{u},r,c\of{v}} \mid \of{u,r,v} \in E_R}.    
 \end{equation}
@@ -417,7 +417,7 @@ KBGAT     &              ${{0.518}}$ &            ${{0.245}_{\pm 0.015}}$ &     
 \end{table}
 
 \begin{table}[H]
-  \caption[Computed per-query-structure MRR metric of Query2Box query answering experiments.]{Computed per-query-structure MRR metric (higher is better) of Query2Box query answering experiments to compare our results with COINs training and evaluation to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}
+  \caption[Computed MRR metric of Query2Box query answering experiments.]{Computed per-query-structure MRR metric (higher is better) of Query2Box query answering experiments to compare our results with COINs training and evaluation to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}
   \label{tab:performance_query_answering_q2b}
   \centering
     \begin{adjustbox}{width=\textwidth}   
