@@ -5,41 +5,50 @@
 \label{sec:appendix_proofs}
 
 \begin{proof}[Proposition~\ref{proposition:complexity}]
-    The time complexity of the first node group prediction step of the new evaluation procedure, is proportional to the number of groups $K$, as this is the number of embeddings required. On the other hand, the second step requires as many model evaluations as the number of nodes in the group, $\abs{C_k}$. For each sample, the total is thus $K+\abs{C_k}$, while each node group is represented by $N_k$ samples in the test data. By summing over all groups $k$ one obtains the provided exact complexity.
+    The time complexity of the first node group prediction step of the new evaluation procedure is proportional to the number of groups $K$, as this is the number of embeddings required. On the other hand, the second step requires as many model evaluations as the number of nodes in the group, $\abs{C_k}$. For each sample, the total is thus $K+\abs{C_k}$, while each node group is represented by $N_k$ samples in the test data. By summing over all groups $k$, one obtains the provided exact complexity.
 
-    Regarding the expression $\sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k}$, let us first assume that we have fixed the number of groups $K$ to some value in $\offf{1,\dots,\abs{V}}$ and we are aiming to optimize the distribution of nodes and evaluation samples across groups for this fixed $K$. Using the KKT theorem, one can prove that extremal configurations only occur when all groups are of equal size and/or all groups are represented with an equal amount of samples in the evaluation set. Lemma~\ref{lemma:kkt_evaluation_cost} gives the details. It is easier to strive towards $\abs{C_k} \approx \frac{\abs{V}}{K}$, however, in any case, the number of node embedding computations will then equal $N\of{K + \frac{\abs{V}}{K}}$. 
+    Regarding the expression $\sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k}$, let us first assume that we have fixed the number of groups $K$ to some value in $\offf{1,\dots,\abs{V}}$ and we are aiming to optimize the distribution of nodes and evaluation samples across groups for this fixed $K$. Using the KKT theorem, one can prove that extremal configurations only occur when all groups are of equal size and/or all groups are represented with an equal number of samples in the evaluation set. Lemma~\ref{lemma:kkt_evaluation_cost} gives the details. It is easier to strive towards $\abs{C_k} \approx \frac{\abs{V}}{K}$; however, in any case, the number of node embedding computations will then equal $N\of{K + \frac{\abs{V}}{K}}$. 
     
     To conclude, we prove that the value of $K$ is what decides whether the lower or upper bound stated above is achieved: $K=\sqrt{V}$ gives the motivating lower bound, while $K \in \offf{1, \abs{V}}$ produces the worst performance, which is in the same order as the baseline $N \abs{V}$. Lemma~\ref{lemma:min_max_evaluation_cost} gives the details.
 \end{proof}
 
 \begin{lemma}
     \label{lemma:kkt_evaluation_cost}
-    Let $\offf{a_k}_{k=1}^{K}=\offf{\abs{C_k}}_{k=1}^{K}$ and $\offf{b_k}_{k=1}^{K}=\offf{N_k}_{k=1}^{K}$ denote the learnable parameters. Then with the constraints $$\sum_{k=1}^{K}{a_k}=\abs{V}, \sum_{k=1}^{K}{b_k}=N, \forall k, a_k > 0, b_k \geq 0,$$ the only extremal points of $g\of{\offf{a_k},\offf{b_k}}=\sum_{k=1}^{K}{\of{K + a_k}b_k}$ are $\forall k, a^*_k = \frac{\abs{V}}{K}$ and/or $\forall k, b^*_k = \frac{N}{K}$, with the extreme value of $g\of{\offf{a^*_k},\offf{b^*_k}}=N\of{K + \frac{\abs{V}}{K}}$.
+    Let $\offf{a_k}_{k=1}^{K}=\offf{\abs{C_k}}_{k=1}^{K}$ and $\offf{b_k}_{k=1}^{K}=\offf{N_k}_{k=1}^{K}$ denote the learnable parameters. Then with the constraints 
+    \begin{equation}
+    \sum_{k=1}^{K}{a_k}=\abs{V}, \sum_{k=1}^{K}{b_k}=N, \forall k, a_k > 0, b_k \geq 0,
+    \end{equation}
+    the only extremal points of $g\of{\offf{a_k},\offf{b_k}}=\sum_{k=1}^{K}{\of{K + a_k}b_k}$ are $\forall k, a^*_k = \frac{\abs{V}}{K}$ and/or $\forall k, b^*_k = \frac{N}{K}$, with the extreme value of $g\of{\offf{a^*_k},\offf{b^*_k}}=N\of{K + \frac{\abs{V}}{K}}$.
 \end{lemma}
     \begin{proof}
         The Lagrangian of the optimization problem is the following:
-        \begin{align*}
-             L\of{\offf{a_k},\offf{b_k}} &= \sum_{k=1}^{K}{\of{K + a_k}b_k} + \lambda_1 \of{\sum_{k=1}^{K}{a_k} - \abs{V}} + \lambda_2 \of{\sum_{k=1}^{K}{b_k} - N} \\
-             &- \sum_{k=1}^{K}{\mu_k a_k} - \sum_{k=1}^{K}{\nu_k b_k}
-        \end{align*}
-        $$$$
+        \begin{equation}
+         L\of{\offf{a_k},\offf{b_k}} = \sum_{k=1}^{K}{\of{K + a_k}b_k} + \lambda_1 \of{\sum_{k=1}^{K}{a_k} - \abs{V}} + \lambda_2 \of{\sum_{k=1}^{K}{b_k} - N}
+             - \sum_{k=1}^{K}{\mu_k a_k} - \sum_{k=1}^{K}{\nu_k b_k}
+        \end{equation}
     From the stationarity KKT conditions:
-    \begin{align*}
+    \begin{align}
+    \begin{split}
         \forall k, \frac{\partial L}{\partial a_k} &= 0 \Leftrightarrow \forall k, b_k + \lambda_1 - \mu_k = 0 \Leftrightarrow  \forall k, b_k = \mu_k - \lambda_1 \\
         \forall k, \frac{\partial L}{\partial b_k} &= 0 \Leftrightarrow \forall k, a_k + K + \lambda_2 - \nu_k = 0, \Leftrightarrow \forall k, a_k = \nu_k - \lambda_2 - K
-    \end{align*}
+    \end{split}
+    \end{align}
     Now, by the primal equality constraints:
-    \begin{align*}
+    \begin{align}
+    \begin{split}
         \sum_{k=1}^{K}{a_k} &= \abs{V} \Leftrightarrow \sum_{k=1}^{K}{\of{\nu_k - \lambda_2 - K}} = \abs{V} \Leftrightarrow \lambda_2 = \frac{1}{K} \sum_{k=1}^{K}{\nu_k} - \frac{\abs{V}}{K} - K \\
         \Rightarrow \forall k, a_k &= \nu_k - \frac{1}{K} \sum_{j=1}^{K}{\nu_j} + \frac{\abs{V}}{K} \\
         \sum_{k=1}^{K}{b_k} &= N \Leftrightarrow \sum_{k=1}^{K}{\of{\mu_k - \lambda_1}} = N \Leftrightarrow \lambda_1 = \frac{1}{K} \sum_{k=1}^{K}{\mu_k} - \frac{N}{K} \\
         \Rightarrow \forall k, b_k &= \mu_k - \frac{1}{K} \sum_{j=1}^{K}{\mu_j} + \frac{N}{K}
-    \end{align*}
+    \end{split}
+    \end{align}
     Finally, by the complementary slackness KKT conditions, primal inequality constraints, and dual feasibility KKT conditions:
-    \begin{align*}
-        \sum_{k=1}^{K}{\mu_k a_k} &= 0 \Leftrightarrow \forall k, \mu_k = 0 \Rightarrow \forall k, b^*_k=\frac{N}{K} & \text{ as $\forall k, a_k>0,\mu_k \geq 0$}\\
-        \sum_{k=1}^{K}{\nu_k b_k} &= 0 \Leftarrow \forall k, \nu_k = 0 \Rightarrow \forall k, a^*_k = \frac{\abs{V}}{K} & \text{ as $\forall k, b_k \geq 0,\nu_k \geq 0$}
-    \end{align*}
+    \begin{align}
+    \begin{split}
+        \sum_{k=1}^{K}{\mu_k a_k} &= 0 \Leftrightarrow \forall k, \mu_k = 0 \Rightarrow \forall k, b^*_k=\frac{N}{K} \text{ as $\forall k, a_k>0,\mu_k \geq 0$}\\
+        \sum_{k=1}^{K}{\nu_k b_k} &= 0 \Leftarrow \forall k, \nu_k = 0 \Rightarrow \forall k, a^*_k = \frac{\abs{V}}{K} \text{ as $\forall k, b_k \geq 0,\nu_k \geq 0$}
+    \end{split}
+    \end{align}
     \end{proof}
 
 \begin{lemma}
@@ -48,12 +57,11 @@
 \end{lemma}
 \begin{proof}
     Let $f\of{K} = N\of{K + \frac{\abs{V}}{K}}$. Then note that $f'\of{K} = N - \frac{N \abs{V}}{K^2}$. From this, we find the only critical point of $f$ in $\of{1, \abs{V}}$: 
-    
-    $N - \frac{N \abs{V}}{K^2} = 0 \Leftrightarrow K^2 = \frac{N \abs{V}}{N} \Leftrightarrow K = \sqrt{\abs{V}}$. 
-    
-    Now $f''\of{K}=\frac{2 N \abs{V}}{K^3}$. As $\forall K \in \off{1, \abs{V}}, f''\of{K} > 0$, $f$ is a convex function for all values of $K$. Thus, $\sqrt{\abs{V}}$ will be both a local and global minimum, while the endpoints of the interval will be global maxima, as $\forall K \neq \sqrt{\abs{V}}, f'\of{K} > 0$, i.e., $f$ increases away from the minimum in both directions.
+    \begin{equation}
+    N - \frac{N \abs{V}}{K^2} = 0 \Leftrightarrow K^2 = \frac{N \abs{V}}{N} \Leftrightarrow K = \sqrt{\abs{V}}. 
+    \end{equation}
+    Now $f''\of{K}=\frac{2 N \abs{V}}{K^3}$. As $\forall K \in \off{1, \abs{V}}, f''\of{K} > 0$, $f$ is a convex function for all values of $K$. Thus, $\sqrt{\abs{V}}$ will be both a local and global minimum, while the endpoints of the interval will be global maxima, as $\forall K \neq \sqrt{\abs{V}}, f'\of{K} > 0$, i.e., $f$ increases away from the minimum.
 \end{proof}
-
 
 \begin{proposition}
     \label{proposition:condition_applicability}
@@ -77,25 +85,30 @@
     \end{equation}
 \end{proposition}
 \begin{proof}
-The better model is deemed the one with lower overall expected cost up until a correct hit:
-    \begin{align*}
+The better model is the one with a lower overall expected cost until a correct hit:
+    \begin{align}
+    \begin{split}
         \mathbb{E}\off{T' H'} &< \mathbb{E}\off{T H} \\
-        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k}{N} T'_k \bar{\rho}'_k} &< T \bar{\rho}, & \text{ by Lemma~\ref{lemma:expected_evaluations}} \\
-        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k}{N} \frac{1 + \varepsilon_k}{A_k}} &< 1, & \text{ after dividing by RHS}
-    \end{align*}
+        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k}{N} T'_k \bar{\rho}'_k} &< T \bar{\rho}, \text{ by Lemma~\ref{lemma:expected_evaluations}} \\
+        \Leftrightarrow \sum_{k=1}^{K}{\frac{N_k}{N} \frac{1 + \varepsilon_k}{A_k}} &< 1, \text{ after dividing by RHS}
+    \end{split}
+    \end{align}
 \end{proof}%
 
 \begin{lemma}
     \label{lemma:expected_evaluations}
-    Let $C \in \offf{1,\dots,K}$ be a r.v. storing from which community a sample belongs. Let $H$ be the r.v. counting how many queries were evaluated before a correct hit is achieved and let $F$ denote the r.v. counting the number of embedding computations required for evaluating a sample. Then:
-    $$\mathbb{E}\off{T H} = \sum_{k=1}^{K}{\frac{N_k}{N} T_k \bar{\rho}_k}$$
+    Let $C \in \offf{1,\dots,K}$ be a r.v. storing from which community a sample belongs. Let $H$ be the r.v. counting how many queries were evaluated before a correct hit is achieved, and let $T$ denote the r.v. counting the number of embedding computations required for evaluating a sample. Then:
+    \begin{equation}
+    \mathbb{E}\off{T H} = \sum_{k=1}^{K}{\frac{N_k}{N} T_k \bar{\rho}_k}
+    \end{equation}
 \end{lemma}
 \begin{proof}
-    \begin{align*}
-        &\mathbb{E}\off{T H} = \mathbb{E}_{C}\off{\mathbb{E}\off{T H \mid C}}%, & \text{ by the Law of Total Expectation} 
+    \begin{align}
+    \begin{split}
+        \mathbb{E}\off{T H} = \mathbb{E}_{C}\off{\mathbb{E}\off{T H \mid C}}%, & \text{ by the Law of Total Expectation} 
         %\\
         %&
-        = \sum_{k=1}^{K}{\mathbb{E}\off{T H \mid C=k} \mathbb{P}\of{C=k}}%, & \text{ by definition and the LOTUS} 
+        &= \sum_{k=1}^{K}{\mathbb{E}\off{T H \mid C=k} \mathbb{P}\of{C=k}}%, & \text{ by definition and the LOTUS} 
         \\
         &= \sum_{k=1}^{K}{T_k \mathbb{E}\off{H_k} \mathbb{P}\of{C=k}}%, & \text{ by definition and linearity of exp.} 
         %\\
@@ -116,29 +129,34 @@ The better model is deemed the one with lower overall expected cost up until a c
         \\
         % &= \sum_{k=1}^{K}{\frac{N_k}{N} T_k \off{\abs{C_k}- \abs{C_k} + \bar{\rho}_k }}, & \text{ by definition} \\
         &= \sum_{k=1}^{K}{\frac{N_k}{N} T_k \bar{\rho}_k}%, & \text{ by definition}
-    \end{align*}
+    \end{split}
+    \end{align}
     If $\forall k, T_k = T$ like for the baseline models, then:
-    \begin{align*}
-        \mathbb{E}\off{T H} &= T \sum_{k=1}^{K}{\frac{N_k}{N} \bar{\rho}_k}%, & \text{ by linearity of expectation and everything before} 
+    \begin{equation}
+        \mathbb{E}\off{T H} = T \sum_{k=1}^{K}{\frac{N_k}{N} \bar{\rho}_k}%, & \text{ by linearity of expectation and everything before} 
         %\\ 
         %&
         = T \sum_{k=1}^{K}{\frac{N_k}{N} \frac{1}{N_k}\sum_{i \mid c\of{a_i}=k}{\rho^{\of{i}}}}%, & \text{ by definition} 
-        \\
-        &= T \frac{1}{N} \sum_{i=1}^{N}{\rho^{\of{i}}}%, & \text{ after cancelling and combining the sums} 
+        %\\
+        = T \frac{1}{N} \sum_{i=1}^{N}{\rho^{\of{i}}}%, & \text{ after cancelling and combining the sums} 
         %\\
         %&
         = T \bar{\rho}%, & \text{ by definition}
-    \end{align*}
+    \end{equation}
 \end{proof}
 
 \begin{proof}[Proposition \ref{proposition:complexity_distributed}]
-    To explain the complexity, we note that in a parallel computing setting, where we assume equal computation power for each machine, the overall cost of Step 2 is equal to that of the machine who will do the most work (in this case the most node-level query-answer embeddings computed). The additional $KN$ term is the total cost of Step 1, which is not parallelized.
+    To explain the complexity, we note that in a parallel computing setting, where we assume equal computation power for each machine, the overall cost of Step 2 is equal to that of the machine that will do the most work (in this case, the most node-level query-answer embeddings computed). The additional $KN$ term is the total cost of Step 1, which is not parallelized.
 
-    The largest overall cost is naturally achieved when $\abs{U}=1$, i.e. we fall back to the single-machine setting without parallelization, thus the upper bound is the same as before.
+    The largest overall cost is naturally achieved when $\abs{U}=1$, i.e., we fall back to the single-machine setting without parallelization, thus the upper bound is the same as before.
 
-    The lower bound requires a new argument based on calculus. To start, the obvious lower bound to the maximum cost across machines is the minimum cost. We would achieve this lower bound when the max and min are equal, i.e. only when each machine does the same amount of work. In our case, this quantity is $\textcolor{blue}{\frac{1}{\abs{U}}}\sum_{k=1}^{K}{\abs{C_k}N_k}$. If we keep $\abs{U}$ and $K$ fixed as constants, we can use the KKT result from the proof of Proposition \ref{proposition:complexity} and deduce that now the only extremal points will have the form $N\of{K+\frac{\abs{V}}{K\textcolor{blue}{\abs{U}}}}$. Note that we have the constraints $1 \leq K \leq \abs{V}$ and $1 \leq \abs{U} \leq K$ (having more machines than communities is useless).
+    The lower bound requires a new argument based on calculus. To start, the obvious lower bound to the maximum cost across machines is the minimum cost. We would achieve this lower bound when the max and min are equal, i.e., only when each machine does the same amount of work. In our case, this quantity is $\textcolor{blue}{\frac{1}{\abs{U}}}\sum_{k=1}^{K}{\abs{C_k}N_k}$. 
+    
+    If we keep $\abs{U}$ and $K$ fixed as constants, we can use the KKT result from the proof of Proposition \ref{proposition:complexity} and deduce that now the only extremal points will have the form $N\of{K+\frac{\abs{V}}{K\textcolor{blue}{\abs{U}}}}$. 
+    
+    Note that we have the constraints $1 \leq K \leq \abs{V}$ and $1 \leq \abs{U} \leq K$ (having more machines than communities is useless).
 
-    Let $f\of{K, \abs{U}}=N\of{K+\frac{\abs{V}}{K\abs{U}}}$. Then $\nabla f \of{K, \abs{U}}=\of{\frac{\partial f}{\partial K},\frac{\partial f}{\partial \abs{U}}}=\of{N\of{1-\frac{\abs{V}}{K^2\abs{U}}}, -N\frac{\abs{V}}{K\abs{U}^2}})$.
+    Let $f\of{K, \abs{U}}=N\of{K+\frac{\abs{V}}{K\abs{U}}}$. Then $\nabla f \of{K, \abs{U}}=\of{\frac{\partial f}{\partial K},\frac{\partial f}{\partial \abs{U}}}=\of{N\of{1-\frac{\abs{V}}{K^2\abs{U}}}, -N\frac{\abs{V}}{K\abs{U}^2}}$.
 
     Setting $\nabla f = \of{0, 0}$ yields that we must have $K^2\abs{U}=\abs{V}$ and $K\abs{U}^2 \to \infty$, which is impossible with the constraints. So the only critical points can be boundary points:
     \begin{itemize}
@@ -147,7 +165,11 @@ The better model is deemed the one with lower overall expected cost up until a c
         \item On the line $K=\abs{V}$, $f\of{K, \abs{U}}=N\of{\abs{V}+\frac{1}{\abs{U}}}$ simply monotonically decreases with $\abs{U}$, so there is no local minimum on this line;
         \item On the line $\abs{U}=K$, $f\of{K, \abs{U}}=N\of{K+\frac{\abs{V}}{K^2}}$. So $\frac{d f}{d K}=N\of{1-\frac{2\abs{V}}{K^3}}$. Setting $\frac{d f}{d K}=0$ yields the local minimum $K=\sqrt[3]{2\abs{V}}$ on this line.
     \end{itemize}
-    So the full set of global minimum candidates is: $$\of{K^*, \abs{U}^*} \in \offf{\of{1, 1}, \of{\abs{V}, 1}, \of{\abs{V},\abs{V}}, \of{\sqrt{\abs{V}}, 1}, \of{\sqrt[3]{2\abs{V}}, \sqrt[3]{2\abs{V}}} }.$$ Out of all of them, using both $\sqrt[3]{2\abs{V}}$ communities and machines yields the minimal function value of $\frac{3}{2}N\sqrt[3]{2\abs{V}}$.
+    So the full set of global minimum candidates is: 
+    \begin{equation}
+        \of{K^*, \abs{U}^*} \in \offf{\of{1, 1}, \of{\abs{V}, 1}, \of{\abs{V},\abs{V}}, \of{\sqrt{\abs{V}}, 1}, \of{\sqrt[3]{2\abs{V}}, \sqrt[3]{2\abs{V}}} }.
+    \end{equation}
+    Out of all of them, using both $\sqrt[3]{2\abs{V}}$ communities and machines yields the minimal function value of $\frac{3}{2}N\sqrt[3]{2\abs{V}}$.
 \end{proof}
 
 \section{Balanced Partitioning for Distributed COINs}
@@ -155,9 +177,9 @@ The better model is deemed the one with lower overall expected cost up until a c
 
 Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the balanced partition problem using top-down dynamic programming, while Algorithm \ref{algorithm:balanced_partition_greedy} displays the scalable greedy method.
 
-\begin{algorithm}[H]
-\algsetup{linenosize=\tiny}
-\scriptsize
+\begin{algorithm}[hb!]%[H]
+% \algsetup{linenosize=\tiny}
+% \scriptsize
 \caption{Exact Balanced Partition}
 \label{algorithm:balanced_partition}
 \begin{algorithmic}[1]
@@ -207,7 +229,7 @@ Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}[H]
+\begin{algorithm}[hb!]%[H]
 % \algsetup{linenosize=\tiny}
 % \scriptsize
 \caption{Greedy Balanced Partition}
@@ -233,9 +255,9 @@ Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the
 \section{Hyperparameters}
 \label{sec:appendix_hpars}
 
-Table~\ref{tab:hyperparameters} lists the chosen values of the main hyperparameters influencing community detection, model architecture and optimization.
+Table~\ref{tab:hyperparameters} lists the chosen values of the main hyperparameters influencing community detection, model architecture, and optimization.
 
-\begin{table}[ht!]
+\begin{table}[hb!]
   \caption[COINs hyperparameter configurations.]{COINs hyperparameter configurations. Left to right: Leiden resolution, embedding dimension, contrastive loss margin, COINs loss weight, mini-batch size, number of negative samples per positive, total number of training epochs, learning rate, and regularization weight.}
   \label{tab:hyperparameters}
   \centering
@@ -272,39 +294,39 @@ Table~\ref{tab:hyperparameters} lists the chosen values of the main hyperparamet
 
 \subsection{Communities \& Scalability}
 
-Figure~\ref{fig:scalability_cut_size} illustrates an alternative method to optimize the scalability factors, through optimization of the cut size (number of inter-community edges) heuristic utilized by the METIS algorithm.
+Figure~\ref{fig:scalability_cut_size} illustrates an alternative method to optimize the scalability factors, through variation of the cut size (number of inter-community edges) heuristic of the METIS algorithm.
 
-For Leiden, one observes smooth curves with similar properties as in Figure~\ref{fig:scalability_resolution}, where we had the resolution parameter as the independent variable. For optimal acceleration, there seems to be a critical cut size, while having more inter-community edges implied more parameters for $g^{*}_V$. 
+For Leiden, one observes smooth curves with similar properties as in Figure~\ref{fig:scalability_resolution}, where we had the resolution parameter as the independent variable. For optimal acceleration, there seems to be a critical cut size, while having more inter-community edges implies more parameters for $g^{*}_V$. Curiously, we observed the METIS algorithm to yield a non-minimal cut size, and there are a lot of Leiden resolution values that achieve lower cut sizes. METIS clearly favors too large an increase in parameter number. 
 
-Curiously, we observed the METIS algorithm to yield a non-minimal cut size, and there are a lot of Leiden resolution values that achieve lower cut sizes. METIS clearly favors too large of an increase in parameter number. The distribution of the metrics over a batch of 100 random uniform community assignments yielded extremal values: the best acceleration, however the largest cut size and most parameters.
+The distribution of the metrics over a batch of 100 random uniform community assignments yielded extreme values: the best acceleration, however, the largest cut size, and most parameters.
 
-\begin{figure}[H]
+\begin{figure}[!ht]%[H]
 \begin{center}
 \includegraphics[width=\textwidth]{figures/coins/scalability_leiden_cut_size}
 \end{center}
-\caption[Dependence of time and memory scalability on the cut size of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the cut size (number of inter-community edges) of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Cut values that yielded optimal balance between scalability and performance for each dataset annotated via black vertical lines. Gray vertical lines denote the cut size values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
+\caption[Dependence of time and memory scalability on the cut size of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the cut size (number of inter-community edges) of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Cut values that yielded an optimal balance between scalability and performance for each dataset are annotated via black vertical lines. Gray vertical lines denote the cut size values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
 \label{fig:scalability_cut_size}
 \end{figure}
 
 Figure~\ref{fig:scalability_modularity} illustrates yet another alternative method to optimize the scalability factors, through optimization of the modularity heuristic utilized by the Leiden algorithm. 
 
-In general, for Leiden, one observes both more acceleration and less overparametrization as modularity increases, however, as the plots display, we found this method to be more unstable than simply traversing the resolution hyperparameter space as before in Figure~\ref{fig:scalability_resolution}. We also note that the METIS algorithm produced slightly higher modularity only for the WN18RR dataset. Random community assignments again, naturally, yield extremal values.
+In general, for Leiden, one observes both more acceleration and less overparametrization as modularity increases; however, as the plots display, we found this method to be more unstable than simply traversing the resolution hyperparameter space as before in Figure~\ref{fig:scalability_resolution}. We also note that the METIS algorithm produced slightly higher modularity only for the WN18RR dataset. Random community assignments again, naturally, yield extremal values.
 
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{figures/coins/scalability_leiden_modularity}
 \end{center}
-\caption[Dependence of time and memory scalability on the value of the modularity heuristic of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the value of the modularity heuristic of the Leiden community detection algorithm. Left to right: different datasets. Modularity values that yielded optimal balance between scalability and performance for each dataset annotated via black vertical lines. Gray vertical lines denote the modularity values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
+\caption[Dependence of time and memory scalability on the value of the modularity heuristic of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the value of the modularity heuristic of the Leiden community detection algorithm. Left to right: different datasets. Modularity values that yielded an optimal balance between scalability and performance for each dataset annotated via black vertical lines. Gray vertical lines denote the modularity values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
 \label{fig:scalability_modularity}
 \end{figure}
 
 \subsection{Performance \& Feasibility}
 
-Table~\ref{tab:performance_query_answering} contains our full query answering metric comparison with the baselines, while Table~\ref{tab:performance_query_answering_2} provides further insight into our query answering performance, after analyzing separately the metrics for each of the two prediction steps. We can observe how well the community Hits@1 score captures the influence of the accuracy in the community prediction on the overall performance. 
+Table~\ref{tab:performance_query_answering} contains our full query answering metric comparison with the baselines, while Table~\ref{tab:performance_query_answering_2} provides further insight into our query answering performance, after analyzing separately the metrics for each of the two prediction steps. 
 
-Namely, with some quick calculations, one can interestingly note that the overall COINs metric values can be closely approximated as the product of the community Hits@1 and respective scores for the within-community node prediction.
+We can observe how well the community Hits@1 score captures the influence of the accuracy in the community prediction on the overall performance. Namely, with some quick calculations, one can interestingly note that the overall COINs metric values can be closely approximated as the product of the community Hits@1 and respective scores for the within-community node prediction.
 
-\begin{table}[!ht]
+\begin{table}[ht!]
   \caption[All computed query answering metrics.]{All computed query answering metrics (higher is better): comparison of our results with COINs training and evaluation to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}
   \label{tab:performance_query_answering}
   \centering
@@ -359,7 +381,7 @@ NELL-995 & TransE & Baseline &                          &                       
 
 % \setlength{\LTcapwidth}{\textwidth}
 % \begin{longtable}[ht!]{cccccccc}
-\begin{table}[!ht]
+\begin{table}[ht!]
   \caption[Decomposition of COINs metrics into the overall values and metrics for the second prediction step separately.]{Decomposition of COINs metrics into the overall values shown before and metrics for the second prediction step separately. Values in bold indicate the superiority of COINs compared to the baselines, while underlined values have a relative error lower than 10\%.}
   \label{tab:performance_query_answering_2}%\tabularnewline
   \centering
@@ -413,7 +435,9 @@ NELL-995 & TransE & Overall &    ${{0.971}_{\pm 0.0}}$ &             ${{0.15}_{\
 % \end{longtable}%
 \end{table}%
 
-Figure~\ref{fig:feasibility_statistic} proposes a manner for visually verifying the satisfaction of the condition from Proposition~\ref{proposition:condition_applicability}. In the left plot, we observe how the per-community acceleration and relative error in mean rank metrics influence different values across both algorithms and datasets. We observe that most values lie in the feasibility region, except for the weak performance of COINs-TransE and COINs-DistMult on the FB15k-237 graph. However, as shown in the right plot, where we remove the impact of the community prediction performance and only focus on node MR, we observe that the inequality is now satisfied even for these hardest scenarios.
+Figure~\ref{fig:feasibility_statistic} proposes a manner for visually verifying the satisfaction of the condition from Proposition~\ref{proposition:condition_applicability}. In the left plot, we observe how the per-community acceleration and relative error in mean rank metrics influence different values across both algorithms and datasets. We observe that most values lie in the feasibility region, except for the weak performance of COINs-TransE and COINs-DistMult on the FB15k-237 graph. 
+
+However, as shown in the right plot, where we remove the impact of the community prediction performance and only focus on node MR, we observe that the inequality is now satisfied even for these hardest scenarios.
 
 \begin{figure}[H]
 \begin{center}
@@ -427,13 +451,13 @@ Figure~\ref{fig:feasibility_statistic} proposes a manner for visually verifying 
 
 Figure~\ref{fig:feasibility_trajectories} aims to integrate community assignment validation with model feasibility analysis to explore the tradeoff between achieved community quality (measured by cut size, the count of inter-community edges affecting overparametrization), and the Proposition~\ref{proposition:condition_applicability} statistic (influenced by relative performance error and acceleration). 
 
-To facilitate this tradeoff analysis, we conducted end-to-end training and evaluation for the COINs-RotatE combination on each dataset using various sources of community assignments. Specifically, we varied the Leiden resolution hyperparameter value, considered METIS for another case, and finally, communities assigned uniformly at random.
+To facilitate this tradeoff analysis, we conducted end-to-end training and evaluation for the COINs-RotatE combination on each dataset using various sources of community assignments. Specifically, we varied the Leiden resolution hyperparameter value, considered METIS for another case, and finally, compared against communities that were assigned uniformly at random.
 
-\begin{figure}[!ht]
+\begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=\linewidth]{figures/coins/feasibility_extra}
 \end{center}
-\caption[Plot of trajectories in the performance-scalability space, for the RotatE algorithm trained and evaluated with different community assignments.]{Plot of trajectories in the performance-scalability space, for the RotatE algorithm trained and evaluated with different community assignments. It is better to have lower cut sizes and lower values of the statistic. The Leiden paths are obtained by varying the resolution hyperparameter, the direction of the arrows indicates an increase of resolution. The feasible region for the statistic from Proposition~\ref{proposition:condition_applicability} is the one shaded. Top vs. bottom: statistic values computed from mean ranks after both steps vs. just the second step of COINs. Left to right: different datasets.}
+\caption[Plot of trajectories in the performance-scalability space, for the RotatE algorithm trained and evaluated with different community assignments.]{Plot of trajectories in the performance-scalability space, for the RotatE algorithm trained and evaluated with different community assignments. It is better to have lower cut sizes and lower values of the statistic. The Leiden paths are obtained by varying the resolution hyperparameter; the direction of the arrows indicates an increase in resolution. The feasible region for the statistic from Proposition~\ref{proposition:condition_applicability} is the one shaded. Top vs. bottom: statistic values computed from mean ranks after both steps vs. just the second step of COINs. Left to right: different datasets.}
 \label{fig:feasibility_trajectories}
 \end{figure}
 
@@ -445,7 +469,7 @@ Finally, we affirm that although METIS and random communities may yield higher s
 
 Table~\ref{tab:performance_link_prediction} contains all of our results on the link prediction task. We do not possess baselines for these results due to the limited scope of the related work, which focuses only on an evaluation of the query answering task. Thus, we cannot perform a similar comparison as before. Regardless, the relative ordering of the metric values across settings is consistent with the query answering performance discussed previously.
 
-\begin{table}[ht!]
+\begin{table}[hb!]
   \caption[All computed link prediction metrics.]{All computed link prediction metrics (higher is better), with community prediction metrics also given separately.}
   \label{tab:performance_link_prediction}
   \centering
@@ -498,26 +522,11 @@ NELL-995 & TransE & Community &    ${{0.995}_{\pm 0.0}}$ &    ${{0.995}_{\pm 0.0
   \end{adjustbox}
 \end{table}%
 
-% Figure~\ref{fig:feasibility_trajectories} is our most detailed experiment, with the goal of merging together the validation of community assignments with the analysis of model feasibility, to investigate the tradeoff between achieved community quality, relative error in performance and acceleration/overparametrization. To facilitate this, for each dataset we end-to-end trained and evaluated the COINs-RotatE combination (as our most successful) with different sources of community assignments. Namely, we searched the region around the optimal value for the Leiden resolution hyperparameter to obtain worse communities, replaced Leiden with METIS for another case, and for a final run picked one random uniform community assignment.
-
-% As in Figures~\ref{fig:scalability_resolution} and~\ref{fig:scalability_cut_size}, we observe that the Leiden trajectories for all datasets have a critical point with an optimal trade-off between relative error and acceleration. We note that overall relative error, although unstable w.r.t. Leiden resolution, does not vary greatly and the main differences seem to lie in the acceleration values (although for FB15k-237 we manage to enter and exit the feasibility region by changing resolution). On the other hand, when considering only the performance in the second prediction step, relative error improves with Leiden resolution much faster. Note that, however, this is to be expected, as greater Leiden resolution implies smaller communities and thus, fewer possible answers to queries. We confirm again that overparametrization simply increases with greater resolution values and dominates the trajectory direction in the overall performance case. Thus, we confirm again that although the METIS and random communities might yield higher speed-ups, there are a lot of Leiden community assignments resulting in similar performance, and equally significant speed-ups but with significantly fewer parameters. 
-
-% \begin{figure}[ht!]
-% \begin{center}
-% \includegraphics[width=\textwidth]{figures/feasibility_rebuttals}
-% \includegraphics[width=\textwidth]{figures/feasibility_rebuttals_2}
-% \end{center}
-% \caption{Plot of trajectories in the performance-scalability space, for the RotatE algorithm trained and evaluated with different community assignments. The Leiden paths are obtained by varying the resolution hyperparameter, the direction of the arrows indicates an increase of resolution. The feasible region for acceleration (Proposition~\ref{proposition:condition_applicability}) is the one shaded. Odd vs. even rows: COINs metric values after both steps vs. just the second step. Top two vs. bottom two rows: acceleration vs. overparametrization space.}
-% \label{fig:feasibility_trajectories}
-% \end{figure}
-
-
-
 \subsection{Stability \& Convergence}
 
 The convergence plots in Figure~\ref{fig:convergence} support our decision to model the final aggregate COINs loss value as the linear combination of the community and node terms. From the convergence lines, one can observe that the community and node iterates seem to converge at equal rates in both training and validation data. As such, the aggregate COINs loss function can be a simple average of the two terms without affecting convergence.
 
-\begin{figure}[!ht]
+\begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=\textwidth]{figures/coins/convergence}
 \end{center}
@@ -525,12 +534,14 @@ The convergence plots in Figure~\ref{fig:convergence} support our decision to mo
 \label{fig:convergence}
 \end{figure}
 
-% \clearpage
-
 \section{Practical speed-ups}
-All of the discussion on the acceleration benefits of COINs so far only concerned the reduction in computational complexity, i.e. how much fewer embedding operations are performed during evaluation. For completeness, we also estimated the speed-up one would observe in practice, i.e. the reduction in total CPU seconds of the evaluation process compared to the baseline. 
+All of the discussion on the acceleration benefits of COINs so far only concerned the reduction in computational complexity, i.e., how many fewer embedding operations are performed during evaluation. 
 
-From the visualization of these results in Figure~\ref{fig:acceleration_wall} we can deduce that even w.r.t. wall time COINs always provides at least around 2 times speed-up, while the time-memory trade-off employed by NodePiece and EARL is also evident. The slow-down factors incurred by these methods are too great to justify the comparatively smaller memory-usage reduction factors. However, due to high variance in the experiment conditions during measurement, as well as differences in the practical complexity of the embedding algorithm implementations, these acceleration numerics are inconsistent across different settings and with large error bars. For such reasons, we relied mainly on the more reliable measurements of computation steps.
+For completeness, we also estimated the speed-up one would observe in practice, i.e., the reduction in total CPU seconds of the evaluation process compared to the baseline. 
+
+From the visualization of these results in Figure~\ref{fig:acceleration_wall}, we can deduce that even w.r.t. wall time, COINs always provides at least around 2 times speed-up, while the time-memory trade-off employed by NodePiece and EARL is also evident. 
+
+The slowdown factors incurred by these methods are too great to justify the comparatively smaller memory-usage reduction factors. However, due to high variance in the experiment conditions during measurement, as well as differences in the practical complexity of the embedding algorithm implementations, these acceleration numerics are inconsistent across different settings and with large error bars. For such reasons, we relied mainly on the more reliable measurements of computation steps.
 
 \begin{figure}[ht!]
 \begin{center}
@@ -556,99 +567,33 @@ All code was executed on a single machine with the following specifications:
     \item NVIDIA A100-SXM4-40GB GPU;
     \item 1.0TB RAM. 
 \end{itemize}
+However, we also successfully tested, even the experiment code for Swisscom's Monty knowledge graph, on a machine with these specifications:
+\begin{itemize}
+    \item Intel\textsuperscript{\textregistered} Xeon\textsuperscript{\textregistered} Gold 5118 12-core CPU @ 2.30GHz;
+    \item NVIDIA Tesla P100-PCIE-16GB GPU;
+    \item 64GB RAM.
+\end{itemize}
 
-% To facilitate reproducibility, our full code implementation is available at: \\
-% \url{https://github.com/LIONS-EPFL/coins-ict-innovations-2025}.
-
-% \section{Appendix}
-% Any possible appendices should be placed after bibliographies.
-% If your paper has appendices, please submit the appendices together with the main body of the paper.
-% There will be no separate supplementary material submission.
-% The main text should be self-contained; reviewers are not obliged to look at the appendices when writing their review comments.
-
-
-% \section{First Section}
-% \subsection{A Subsection Sample}
-% Please note that the first paragraph of a section or subsection is
-% not indented. The first paragraph that follows a table, figure,
-% equation etc. does not need an indent, either.
-
-% Subsequent paragraphs, however, are indented.
-
-% \subsubsection{Sample Heading (Third Level)} Only two levels of
-% headings should be numbered. Lower level headings remain unnumbered;
-% they are formatted as run-in headings.
-
-% \paragraph{Sample Heading (Fourth Level)}
-% The contribution should contain no more than four levels of
-% headings. Table~\ref{tab1} gives a summary of all heading levels.
-
-% \begin{table}
-% \caption{Table captions should be placed above the
-% tables.}\label{tab1}
-% \begin{tabular}{lll}
-% \hline
-% Heading level &  Example & Font size and style\\
-% \hline
-% Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
-% 1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
-% 2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
-% 3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
-% 4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
-% \hline
-% \end{tabular}
-% \end{table}
-
-
-% \noindent Displayed equations are centered and set on a separate
-% line.
-% \begin{equation}
-% x + y = z
-% \end{equation}
-% Please try to avoid rasterized images for line-art diagrams and
-% schemas. Whenever possible, use vector graphics instead (see
-% Fig.~\ref{fig1}).
-
-% \begin{figure}
-% \includegraphics[width=\textwidth]{fig1.eps}
-% \caption{A figure caption is always placed below the illustration.
-% Please note that short captions are centered, while long ones are
-% justified by the macro package automatically.} \label{fig1}
-% \end{figure}
-
-% \begin{theorem}
-% This is a sample theorem. The run-in heading is set in bold, while
-% the following text appears in italics. Definitions, lemmas,
-% propositions, and corollaries are styled the same way.
-% \end{theorem}
-% %
-% % the environments 'definition', 'lemma', 'proposition', 'corollary',
-% % 'remark', and 'example' are defined in the LLNCS documentclass as well.
-% %
-% \begin{proof}
-% Proofs, examples, and remarks have the initial word in italics,
-% while the following text appears in normal font.
-% \end{proof}
-% For citations of references, we prefer the use of square brackets
-% and consecutive numbers. Citations using labels or the author/year
-% convention are also acceptable. The following bibliography provides
-% a sample reference list with entries for journal
-% articles~\cite{ref_article1}, an LNCS chapter~\cite{ref_lncs1}, a
-% book~\cite{ref_book1}, proceedings without editors~\cite{ref_proc1},
-% and a homepage~\cite{ref_url1}. Multiple citations are grouped
-% \cite{ref_article1,ref_lncs1,ref_book1},
-% \cite{ref_article1,ref_book1,ref_proc1,ref_url1}.
+To facilitate reproducibility, our full code implementation is available at:
+\url{https://github.com/LIONS-EPFL/coins-ict-innovations-2025}.
 
 \chapter{Appendix for HiGenDiff}
 
 \section{Proofs}
 \label{sec:appendix_higendiff_theory}
-
 \begin{proof}[Proposition~\ref{proposition:complexity_higendiff}]
-Let $\offf{c^{\of{L}}_k}_{k=1}^{n^{\of{L+1}}}$ be the sizes of the communities imposed by $M^{\of{L}}$, i.e., $\forall k, c^{\of{L}}_k=\sum_{i=1}^{n^{\of{L}}}{M^{\of{L}}_{k,i}}$. Then the worst-case cost of one diffusion step of HiGenDiff for a given adjacency matrix $A^{\of{L}}$ will be thus ${n^{\of{L+1}}}^2 + \sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_j c^{\of{L}}_k \bar{A}_{j,k}^{\of{L+1}}}$. This is because we need to sample all the edges of the parent graph and then sample all communities and the bipartites that should exist, according to the parent level's adjacency. Since all the above quantities are random variables, under the i.i.d. Bernoulli assumption the expectation yields:
+Let $\offf{c^{\of{L}}_k}_{k=1}^{n^{\of{L+1}}}$ be the sizes of the communities imposed by $M^{\of{L}}$, i.e., 
+\begin{equation}
+    \forall k, c^{\of{L}}_k=\sum_{i=1}^{n^{\of{L}}}{M^{\of{L}}_{k,i}}.
+\end{equation}
+Then the worst-case cost of one diffusion step of HiGenDiff for a given adjacency matrix $A^{\of{L}}$ will be thus
+\begin{equation}
+    \mathcal{L}\of{A^{\of{L}}}={n^{\of{L+1}}}^2 + \sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_j c^{\of{L}}_k \bar{A}_{j,k}^{\of{L+1}}}
+\end{equation}
+This is because we need to sample all the edges of the parent graph and then sample all communities and the bipartites that should exist, according to the parent level's adjacency. Since all the above quantities are random variables, under the i.i.d. Bernoulli assumption, the expectation yields:
 \begin{align}
     \begin{split}
-        \mathbb{E}\off{{n^{\of{L+1}}}^2 + \sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_j c^{\of{L}}_k \bar{A}_{j,k}^{\of{L+1}}}} 
+        \mathbb{E}\off{\mathcal{L}\of{A^{\of{L}}}}&=\mathbb{E}\off{{n^{\of{L+1}}}^2 + \sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_j c^{\of{L}}_k \bar{A}_{j,k}^{\of{L+1}}}} \\
         &= \mathbb{E}\off{{n^{\of{L+1}}}^2}+\sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{\mathbb{E}\off{c^{\of{L}}_j c^{\of{L}}_k} \mathbb{E}\off{\bar{A}_{j,k}^{\of{L+1}}}} \\
         &= \mathbb{E}\off{{n^{\of{L+1}}}^2}+p\sum_{j=1}^{n^{\of{L+1}}}\sum_{k=1}^{n^{\of{L+1}}}{\of{\mathrm{Cov}\off{c^{\of{L}}_j,c^{\of{L}}_k}+\mathbb{E}\off{c^{\of{L}}_j}\mathbb{E}\off{c^{\of{L}}_k}}} \\
         &= \mathbb{E}\off{{n^{\of{L+1}}}^2}+p\of{\mathrm{Cov}\off{\sum_{j=1}^{n^{\of{L+1}}}{c^{\of{L}}_j},\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_k}}+\mathbb{E}\off{\sum_{k=1}^{n^{\of{L+1}}}{c^{\of{L}}_k}}^2}\\
@@ -656,25 +601,26 @@ Let $\offf{c^{\of{L}}_k}_{k=1}^{n^{\of{L+1}}}$ be the sizes of the communities i
           &= \mathbb{E}\off{{n^{\of{L+1}}}^2} + p\mathbb{E}\off{{n^{\of{L}}}^2}
     \end{split}
 \end{align}
-For the upper bound, note that always $p \leq 1$ and $n^{\of{L+1}} \leq n^{\of{L}}$.
-
-For the lower bound, we know that $p \geq \frac{1}{n^{\of{L+1}}}$, as in the best case, there will not be a single bipartite to generate, but we always have to sample the communities (the self-loops in the parent). Thus taking the expectation of $p$ w.r.t. $n^{\of{L}}$ implies: $\mathbb{E}\off{{n^{\of{L+1}}}^2} +p\mathbb{E}\off{{n^{\of{L}}}^2} \geq \mathbb{E}\off{{n^{\of{L+1}}}^2 + \frac{{n^{\of{L}}}^2}{n^{\of{L+1}}}}$. Similar to the proof of Proposition \ref{proposition:complexity_distributed}, we find that the minimum of the function $f\of{K}=K^2+\frac{\abs{V}}{K}$ is $\frac{3}{2}\sqrt[3]{2\abs{V}^2}$ and is achieved when $K=\frac{1}{2}\sqrt[3]{4\abs{V}}$. Plugging in $\abs{V}={n^{\of{L}}}^2$ and $K=n^{\of{L+1}}$ yields the result.
+For the upper bound, note that always $p \leq 1$ and $n^{\of{L+1}} \leq n^{\of{L}}$. For the lower bound, we know that $p \geq \frac{1}{n^{\of{L+1}}}$, as in the best case, there will not be a single bipartite to generate, but we always sample the communities (the parent's self-loops). Thus after averaging $p$ w.r.t. $n^{\of{L}}$ implies: 
+\begin{equation}
+    \mathbb{E}\off{{n^{\of{L+1}}}^2} +p\mathbb{E}\off{{n^{\of{L}}}^2} \geq \mathbb{E}\off{{n^{\of{L+1}}}^2 + \frac{{n^{\of{L}}}^2}{n^{\of{L+1}}}}
+\end{equation}
+Similar to the proof of Proposition \ref{proposition:complexity_distributed}, the minimum of the function $f\of{K}=K^2+\frac{\abs{V}}{K}$ is $\frac{3}{2}\sqrt[3]{2\abs{V}^2}$, achieved when $K=\frac{1}{2}\sqrt[3]{4\abs{V}}$. Plug in $\abs{V}={n^{\of{L}}}^2$ and $K=n^{\of{L+1}}$ to yield the result.
 \end{proof}
 
 \section{Detailed results}
 \label{sec:appendix_higendiff_results}
 
-\begin{table}[H]
+\begin{table}[ht!]%[H]
     \centering
-\caption[All MMD metrics for HiGenDiff.]{All MMD metrics (lower is better) for HiGenDiff of the model ablation experiments for each dataset.}
+\caption[All MMD metrics for HiGenDiff.]{All MMD metrics (lower is better) for HiGenDiff's ablation experiments.}
 \label{tab:higendiff_full}
-\begin{adjustbox}{width=\textwidth}
+\begin{adjustbox}{width=0.7\textwidth}
     \begin{tabular}{lllrrrr}
 \toprule
- &  &  & Degree MMD & Cluster MMD & Orbit MMD & Spectral MMD \\
-Dataset & Model & Bucketized &  &  &  &  \\
+ Dataset & Model & Bucketized & Degree & Cluster & Orbit & Spectral \\
 \midrule
-\multirow[t]{5}{*}{enzyme} & Simple & No & 0.002 & 0.018 & 0.046 & 0.008 \\
+\multirow[t]{5}{*}{enzyme} & Simple & \textemdash & 0.002 & 0.018 & 0.046 & 0.008 \\
 % \cline{2-7}
  & \multirow[t]{2}{*}{Integer} & No & 0.007 & 0.019 & 0.048 & 0.01 \\
  &  & Yes & 0.004 & 0.016 & 0.025 & 0.005 \\
@@ -683,7 +629,7 @@ Dataset & Model & Bucketized &  &  &  &  \\
  &  & Yes & 0.004 & 0.019 & 0.043 & 0.008 \\
 % \cline{1-7} \cline{2-7}
 \midrule
-\multirow[t]{5}{*}{SBM} & Simple & No & 0.002 & 0.03 & 0.044 & 0.004 \\
+\multirow[t]{5}{*}{SBM} & Simple & \textemdash & 0.002 & 0.03 & 0.044 & 0.004 \\
 % \cline{2-7}
  & \multirow[t]{2}{*}{Integer} & No & 0.001 & 0.028 & 0.047 & 0.004 \\
  &  & Yes & 0.001 & 0.027 & 0.04 & 0.004 \\
@@ -692,7 +638,7 @@ Dataset & Model & Bucketized &  &  &  &  \\
  &  & Yes & 0.001 & 0.03 & 0.068 & 0.005 \\
 % \cline{1-7} \cline{2-7}
 \midrule
-\multirow[t]{5}{*}{Ego2} & Simple & No & 0.002 & 0.06 & 0.036 & 0.005 \\
+\multirow[t]{5}{*}{Ego2} & Simple & \textemdash & 0.002 & 0.06 & 0.036 & 0.005 \\
 % \cline{2-7}
  & \multirow[t]{2}{*}{Integer} & No & 0.002 & 0.065 & 0.033 & 0.003 \\
  &  & Yes & 0.002 & 0.055 & 0.053 & 0.007 \\
@@ -701,7 +647,7 @@ Dataset & Model & Bucketized &  &  &  &  \\
  &  & Yes & 0.002 & 0.059 & 0.042 & 0.004 \\
 % \cline{1-7} \cline{2-7}
 \midrule
-\multirow[t]{5}{*}{DD2} & Simple & No & 0.004 & 0.08 & 0.024 & 0.005 \\
+\multirow[t]{5}{*}{DD2} & Simple & \textemdash & 0.004 & 0.08 & 0.024 & 0.005 \\
 % \cline{2-7}
  & \multirow[t]{2}{*}{Integer} & No & 0.009 & 0.092 & 0.05 & 0.007 \\
  &  & Yes & 0.013 & 0.109 & 0.035 & 0.008 \\
@@ -710,7 +656,7 @@ Dataset & Model & Bucketized &  &  &  &  \\
  &  & Yes & 0.008 & 0.09 & 0.031 & 0.007 \\
 % \cline{1-7} \cline{2-7}
 \midrule
-\multirow[t]{5}{*}{RoC} & Simple & No & 0.003 & 0.218 & 0.002 & 0.027 \\
+\multirow[t]{5}{*}{RoC} & Simple & \textemdash & 0.003 & 0.218 & 0.002 & 0.027 \\
 % \cline{2-7}
  & \multirow[t]{2}{*}{Integer} & No & 0.013 & 0.312 & 0.014 & 0.044 \\
  &  & Yes & 0.008 & 0.266 & 0.018 & 0.039 \\
@@ -719,7 +665,7 @@ Dataset & Model & Bucketized &  &  &  &  \\
  &  & Yes & 0.01 & 0.298 & 0.019 & 0.041 \\
 % \cline{1-7} \cline{2-7}
 \midrule
-\multirow[t]{5}{*}{LFR} & Simple & No & 0.022 & 0.214 & 0.12 & 0.004 \\
+\multirow[t]{5}{*}{LFR} & Simple & \textemdash & 0.022 & 0.214 & 0.12 & 0.004 \\
 % \cline{2-7}
  & \multirow[t]{2}{*}{Integer} & No & 0.103 & 0.309 & 0.448 & 0.055 \\
  &  & Yes & 0.037 & 0.05 & 0.162 & 0.012 \\
@@ -774,20 +720,18 @@ where $Z \sim N\of{\mathbf{0}, \mathbf{I}_F}$, which reduces the amount of noise
     \end{equation}
 \end{theorem}
 
-According to \eqref{eq:concave}, as long as $m > \of{e^{2t} - 1} L$, the denoising distribution $\mathbf{X}_0|\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ is strongly-log-concave, i.e, unimodal, making the denoising tractable. Consequently, as long as a sample from $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ can be obtained, a sample of $\mathbf{X}_0$ can obtained through sampling from a strongly log-concave distribution.
-
-% \begin{remark}
-%     Our result holds for log-smooth distributions (Assumption \ref{ass:log-smooth}), this assumption is standard in the analysis of denoising diffusions \cite{chen2022sampling, benton2023linear}. A alternative way of obtaining a log-smooth distribution is through Gaussian convolution of a bounded distribution: if $X$ is bounded, then $X + \sqrt{\delta}Z$, with $Z\sim \sN\br{0, I}$ is log-smooth. This convolution trick to obtain log-smooth distributions corresponds to the \emph{early-stopping} criterion assumption in convergence proofs of diffusion samplers.
-% \end{remark}
+According to \eqref{eq:concave}, as long as $m > \of{e^{2t} - 1} L$, the denoising distribution $\mathbf{X}_0|\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ is strongly-log-concave, i.e, unimodal, making the denoising tractable. Consequently, as long as a sample from $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ can be obtained, a sample of $\mathbf{X}_0$ can be obtained through sampling from a strongly log-concave distribution.
 
 \subsection{Sampling the noisy measurements}
 We turn our attention to the initialization problem of obtaining a sample from  $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. If $t$ is large, each $\mathbf{Y}_i$ approaches a standard Gaussian according to \eqref{eq:multimeasure}. The individual coordinates approximate standard Gaussians, but they must be appropriately correlated in order to accurately approximate $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. Indeed, the benefit of multiple measurements follows from the correlation of the measurements and is a crucial component as the noise reduction in \eqref{eq:noisereduction} depends on it. 
 
-Instead of sampling each coordinate by sequentially increasing the conditioning as in \cite{saremi_chain_2024}, we propose a Gibbs sampling strategy \cite{casella_explaining_1992, roberts_updating_1997}. Gibbs sampling consists of iteratively sampling each component $\mathbf{Y}_i$ conditioned on all the other $m-1$ measurements, denoted $\mathbf{Y}_{-i}$. Gibbs sampling is guaranteed to converge to the joint distribution \cite{rosenthal_minorization_1995} and is a well-studied strategy for sampling when each conditioned marginal is easy to sample from \cite{koller_probabilistic_2009}. The following theorem will help show that there exists a choice of $t$ such that each conditional marginal $\mathbf{Y}_i|\mathbf{Y}_{-i}$ is easy to sample from. 
+Instead of sampling each coordinate by sequentially increasing the conditioning as in \cite{saremi_chain_2024}, we propose a Gibbs sampling strategy \cite{casella_explaining_1992, roberts_updating_1997}. Gibbs sampling consists of iteratively sampling each component $\mathbf{Y}_i$ conditioned on all the other $m-1$ measurements, denoted $\mathbf{Y}_{-i}$. Gibbs sampling is guaranteed to converge to the joint distribution \cite{rosenthal_minorization_1995} and is a well-studied strategy for sampling when each conditioned marginal is easy to sample from \cite{koller_probabilistic_2009}. 
+
+The following theorem will help show that there exists a choice of $t$ such that each conditional marginal $\mathbf{Y}_i|\mathbf{Y}_{-i}$ is easy to sample from. 
 
 \begin{theorem}
 \label{thm:unimodality_conditional}
-    Under the log-smoothness assumption again, for any, $t>0$ and $\mathbf{Y}_1, \dots, \mathbf{Y}_m$ as in \eqref{eq:multimeasure}, we have that for any  $i \in \off{m}$, the hessian of $\log p\of{y_i|y_{-i}}$ is given by
+    Under the log-smoothness assumption again, for any, $t>0$ and $\mathbf{Y}_1, \dots, \mathbf{Y}_m$ as in \eqref{eq:multimeasure}, we have that for any  $i \in \off{m}$, the Hessian of $\log p\of{y_i|y_{-i}}$ is given by
     \begin{align}
     \begin{split}
     \nabla^2_{y_i} \log p\of{y_i|y_{-i}} &= \mathbb{V}_{\mathbf{X}|\mathbf{Y}_1, \dots, \mathbf{Y}_m = (y_1, \dots, y_m)}\off{\frac{e^{-t} \mathbf{X} - y_i}{1 - e^{-2t}}} - \frac{1}{1-e^{-2t}}\mathbf{I}_F \\
@@ -796,11 +740,11 @@ Instead of sampling each coordinate by sequentially increasing the conditioning 
     \end{align}
     \label{eq:conditionalunimodal}
 \end{theorem}
-In order to use the theorem above to show that the distributions are log-concave, we need to control the variance term in \eqref{eq:conditionalunimodal}. We can upper-bound this variance term using Bakry-Emery's result showing that strongly log-concave measures verify the Poincaré inequality.
+In order to use the theorem above to show that the distributions are log-concave, we need to control the variance term in \eqref{eq:conditionalunimodal}. We can upper-bound this variance term using Bakry-Emery's result, showing that strongly log-concave measures verify the Poincaré inequality.
 
 \begin{theorem}
 \label{thm:variance}
-    Let $\mathbf{X}$ be an $L$-smooth density, if $m$ is such that $m \geq 2\of{e^{2t} - 1}L$, then it holds that
+    Let $\mathbf{X}$ be an $L$-smooth density, if $m \geq 2\of{e^{2t} - 1}L$, then it holds that
     \begin{equation}
        \mathbb{V}_{\mathbf{X}|\mathbf{Y}_1, \dots, \mathbf{Y}_m =(y_1, \dots, y_m)}\off{\mathbf{X}} \leq \frac{L}{2}.
     \end{equation}
@@ -815,7 +759,7 @@ With the above conditions, we can show that our sampling framework, detailed in 
 
 \begin{theorem}
     \label{thm:logconcavepipe}
-    Under the log-smoothness assumption, for $t> \frac{1}{2}\log\of{1 + \frac{L}{2}}$ and $m \geq 2\of{e^{2t} - 1}L$, we have that the framework of Algorithm \ref{alg:pipeline} is a fully log-concave pipeline, where each step only samples from a unimodal distribution.
+    Under log-smoothness, for $t> \frac{1}{2}\log\of{1 + \frac{L}{2}}$ and $m \geq 2\of{e^{2t} - 1}L$, we have that the framework of Algorithm \ref{alg:pipeline} is a fully log-concave pipeline, where each step only samples from a unimodal distribution.
 \end{theorem}
 
 \section{Additional experiments}
@@ -854,7 +798,7 @@ With the above conditions, we can show that our sampling framework, detailed in 
 
 \section{Implementation}
 
-For the molecule generation experiments, we extend the implementation of \cite{vignac_digress_2022} (available at \url{https://github.com/cvignac/DiGress}) with code for our novel specific sampling method tailored to the architecture of DiGress. Our experiment code implementation is fully available at \url{https://github.com/ResearchWeasel/multi-prox-diffusion-nips-2025} to facilitate reproducibility.
+For the molecule generation experiments, we extend the implementation of \cite{vignac_digress_2022} (available at \url{https://github.com/cvignac/DiGress}) with code for our novel specific sampling method tailored to the architecture of DiGress. Our experiment code implementation is fully available at \url{https://github.com/Bani57/multi-prox-diffusion-iclr-delta-2025} to facilitate reproducibility.
 
 All code was executed on a single machine with the following specifications:
 \begin{itemize}

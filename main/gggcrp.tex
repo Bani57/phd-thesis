@@ -285,27 +285,27 @@ We observe this visually as well: Figures \labelcref{fig:qm9,fig:community_20,fi
     \begin{minipage}{0.475\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figures/gggcrp/QM9.pdf}
-    \caption{GGG-CRP performance on QM9.}
+    \caption[GGG-CRP performance on QM9.]{QM9 performance.}
     \label{fig:qm9}    
     \end{minipage}
     \hfill
     \begin{minipage}{0.475\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figures/gggcrp/CommunitySmall_20.pdf}
-    \caption{GGG-CRP performance on Community20.}
+    \caption[GGG-CRP performance on Community20.]{Community20 performance.}
     \label{fig:community_20}    
     \end{minipage}
     \begin{minipage}{0.475\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figures/gggcrp/Chordal9.pdf}
-    \caption{GGG-CRP performance on Chordal9.}
+    \caption[GGG-CRP performance on Chordal9.]{Chordal9 performance.}
     \label{fig:chordal9}    
     \end{minipage}
     \hfill
     \begin{minipage}{0.475\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figures/gggcrp/Housefloorplan.pdf}
-    \caption{GGG-CRP performance on HouseFloorplan.}
+    \caption[GGG-CRP performance on HouseFloorplan.]{HouseFloorplan performance.}
     \label{fig:house}    
     \end{minipage}
 \end{figure}
@@ -328,7 +328,9 @@ HouseFloorplan & \textemdash & 3868 \\
 \end{tabular}
 }
 \end{table}
-We do note another positive behaviour of the GGG-CRP model observed during the training phase: for the Community20 graphs, which possess a very clear community structure, the convergence time compared to the base model was greatly decreased. Less than ten epochs yielded a stable Wasserstein score to obtain the displayed visual results. Autoregressive models in general are known to show greater performance when such graph structures are present, and we are pleased that these benefits are also obtained for our model.
+We do note another positive behaviour of the GGG-CRP model observed during the training phase: for the Community20 graphs, which possess a very clear community structure, the convergence time compared to the base model was greatly decreased. Less than ten epochs yielded a stable Wasserstein score to obtain the displayed visual results. 
+
+Autoregressive models in general are known to show greater performance when such graph structures are present, and we are pleased that these benefits are also obtained for our model.
 
 \subsection{Summary}
 \label{sec:conclusion}
