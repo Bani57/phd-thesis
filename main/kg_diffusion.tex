@@ -9,7 +9,7 @@ As such, before closing off this thesis work, we present our proposal for genera
 
 Recall that knowledge graphs represent structured real-world information modeled as a set of triplets
 of head entity, relation, and tail entity. Many modern graphs are constructed automatically from
-text or manually curated classically. Regardless of the construction method, massive knowledge graphs often suffer from misinformation, incompleteness, and general noise, which hinder their reliability and utility. These issues began cropping up in recent years, on one part, due to the increasing heterogeneity and bulk of data sources that are used to construct the database, where schema mismatches cause nodes and edges to be connected to incorrect subgraphs, often with incorrect labels, as well as data being lost during migration. However, these issues in other or the same cases can arise from the use of artificial intelligence in parsing text documents to attempt to extract all new facts from them. It is evident that these kinds of defects in knowledge graph data that will be used to train a query answering model could cause serious damage.
+text or manually curated classically. Regardless of the construction method, massive knowledge graphs often suffer from misinformation, incompleteness, and general noise, which hinder their reliability and utility. These issues began cropping up in recent years, in part, due to the increasing heterogeneity and bulk of data sources that are used to construct the database, where schema mismatches cause nodes and edges to be connected to incorrect subgraphs, often with incorrect labels, as well as data being lost during migration. However, these issues in other or the same cases can arise from the use of artificial intelligence in parsing text documents to attempt to extract all new facts from them. It is evident that these kinds of defects in knowledge graph data that will be used to train a query answering model could cause serious damage.
 
 This noise, during knowledge graph representation, will be expressed through the presence of spurious false-positive triplets, which should be corrected or removed, and the absence of many triplets that are facts but have been labeled as false negatives. From this point onwards, in order to formalize the problem statement and potential solutions, we will assume that we are already in possession of link prediction and query answering models trained on clean data, but several newly modified $n \times n$ blocks of the immense adjacency matrix have been flagged as potentially noisy, thus we have to propose a denoising algorithm to immediately repair them (while assuming the blocks are small enough such that localized modifications will not propagate to the full graph).
 
@@ -49,13 +49,12 @@ $\mathbf{x}_i \in \mathbb{R}^{n \times F}$ (or $\mathbb{R}^{2n \times F}$ when t
 
 Due to the node permutation group symmetry of graphs \cite{bronstein_geometric_2021}, the entity-to-subgraph assignment cannot be performed with a default entity ID permutation, and to preserve edge locality within subgraphs, we chose to employ depth-first-search-based topological sorting and subgraph splitting based on cutting DFS spanning tree branches. The full dataset construction procedure is detailed in Algorithm \ref{alg:knowledge_correction_dataset}. Note that for computational feasibility and relevance, we only consider sufficiently dense adjacency blocks as valid samples (arbitrarily, we chose the cutoff of 5 edges). 
 
-\begin{algorithm}[H]
+\begin{algorithm}[ht!]%[H]
     \caption{Knowledge correction dataset sampling}
     \label{alg:knowledge_correction_dataset}
     \begin{algorithmic}
         \STATE{\textbf{input}: knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$, maximal subgraph size $n<|V|$}
-        \STATE{$k \gets 1$}
-        \STATE{$l \gets 0$}
+        \STATE{$\of{k, l} \gets \of{1, 0}$}
         \STATE{$s:V \to \mathbb{N} \gets$ empty map}
         \FOR{$v \in V$}
         \IF{$c(v)$ does not exist}
@@ -67,16 +66,14 @@ Due to the node permutation group symmetry of graphs \cite{bronstein_geometric_2
         \STATE{$c(u)\gets k$}
         \STATE{$l \gets l+1$}
         \IF{$l=n$}
-        \STATE{$k\gets k+1$}
-        \STATE{$l\gets 0$}
+        \STATE{$\of{k,l}\gets \of{k+1,0}$}
         \ENDIF
         \FOR{$w \in N(u)$}
         \STATE{$\text{StackPush}\of{S,w}$}
         \ENDFOR
         \ENDIF
         \ENDWHILE
-        \STATE{$k\gets k+1$}
-        \STATE{$l\gets 0$}
+        \STATE{$\of{k,l}\gets \of{k+1,0}$}
         \ENDIF
         \ENDFOR
         \FOR{$i \gets 1$ to $k$}
@@ -105,12 +102,17 @@ Each generator in $\offf{g_t}_{t=1}^T$ thus is trained to maximize the same like
 \begin{equation}
     g_t=\argmin_g{\mathbb{E}_{\mathcal{D},Z_A}\off{-\log\of{\mathbb{P}\of{A_{t-1} \mid A_t, \mathbf{x}, \mathbf{v}}}}},
 \end{equation}
-where, now internally the graph transformer models of \cite{dwivedi_generalization_2021} employed by the generators possess a knowledge graph entity embedding model $g_V:V\to\mathbb{R}^F$ used to embed the novel input $\mathbf{v}$. The entity embeddings are a new hidden state passed through the whole graph transformer, enhancing especially the representation that the FiLM \cite{perez_film_2018} graph attention layers learn.
+where, now internally the graph transformer models of \cite{dwivedi_generalization_2021} employed by the generators possess a knowledge graph entity embedding model $g_V:V\to\mathbb{R}^F$ used to embed the novel input $\mathbf{v}$. 
 
-As a simpler auxiliary knowledge correction task, we also explore \emph{context-based} generation, where, by applying masking during the noising process, only the lower right region of the adjacency samples is denoised, while the remaining three quadrants always remain fixed, serving thus as additional conditioning to help guide more accurate corrections. Formally, in this setting:
+The entity embeddings are a new hidden state passed through the whole graph transformer, enhancing especially the representation that the FiLM \cite{perez_film_2018} graph attention layers learn.
+
+As a simpler auxiliary knowledge correction task, we also explore \emph{context-based} generation, where, by applying masking during the noising process, only the lower right region of the adjacency samples is denoised, while the remaining three quadrants always remain fixed, serving thus as additional conditioning to help guide more accurate corrections. 
+
+Formally, in this setting:
 \begin{align}
     \begin{split}
         A_t &\sim \mathbf{M} \odot \text{Categorical}\of{Q_t \cdot \text{OneHot}\of{A_0}} + \of{1-\mathbf{M}} \odot A_0, \\
+        \hat{A}_{t-1} &= \mathbf{M} \odot g_t(\hat{A}_t) + \of{1-\mathbf{M}} \odot A_0, \\
         \forall i,j, \mathbf{M}_{i,j}&=\mathbb{I}\of{i \geq \frac{n}{2}, j \geq \frac{n}{2}}
     \end{split}
 \end{align}
@@ -121,11 +123,7 @@ As this section of the work lies in the intersection between knowledge graph rea
 
 \subsection{Results}
 
-Table \ref{tab:kg_diffusion_metrics} presents our numerical results from each experiment. First, we can observe that the modified DiGress had no issues with learning each of the data distributions, as MMD metrics are decently low and comparable to baselines on data from other domains. 
-
-For the fully unmasked experiments, the classification metrics tell a different story. Namely, while for the Wordnet graph, the training distribution seems to have been learned almost perfectly, there is almost no generalization to the test set. On the other hand, for Freebase and NELL, slight underfitting even during training is detected. Interestingly, for the masked setting, the results are much more promising, as both sufficient anomaly correction learning and generalization are observed. 
-
-Thus we hypothesize that, unfortunately, this is due to the difficulty of the problem of correcting fully noisy adjacency matrices such that all triplets are valid facts. To improve model performance, we could employ more bespoke data curation than simple uniform train-test splitting, as well as data augmentation during training, in addition to potentially also designing a bespoke graph transformer architecture for the task of knowledge graph subgraph generation.,
+Table \ref{tab:kg_diffusion_metrics} presents our numerical results from each experiment.
 
 \begin{table}[H]
     \centering
@@ -155,7 +153,19 @@ Thus we hypothesize that, unfortunately, this is due to the difficulty of the pr
     \end{adjustbox}
 \end{table}
 
-Figure \ref{fig:kg_diffusion_loss} provides perhaps the best alternative summary to our experiment results, as well as proving the benefits of employing diffusion models to the task. The plots visualize the distribution of the contrastive loss of the current state of the subgraphs against the number of denoisers applied thus far. While achieving the range of TransE loss values of the clean data is often out of reach, during training, the DiGress generators are able to almost monotonically decrease the contrastive loss over time. This is very relevant, as this implies almost all proposed edge flips by DiGress are valid corrections when the model is able to learn and generalize. As the examples provided in Figure \ref{fig:kg_diffusion_examples} show, in some cases the quality of the corrected graphs can be extremely high, with very few spurious entity relations.
+First, we observe that the DiGress for KGs had no issues with learning each of the data distributions, with MMDs decently low and comparable to baselines on data from other domains. 
+
+For the fully unmasked experiments, the classification metrics tell a different story. Namely, while for the Wordnet graph, the training distribution seems to have been learned almost perfectly, there is almost no generalization to the test set. On the other hand, for Freebase and NELL, slight underfitting even during training is detected. 
+
+Interestingly, for the masked setting, the results are much more promising, as both sufficient anomaly correction learning and generalization are observed. 
+
+Thus, we hypothesize that, unfortunately, this is due to the difficulty of the problem of correcting fully noisy adjacency matrices such that all triplets are valid facts. To improve model performance, we could employ more bespoke data curation than simple uniform train-test splitting, as well as data augmentation during training, in addition to potentially also designing a bespoke graph transformer architecture for the task of knowledge graph subgraph generation.
+
+Figure \ref{fig:kg_diffusion_loss} provides perhaps the best alternative summary to our experiment results, as well as proving the benefits of employing diffusion models to the task. The plots visualize the distribution of the contrastive loss of the current state of the subgraphs against the number of denoisers applied thus far. 
+
+While achieving the range of TransE loss values of the clean data is often out of reach, during training, the DiGress generators are able to almost monotonically decrease the contrastive loss over time. This is very relevant, as this implies almost all proposed edge flips by DiGress are valid corrections when the model is able to learn and generalize. 
+
+As the examples provided in Figure \ref{fig:kg_diffusion_examples} show, in some cases the quality of the corrected graphs can be extremely high, with very few spurious entity relations.
 
 \begin{figure}[H]
     \centering

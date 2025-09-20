@@ -1,3 +1,668 @@
+@inproceedings{liao_efficient_2019,
+	title = {Efficient {Graph} {Generation} with {Graph} {Recurrent} {Attention} {Networks}},
+	volume = {32},
+	url = {https://proceedings.neurips.cc/paper_files/paper/2019/hash/d0921d442ee91b896ad95059d13df618-Abstract.html},
+	abstract = {We propose a new family of efficient and expressive deep generative models of graphs, called Graph Recurrent Attention Networks (GRANs).
+Our model generates graphs one block of nodes and associated edges at a time.
+The block size and sampling stride allow us to trade off sample quality for efficiency.
+Compared to previous RNN-based graph generative models, our framework better captures the auto-regressive conditioning between the already-generated and to-be-generated parts of the graph using Graph Neural Networks (GNNs) with attention.
+This not only reduces the dependency on node ordering but also bypasses the long-term bottleneck caused by the sequential nature of RNNs.
+Moreover, we parameterize the output distribution per block using a mixture of Bernoulli, which captures the correlations among generated edges within the block. 
+Finally, we propose to handle node orderings in generation by marginalizing over a family of canonical orderings.
+On standard benchmarks, we achieve state-of-the-art time efficiency and sample quality compared to previous models.
+Additionally, we show our model is capable of generating large graphs of up to 5K nodes with good quality.
+Our code is released at: {\textbackslash}url\{https://github.com/lrjconan/GRAN\}.},
+	urldate = {2025-01-30},
+	booktitle = {Advances in {Neural} {Information} {Processing} {Systems}},
+	publisher = {Curran Associates, Inc.},
+	author = {Liao, Renjie and Li, Yujia and Song, Yang and Wang, Shenlong and Hamilton, Will and Duvenaud, David K and Urtasun, Raquel and Zemel, Richard},
+	year = {2019},
+}
+
+@article{gretton_kernel_2012,
+	title = {A {Kernel} {Two}-{Sample} {Test}},
+	volume = {13},
+	issn = {1533-7928},
+	url = {http://jmlr.org/papers/v13/gretton12a.html},
+	abstract = {We propose a framework for analyzing and comparing distributions, which we use to construct statistical tests to determine if two samples are drawn from different distributions.  Our test statistic is the largest difference in expectations over functions in the unit ball of a reproducing kernel Hilbert space (RKHS), and is called the maximum mean discrepancy (MMD).  We present two distribution-free tests based on large deviation bounds for the MMD, and a third test based on the asymptotic distribution of this statistic.  The MMD can be computed in quadratic time, although efficient linear time approximations are available.  Our statistic is an instance of an integral probability metric, and various classical metrics on distributions are obtained when alternative function classes are used in place of an RKHS.  We apply our two-sample tests  to a variety of problems, including attribute matching for databases using the Hungarian marriage method, where they perform strongly.  Excellent performance is also obtained when comparing distributions over graphs, for which these are the first such tests.},
+	number = {25},
+	urldate = {2025-01-30},
+	journal = {Journal of Machine Learning Research},
+	author = {Gretton, Arthur and Borgwardt, Karsten M. and Rasch, Malte J. and Schölkopf, Bernhard and Smola, Alexander},
+	year = {2012},
+	pages = {723--773},
+}
+
+@article{ramakrishnan_quantum_2014,
+	title = {Quantum chemistry structures and properties of 134 kilo molecules},
+	volume = {1},
+	copyright = {2014 The Author(s)},
+	issn = {2052-4463},
+	url = {https://www.nature.com/articles/sdata201422},
+	doi = {10.1038/sdata.2014.22},
+	abstract = {Computational de novo design of new drugs and materials requires rigorous and unbiased exploration of chemical compound space. However, large uncharted territories persist due to its size scaling combinatorially with molecular size. We report computed geometric, energetic, electronic, and thermodynamic properties for 134k stable small organic molecules made up of CHONF. These molecules correspond to the subset of all 133,885 species with up to nine heavy atoms (CONF) out of the GDB-17 chemical universe of 166 billion organic molecules. We report geometries minimal in energy, corresponding harmonic frequencies, dipole moments, polarizabilities, along with energies, enthalpies, and free energies of atomization. All properties were calculated at the B3LYP/6-31G(2df,p) level of quantum chemistry. Furthermore, for the predominant stoichiometry, C7H10O2, there are 6,095 constitutional isomers among the 134k molecules. We report energies, enthalpies, and free energies of atomization at the more accurate G4MP2 level of theory for all of them. As such, this data set provides quantum chemical properties for a relevant, consistent, and comprehensive chemical space of small organic molecules. This database may serve the benchmarking of existing methods, development of new methods, such as hybrid quantum mechanics/machine learning, and systematic identification of structure-property relationships.},
+	language = {en},
+	number = {1},
+	urldate = {2025-01-30},
+	journal = {Scientific Data},
+	author = {Ramakrishnan, Raghunathan and Dral, Pavlo O. and Rupp, Matthias and von Lilienfeld, O. Anatole},
+	month = aug,
+	year = {2014},
+	note = {Publisher: Nature Publishing Group},
+	keywords = {Computational chemistry, Density functional theory, Quantum chemistry},
+	pages = {140022},
+}
+
+@article{rosenthal_minorization_1995,
+	title = {Minorization conditions and convergence rates for {Markov} chain {Monte} {Carlo}},
+	volume = {90},
+	number = {430},
+	journal = {Journal of the American Statistical Association},
+	author = {Rosenthal, Jeffrey S},
+	year = {1995},
+	note = {Publisher: Taylor \& Francis},
+	pages = {558--566},
+}
+
+@book{koller_probabilistic_2009,
+	title = {Probabilistic graphical models: principles and techniques},
+	publisher = {MIT press},
+	author = {Koller, Daphne and Friedman, Nir},
+	year = {2009},
+}
+
+@misc{dieleman_diffusion_2024,
+	title = {Diffusion is spectral autoregression},
+	url = {https://sander.ai/2024/09/02/spectral-autoregression.html},
+	author = {Dieleman, Sander},
+	year = {2024},
+}
+
+@article{ho_cascaded_2022,
+	title = {Cascaded diffusion models for high fidelity image generation},
+	volume = {23},
+	number = {47},
+	journal = {Journal of Machine Learning Research},
+	author = {Ho, Jonathan and Saharia, Chitwan and Chan, William and Fleet, David J and Norouzi, Mohammad and Salimans, Tim},
+	year = {2022},
+	pages = {1--33},
+}
+
+@inproceedings{dadi_improving_2025,
+	title = {Improving {Single} {Noise} {Level} {Denoising} {Samplers} with {Restricted} {Gaussian} {Oracles}},
+	url = {https://openreview.net/forum?id=xkiI5tou6J},
+	booktitle = {{ICLR} 2025 {Workshop} on {Deep} {Generative} {Model} in {Machine} {Learning}: {Theory}, {Principle} and {Efficacy}},
+	author = {Dadi, Leello Tadesse and Janchevski, Andrej and Cevher, Volkan},
+	year = {2025},
+}
+
+@inproceedings{choi_stargan_2020,
+	title = {{StarGAN} v2: {Diverse} {Image} {Synthesis} for {Multiple} {Domains}},
+	doi = {10.1109/CVPR42600.2020.00821},
+	booktitle = {2020 {IEEE}/{CVF} {Conference} on {Computer} {Vision} and {Pattern} {Recognition} ({CVPR})},
+	author = {Choi, Yunjey and Uh, Youngjung and Yoo, Jaejun and Ha, Jung-Woo},
+	year = {2020},
+	keywords = {Generators, Training, Animals, Image generation, Image reconstruction, Transforms, Visualization},
+	pages = {8185--8194},
+}
+
+@article{krizhevsky_learning_2009,
+	title = {Learning multiple layers of features from tiny images},
+	author = {Krizhevsky, Alex and Hinton, Geoffrey and {others}},
+	year = {2009},
+	note = {Publisher: Toronto, ON, Canada},
+}
+
+@inproceedings{sahoo_diffusion_2025,
+	title = {The {Diffusion} {Duality}},
+	url = {https://openreview.net/forum?id=CB0Ub2yXjC},
+	booktitle = {{ICLR} 2025 {Workshop} on {Deep} {Generative} {Model} in {Machine} {Learning}: {Theory}, {Principle} and {Efficacy}},
+	author = {Sahoo, Subham Sekhar and Deschenaux, Justin and Gokaslan, Aaron and Wang, Guanghan and Chiu, Justin T. and Kuleshov, Volodymyr},
+	year = {2025},
+}
+
+@inproceedings{akhound-sadegh_iterated_2024,
+	title = {Iterated {Denoising} {Energy} {Matching} for {Sampling} from {Boltzmann} {Densities}},
+	url = {https://proceedings.mlr.press/v235/akhound-sadegh24a.html},
+	abstract = {Efficiently generating statistically independent samples from an unnormalized probability distribution, such as equilibrium samples of many-body systems, is a foundational problem in science. In this paper, we propose Iterated Denoising Energy Matching (iDEM), an iterative algorithm that uses a novel stochastic score matching objective leveraging solely the energy function and its gradient—and no data samples—to train a diffusion-based sampler. Specifically, iDEM alternates between (I) sampling regions of high model density from a diffusion-based sampler and (II) using these samples in our stochastic matching objective to further improve the sampler. iDEM is scalable to high dimensions as the inner matching objective, is simulation-free, and requires no MCMC samples. Moreover, by leveraging the fast mode mixing behavior of diffusion, iDEM smooths out the energy landscape enabling efficient exploration and learning of an amortized sampler. We evaluate iDEM on a suite of tasks ranging from standard synthetic energy functions to invariant nnn-body particle systems. We show that the proposed approach achieves state-of-the-art performance on all metrics and trains 2−5×2−5×2-5{\textbackslash}times faster, which allows it to be the first method to train using energy on the challenging 555555-particle Lennard-Jones system.},
+	language = {en},
+	urldate = {2025-09-20},
+	booktitle = {Proceedings of the 41st {International} {Conference} on {Machine} {Learning}},
+	publisher = {PMLR},
+	author = {Akhound-Sadegh, Tara and Rector-Brooks, Jarrid and Bose, Joey and Mittal, Sarthak and Lemos, Pablo and Liu, Cheng-Hao and Sendera, Marcin and Ravanbakhsh, Siamak and Gidel, Gauthier and Bengio, Yoshua and Malkin, Nikolay and Tong, Alexander},
+	month = jul,
+	year = {2024},
+	note = {ISSN: 2640-3498},
+	pages = {760--786},
+}
+
+@inproceedings{chehab_practical_2024,
+	title = {A {Practical} {Diffusion} {Path} for {Sampling}},
+	url = {https://openreview.net/forum?id=1pjDEW2AsZ},
+	booktitle = {{ICML} 2024 {Workshop} on {Structured} {Probabilistic} {Inference} \& {Generative} {Modeling}},
+	author = {Chehab, Omar and Korba, Anna},
+	year = {2024},
+}
+
+@inproceedings{sabour_align_2024,
+	address = {Vienna, Austria},
+	series = {{ICML}'24},
+	title = {Align your steps: optimizing sampling schedules in diffusion models},
+	volume = {235},
+	shorttitle = {Align your steps},
+	abstract = {Diffusion models (DMs) have established themselves as the state-of-the-art generative modeling approach in the visual domain and beyond. A crucial drawback of DMs is their slow sampling speed, relying on many sequential function evaluations through large neural networks. Sampling from DMs can be seen as solving a differential equation through a discretized set of noise levels known as the sampling schedule. While past works primarily focused on deriving efficient solvers, little attention has been given to finding optimal sampling schedules, and the entire literature relies on hand-crafted heuristics. In this work, for the first time, we propose a general and principled approach to optimizing the sampling schedules of DMs for high-quality outputs, called Align Your Steps. We leverage methods from stochastic calculus and find optimal schedules specific to different solvers, trained DMs and datasets. We evaluate our novel approach on several image, video as well as 2D toy data synthesis benchmarks, using a variety of different samplers, and observe that our optimized schedules outperform previous hand-crafted schedules in almost all experiments. Our method demonstrates the untapped potential of sampling schedule optimization, especially in the few-step synthesis regime.},
+	urldate = {2025-09-19},
+	booktitle = {Proceedings of the 41st {International} {Conference} on {Machine} {Learning}},
+	publisher = {JMLR.org},
+	author = {Sabour, Amirmojtaba and Fidler, Sanja and Kreis, Karsten},
+	month = jul,
+	year = {2024},
+	pages = {42947--42975},
+}
+
+@inproceedings{karras_analyzing_2024,
+	title = {Analyzing and {Improving} the {Training} {Dynamics} of {Diffusion} {Models}},
+	url = {https://openaccess.thecvf.com/content/CVPR2024/html/Karras_Analyzing_and_Improving_the_Training_Dynamics_of_Diffusion_Models_CVPR_2024_paper.html},
+	language = {en},
+	urldate = {2025-09-20},
+	author = {Karras, Tero and Aittala, Miika and Lehtinen, Jaakko and Hellsten, Janne and Aila, Timo and Laine, Samuli},
+	year = {2024},
+	pages = {24174--24184},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\AEXHLLNK\\Karras et al. - 2024 - Analyzing and Improving the Training Dynamics of Diffusion Models.pdf:application/pdf},
+}
+
+@inproceedings{karras_style-based_2019,
+	title = {A {Style}-{Based} {Generator} {Architecture} for {Generative} {Adversarial} {Networks}},
+	url = {https://openaccess.thecvf.com/content_CVPR_2019/html/Karras_A_Style-Based_Generator_Architecture_for_Generative_Adversarial_Networks_CVPR_2019_paper.html},
+	urldate = {2025-09-20},
+	author = {Karras, Tero and Laine, Samuli and Aila, Timo},
+	year = {2019},
+	pages = {4401--4410},
+}
+
+@inproceedings{saremi_chain_2024,
+	title = {Chain of {Log}-{Concave} {Markov} {Chains}},
+	url = {https://openreview.net/forum?id=yiMB2DOjsR},
+	booktitle = {The {Twelfth} {International} {Conference} on {Learning} {Representations}},
+	author = {Saremi, Saeed and Park, Ji Won and Bach, Francis},
+	year = {2024},
+}
+
+@inproceedings{lee_structured_2021,
+	title = {Structured {Logconcave} {Sampling} with a {Restricted} {Gaussian} {Oracle}},
+	url = {https://proceedings.mlr.press/v134/lee21a.html},
+	abstract = {We give algorithms for sampling several structured logconcave families to high accuracy. We further develop a reduction framework, inspired by proximal point methods in convex optimization, which bootstraps samplers for regularized densities to generically improve dependences on problem conditioning κκ{\textbackslash}kappa from polynomial to linear. A key ingredient in our framework is the notion of a "restricted Gaussian oracle" (RGO) for g:Rd→Rg:Rd→Rg: {\textbackslash}mathbb\{R\}{\textasciicircum}d {\textbackslash}rightarrow {\textbackslash}mathbb\{R\}, which is a sampler for distributions whose negative log-likelihood sums a quadratic (in a multiple of the identity) and ggg. By combining our reduction framework with our new samplers, we obtain the following bounds for sampling structured distributions to total variation distance {\textbackslash}eps{\textbackslash}eps{\textbackslash}eps.
+For composite densities exp(−f(x)−g(x))exp⁡(−f(x)−g(x)){\textbackslash}exp(-f(x) - g(x)), where fff has condition number κκ{\textbackslash}kappa and convex (but possibly non-smooth) ggg admits an RGO, we obtain a mixing time of O(κdlog3κdϵ)O(κdlog3⁡κdϵ)O({\textbackslash}kappa d {\textbackslash}log{\textasciicircum}3{\textbackslash}tfrac\{{\textbackslash}kappa d\}\{{\textbackslash}epsilon\}), matching the state-of-the-art non-composite bound Lee et.{\textbackslash} al.{\textbackslash}. No composite samplers with better mixing than general-purpose logconcave samplers were previously known.
+For logconcave finite sums exp(−F(x))exp⁡(−F(x)){\textbackslash}exp(-F(x)), where F(x)=1n∑i∈[n]fi(x)F(x)=1n∑i∈[n]fi(x)F(x) = {\textbackslash}tfrac\{1\}\{n\}{\textbackslash}sum\_\{i {\textbackslash}in [n]\} f\_i(x) has condition number κκ{\textbackslash}kappa, we give a sampler querying O˜(n+κmax(d,nd−−√))O{\textasciitilde}(n+κmax(d,nd)){\textbackslash}widetilde\{O\}(n + {\textbackslash}kappa{\textbackslash}max(d, {\textbackslash}sqrt\{nd\})) gradient oracles{\textbackslash}footnote\{For convenience of exposition, the O˜O{\textasciitilde}{\textbackslash}widetilde\{O\} notation hides logarithmic factors in the dimension ddd, problem conditioning κκ{\textbackslash}kappa, desired accuracy ϵϵ{\textbackslash}epsilon, and summand count nnn (when applicable). A first-order (gradient) oracle for f:Rd→Rf:Rd→Rf:{\textbackslash}mathbb\{R\}{\textasciicircum}d {\textbackslash}rightarrow {\textbackslash}mathbb\{R\} returns (f(x),∇f(x))(f(x),∇f(x))(f(x), {\textbackslash}nabla f(x)) on input xxx, and a zeroth-order (value) oracle only returns f(x)f(x)f(x).\} to \{fi\}i∈[n]\{fi\}i∈[n]{\textbackslash}\{f\_i{\textbackslash}\}\_\{i {\textbackslash}in [n]\}. No high-accuracy samplers with nontrivial gradient query complexity were previously known.
+For densities with condition number κκ{\textbackslash}kappa, we give an algorithm obtaining mixing time O(κdlog2κdϵ)O(κdlog2⁡κdϵ)O({\textbackslash}kappa d {\textbackslash}log{\textasciicircum}2{\textbackslash}tfrac\{{\textbackslash}kappa d\}\{{\textbackslash}epsilon\}), improving Lee et.{\textbackslash} al.{\textbackslash} by a logarithmic factor with a significantly simpler analysis. We also show a zeroth-order algorithm attains the same query complexity.},
+	language = {en},
+	urldate = {2025-09-20},
+	booktitle = {Proceedings of {Thirty} {Fourth} {Conference} on {Learning} {Theory}},
+	publisher = {PMLR},
+	author = {Lee, Yin Tat and Shen, Ruoqi and Tian, Kevin},
+	month = jul,
+	year = {2021},
+	note = {ISSN: 2640-3498},
+	pages = {2993--3050},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\BV2ZVDTL\\Lee et al. - 2021 - Structured Logconcave Sampling with a Restricted Gaussian Oracle.pdf:application/pdf},
+}
+
+@misc{shen_composite_2020,
+	title = {Composite {Logconcave} {Sampling} with a {Restricted} {Gaussian} {Oracle}},
+	url = {https://ui.adsabs.harvard.edu/abs/2020arXiv200605976S},
+	doi = {10.48550/arXiv.2006.05976},
+	abstract = {We consider sampling from composite densities on \${\textbackslash}mathbb\{R\}{\textasciicircum}d\$ of the form \$d{\textbackslash}pi(x) {\textbackslash}propto {\textbackslash}exp(-f(x) - g(x))dx\$ for well-conditioned \$f\$ and convex (but possibly non-smooth) \$g\$, a family generalizing restrictions to a convex set, through the abstraction of a restricted Gaussian oracle. For \$f\$ with condition number \${\textbackslash}kappa\$, our algorithm runs in \$O {\textbackslash}left({\textbackslash}kappa{\textasciicircum}2 d {\textbackslash}log{\textasciicircum}2{\textbackslash}tfrac\{{\textbackslash}kappa d\}\{{\textbackslash}epsilon\}{\textbackslash}right)\$ iterations, each querying a gradient of \$f\$ and a restricted Gaussian oracle, to achieve total variation distance \${\textbackslash}epsilon\$. The restricted Gaussian oracle, which draws samples from a distribution whose negative log-likelihood sums a quadratic and \$g\$, has been previously studied and is a natural extension of the proximal oracle used in composite optimization. Our algorithm is conceptually simple and obtains stronger provable guarantees and greater generality than existing methods for composite sampling. We conduct experiments showing our algorithm vastly improves upon the hit-and-run algorithm for sampling the restriction of a (non-diagonal) Gaussian to the positive orthant.},
+	urldate = {2025-09-20},
+	publisher = {arXiv},
+	author = {Shen, Ruoqi and Tian, Kevin and Tat Lee, Yin},
+	month = jun,
+	year = {2020},
+	note = {ADS Bibcode: 2020arXiv200605976S},
+	keywords = {Computer Science - Data Structures and Algorithms, Computer Science - Machine Learning, Mathematics - Numerical Analysis, Mathematics - Optimization and Control, Statistics - Machine Learning},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\DCB6L54G\\Shen et al. - 2020 - Composite Logconcave Sampling with a Restricted Gaussian Oracle.pdf:application/pdf},
+}
+
+@inproceedings{kim_consistency_2024,
+	title = {Consistency {Trajectory} {Models}: {Learning} {Probability} {Flow} {ODE} {Trajectory} of {Diffusion}},
+	url = {https://openreview.net/forum?id=ymjI8feDTD},
+	booktitle = {The {Twelfth} {International} {Conference} on {Learning} {Representations}},
+	author = {Kim, Dongjun and Lai, Chieh-Hsin and Liao, Wei-Hsiang and Murata, Naoki and Takida, Yuhta and Uesaka, Toshimitsu and He, Yutong and Mitsufuji, Yuki and Ermon, Stefano},
+	year = {2024},
+}
+
+@inproceedings{song_denoising_2021,
+	title = {Denoising {Diffusion} {Implicit} {Models}},
+	url = {https://openreview.net/forum?id=St1giarCHLP},
+	booktitle = {International {Conference} on {Learning} {Representations}},
+	author = {Song, Jiaming and Meng, Chenlin and Ermon, Stefano},
+	year = {2021},
+}
+
+@inproceedings{ho_denoising_2020,
+	title = {Denoising {Diffusion} {Probabilistic} {Models}},
+	volume = {33},
+	url = {https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html},
+	abstract = {We present high quality image synthesis results using diffusion probabilistic models, a class of latent variable models inspired by considerations from nonequilibrium thermodynamics. Our best results are obtained by training on a weighted variational bound designed according to a novel connection between diffusion probabilistic models and denoising score matching with Langevin dynamics, and our models naturally admit a progressive lossy decompression scheme that can be interpreted as a generalization of autoregressive decoding. On the unconditional CIFAR10 dataset, we obtain an Inception score of 9.46 and a state-of-the-art FID score of 3.17. On 256x256 LSUN, we obtain sample quality similar to ProgressiveGAN.},
+	urldate = {2025-09-20},
+	booktitle = {Advances in {Neural} {Information} {Processing} {Systems}},
+	publisher = {Curran Associates, Inc.},
+	author = {Ho, Jonathan and Jain, Ajay and Abbeel, Pieter},
+	year = {2020},
+	pages = {6840--6851},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\ZTSKU88T\\Ho et al. - 2020 - Denoising Diffusion Probabilistic Models.pdf:application/pdf},
+}
+
+@inproceedings{vargas_denoising_2023,
+	title = {Denoising {Diffusion} {Samplers}},
+	url = {https://openreview.net/forum?id=8pvnfTAbu1f},
+	booktitle = {The {Eleventh} {International} {Conference} on {Learning} {Representations}},
+	author = {Vargas, Francisco and Grathwohl, Will Sussman and Doucet, Arnaud},
+	year = {2023},
+}
+
+@inproceedings{dhariwal_diffusion_2021,
+	title = {Diffusion {Models} {Beat} {GANs} on {Image} {Synthesis}},
+	volume = {34},
+	url = {https://proceedings.nips.cc/paper/2021/hash/49ad23d1ec9fa4bd8d77d02681df5cfa-Abstract.html},
+	urldate = {2025-09-20},
+	booktitle = {Advances in {Neural} {Information} {Processing} {Systems}},
+	publisher = {Curran Associates, Inc.},
+	author = {Dhariwal, Prafulla and Nichol, Alexander},
+	year = {2021},
+	pages = {8780--8794},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\C2JMY5T4\\Dhariwal and Nichol - 2021 - Diffusion Models Beat GANs on Image Synthesis.pdf:application/pdf},
+}
+
+@inproceedings{yang_diffusion_2023,
+	title = {Diffusion {Probabilistic} {Model} {Made} {Slim}},
+	url = {https://openaccess.thecvf.com/content/CVPR2023/html/Yang_Diffusion_Probabilistic_Model_Made_Slim_CVPR_2023_paper.html},
+	language = {en},
+	urldate = {2025-09-20},
+	author = {Yang, Xingyi and Zhou, Daquan and Feng, Jiashi and Wang, Xinchao},
+	year = {2023},
+	pages = {22552--22562},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\JFP4FC8N\\Yang et al. - 2023 - Diffusion Probabilistic Model Made Slim.pdf:application/pdf},
+}
+
+@inproceedings{chen_diffusive_2024,
+	title = {Diffusive {Gibbs} {Sampling}},
+	url = {https://proceedings.mlr.press/v235/chen24be.html},
+	abstract = {The inadequate mixing of conventional Markov Chain Monte Carlo (MCMC) methods for multi-modal distributions presents a significant challenge in practical applications such as Bayesian inference and molecular dynamics. Addressing this, we propose Diffusive Gibbs Sampling (DiGS), an innovative family of sampling methods designed for effective sampling from distributions characterized by distant and disconnected modes. DiGS integrates recent developments in diffusion models, leveraging Gaussian convolution to create an auxiliary noisy distribution that bridges isolated modes in the original space and applying Gibbs sampling to alternately draw samples from both spaces. A novel Metropolis-within-Gibbs scheme is proposed to enhance mixing in the denoising sampling step. DiGS exhibits a better mixing property for sampling multi-modal distributions than state-of-the-art methods such as parallel tempering, attaining substantially improved performance across various tasks, including mixtures of Gaussians, Bayesian neural networks and molecular dynamics.},
+	language = {en},
+	urldate = {2025-09-20},
+	booktitle = {Proceedings of the 41st {International} {Conference} on {Machine} {Learning}},
+	publisher = {PMLR},
+	author = {Chen, Wenlin and Zhang, Mingtian and Paige, Brooks and Hernández-Lobato, José Miguel and Barber, David},
+	month = jul,
+	year = {2024},
+	note = {ISSN: 2640-3498},
+	pages = {7731--7747},
+}
+
+@article{lu_dpm-solver_2022,
+	title = {{DPM}-{Solver}: {A} {Fast} {ODE} {Solver} for {Diffusion} {Probabilistic} {Model} {Sampling} in {Around} 10 {Steps}},
+	volume = {35},
+	shorttitle = {{DPM}-{Solver}},
+	url = {https://proceedings.neurips.cc/paper_files/paper/2022/hash/260a14acce2a89dad36adc8eefe7c59e-Abstract-Conference.html},
+	language = {en},
+	urldate = {2025-09-20},
+	journal = {Advances in Neural Information Processing Systems},
+	author = {Lu, Cheng and Zhou, Yuhao and Bao, Fan and Chen, Jianfei and Li, Chongxuan and Zhu, Jun},
+	month = dec,
+	year = {2022},
+	pages = {5775--5787},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\A42UJEK4\\Lu et al. - 2022 - DPM-Solver A Fast ODE Solver for Diffusion Probabilistic Model Sampling in Around 10 Steps.pdf:application/pdf},
+}
+
+@misc{lu_dpm-solver_2023,
+	title = {{DPM}-{Solver}++: {Fast} {Solver} for {Guided} {Sampling} of {Diffusion} {Probabilistic} {Models}},
+	url = {https://openreview.net/forum?id=4vGwQqviud5},
+	author = {Lu, Cheng and Zhou, Yuhao and Bao, Fan and Chen, Jianfei and Li, Chongxuan and Zhu, Jun},
+	year = {2023},
+}
+
+@misc{balaji_ediff-i_2022,
+	title = {{eDiff}-{I}: {Text}-to-{Image} {Diffusion} {Models} with an {Ensemble} of {Expert} {Denoisers}},
+	shorttitle = {{eDiff}-{I}},
+	url = {https://ui.adsabs.harvard.edu/abs/2022arXiv221101324B},
+	doi = {10.48550/arXiv.2211.01324},
+	abstract = {Large-scale diffusion-based generative models have led to breakthroughs in text-conditioned high-resolution image synthesis. Starting from random noise, such text-to-image diffusion models gradually synthesize images in an iterative fashion while conditioning on text prompts. We find that their synthesis behavior qualitatively changes throughout this process: Early in sampling, generation strongly relies on the text prompt to generate text-aligned content, while later, the text conditioning is almost entirely ignored. This suggests that sharing model parameters throughout the entire generation process may not be ideal. Therefore, in contrast to existing works, we propose to train an ensemble of text-to-image diffusion models specialized for different synthesis stages. To maintain training efficiency, we initially train a single model, which is then split into specialized models that are trained for the specific stages of the iterative generation process. Our ensemble of diffusion models, called eDiff-I, results in improved text alignment while maintaining the same inference computation cost and preserving high visual quality, outperforming previous large-scale text-to-image diffusion models on the standard benchmark. In addition, we train our model to exploit a variety of embeddings for conditioning, including the T5 text, CLIP text, and CLIP image embeddings. We show that these different embeddings lead to different behaviors. Notably, the CLIP image embedding allows an intuitive way of transferring the style of a reference image to the target text-to-image output. Lastly, we show a technique that enables eDiff-I's "paint-with-words" capability. A user can select the word in the input text and paint it in a canvas to control the output, which is very handy for crafting the desired image in mind. The project page is available at https://deepimagination.cc/eDiff-I/},
+	urldate = {2025-09-20},
+	publisher = {arXiv},
+	author = {Balaji, Yogesh and Nah, Seungjun and Huang, Xun and Vahdat, Arash and Song, Jiaming and Zhang, Qinsheng and Kreis, Karsten and Aittala, Miika and Aila, Timo and Laine, Samuli and Catanzaro, Bryan and Karras, Tero and Liu, Ming-Yu},
+	month = nov,
+	year = {2022},
+	note = {ADS Bibcode: 2022arXiv221101324B},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Machine Learning},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\3XIVSMVW\\Balaji et al. - 2022 - eDiff-I Text-to-Image Diffusion Models with an Ensemble of Expert Denoisers.pdf:application/pdf},
+}
+
+@article{karras_elucidating_2022,
+	title = {Elucidating the {Design} {Space} of {Diffusion}-{Based} {Generative} {Models}},
+	volume = {35},
+	url = {https://proceedings.neurips.cc/paper_files/paper/2022/hash/a98846e9d9cc01cfb87eb694d946ce6b-Abstract-Conference.html},
+	language = {en},
+	urldate = {2025-09-20},
+	journal = {Advances in Neural Information Processing Systems},
+	author = {Karras, Tero and Aittala, Miika and Aila, Timo and Laine, Samuli},
+	month = dec,
+	year = {2022},
+	pages = {26565--26577},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\L7F7QF5T\\Karras et al. - 2022 - Elucidating the Design Space of Diffusion-Based Generative Models.pdf:application/pdf},
+}
+
+@article{casella_explaining_1992,
+	title = {Explaining the {Gibbs} {Sampler}},
+	volume = {46},
+	url = {https://www.tandfonline.com/doi/abs/10.1080/00031305.1992.10475878},
+	doi = {10.1080/00031305.1992.10475878},
+	number = {3},
+	journal = {The American Statistician},
+	author = {Casella, George and George, Edward I.},
+	year = {1992},
+	pages = {167--174},
+}
+
+@inproceedings{rissanen_generative_2023,
+	title = {Generative {Modelling} with {Inverse} {Heat} {Dissipation}},
+	url = {https://openreview.net/forum?id=4PJUBT9f2Ol},
+	booktitle = {The {Eleventh} {International} {Conference} on {Learning} {Representations}},
+	author = {Rissanen, Severi and Heinonen, Markus and Solin, Arno},
+	year = {2023},
+}
+
+@inproceedings{rombach_high-resolution_2022,
+	title = {High-{Resolution} {Image} {Synthesis} {With} {Latent} {Diffusion} {Models}},
+	url = {https://openaccess.thecvf.com/content/CVPR2022/html/Rombach_High-Resolution_Image_Synthesis_With_Latent_Diffusion_Models_CVPR_2022_paper.html},
+	language = {en},
+	urldate = {2025-09-20},
+	author = {Rombach, Robin and Blattmann, Andreas and Lorenz, Dominik and Esser, Patrick and Ommer, Björn},
+	year = {2022},
+	pages = {10684--10695},
+}
+
+@inproceedings{chen_improved_2023,
+	title = {Improved {Analysis} of {Score}-based {Generative} {Modeling}: {User}-{Friendly} {Bounds} under {Minimal} {Smoothness} {Assumptions}},
+	shorttitle = {Improved {Analysis} of {Score}-based {Generative} {Modeling}},
+	url = {https://proceedings.mlr.press/v202/chen23q.html},
+	abstract = {We give an improved theoretical analysis of score-based generative modeling. Under a score estimate with small L2L2L{\textasciicircum}2 error (averaged across timesteps), we provide efficient convergence guarantees for any data distribution with second-order moment, by either employing early stopping or assuming smoothness condition on the score function of the data distribution. Our result does not rely on any log-concavity or functional inequality assumption and has a logarithmic dependence on the smoothness. In particular, we show that under only a finite second moment condition, approximating the following in reverse KL divergence in ϵϵ{\textbackslash}epsilon-accuracy can be done in O{\textasciitilde}(dlog(1/δ)ϵ)O{\textasciitilde}(dlog⁡(1/δ)ϵ){\textbackslash}tilde O{\textbackslash}left({\textbackslash}frac\{d {\textbackslash}log (1/{\textbackslash}delta)\}\{{\textbackslash}epsilon\}{\textbackslash}right) steps: 1) the variance-δδ{\textbackslash}delta Gaussian perturbation of any data distribution; 2) data distributions with 1/δ1/δ1/{\textbackslash}delta-smooth score functions. Our analysis also provides a quantitative comparison between different discrete approximations and may guide the choice of discretization points in practice.},
+	language = {en},
+	urldate = {2025-09-20},
+	booktitle = {Proceedings of the 40th {International} {Conference} on {Machine} {Learning}},
+	publisher = {PMLR},
+	author = {Chen, Hongrui and Lee, Holden and Lu, Jianfeng},
+	month = jul,
+	year = {2023},
+	note = {ISSN: 2640-3498},
+	pages = {4735--4763},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\UMX7ZIX8\\Chen et al. - 2023 - Improved Analysis of Score-based Generative Modeling User-Friendly Bounds under Minimal Smoothness.pdf:application/pdf},
+}
+
+@inproceedings{jain_journey_2022,
+	title = {Journey to the {BAOAB}-limit: finding effective {MCMC} samplers for score-based models},
+	url = {https://openreview.net/forum?id=j4-a3SNyaY},
+	booktitle = {{NeurIPS} 2022 {Workshop} on {Score}-{Based} {Methods}},
+	author = {Jain, Ajay and Poole, Ben},
+	year = {2022},
+}
+
+@inproceedings{gao_learning_2021,
+	title = {Learning {Energy}-{Based} {Models} by {Diffusion} {Recovery} {Likelihood}},
+	url = {https://openreview.net/forum?id=v_1Soh8QUNc},
+	booktitle = {International {Conference} on {Learning} {Representations}},
+	author = {Gao, Ruiqi and Song, Yang and Poole, Ben and Wu, Ying Nian and Kingma, Diederik P.},
+	year = {2021},
+}
+
+@inproceedings{benton_nearly_2024,
+	title = {Nearly {\textbackslash}d{\textbackslash}-{Linear} {Convergence} {Bounds} for {Diffusion} {Models} via {Stochastic} {Localization}},
+	url = {https://openreview.net/forum?id=r5njV3BsuD},
+	booktitle = {The {Twelfth} {International} {Conference} on {Learning} {Representations}},
+	author = {Benton, Joe and Bortoli, Valentin De and Doucet, Arnaud and Deligiannidis, George},
+	year = {2024},
+}
+
+@inproceedings{saremi_multimeasurement_2022,
+	title = {Multimeasurement {Generative} {Models}},
+	url = {https://openreview.net/forum?id=QRX0nCX_gk},
+	booktitle = {International {Conference} on {Learning} {Representations}},
+	author = {Saremi, Saeed and Srivastava, Rupesh Kumar},
+	year = {2022},
+}
+
+@article{saremi_neural_2019,
+	title = {Neural {Empirical} {Bayes}},
+	volume = {20},
+	issn = {1533-7928},
+	url = {http://jmlr.org/papers/v20/19-216.html},
+	abstract = {We unify kernel density estimation and empirical Bayes and address a set of problems in unsupervised machine learning with a geometric interpretation of those methods, rooted in the concentration of measure phenomenon. Kernel density is viewed symbolically as X⇀YX⇀YX{\textbackslash}rightharpoonup Y where the random variable XXX is smoothed to Y=X+N(0,σ2Id)Y=X+N(0,σ2Id)Y= X+N(0,{\textbackslash}sigma{\textasciicircum}2 I\_d), and empirical Bayes is the machinery to denoise in a least-squares sense, which we express as X↽YX↽YX {\textbackslash}leftharpoondown Y. A learning objective is derived by combining these two, symbolically captured by X⇌YX⇌YX {\textbackslash}rightleftharpoons Y. Crucially, instead of using the original nonparametric estimators, we parametrize the energy function with a neural network denoted by ϕϕ{\textbackslash}phi; at optimality, ∇ϕ≈−∇logf∇ϕ≈−∇log⁡f{\textbackslash}nabla {\textbackslash}phi {\textbackslash}approx -{\textbackslash}nabla {\textbackslash}log f where fff is the density of YYY. The optimization problem is abstracted as interactions of high-dimensional spheres which emerge due to the concentration of isotropic Gaussians. We introduce two algorithmic frameworks based on this machinery: (i) a “walk-jump” sampling scheme that combines Langevin MCMC (walks) and empirical Bayes (jumps), and (ii) a probabilistic framework for associative memory, called NEBULA, defined a la Hopfield by the gradient flow of the learned energy to a set of attractors. We finish the paper by reporting the emergence of very rich “creative memories” as attractors of NEBULA for highly-overlapping spheres.},
+	number = {181},
+	urldate = {2025-09-20},
+	journal = {Journal of Machine Learning Research},
+	author = {Saremi, Saeed and Hyvärinen, Aapo},
+	year = {2019},
+	pages = {1--23},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\LJMNEJT2\\Saremi and Hyvärinen - 2019 - Neural Empirical Bayes.pdf:application/pdf},
+}
+
+@article{chen_importance_2023,
+	title = {On the {Importance} of {Noise} {Scheduling} for {Diffusion} {Models}},
+	url = {https://arxiv.org/abs/2301.10972},
+	journal = {arXiv preprint arXiv:2301.10972},
+	author = {Chen, Ting},
+	year = {2023},
+}
+
+@misc{syed_optimised_2024,
+	title = {Optimised {Annealed} {Sequential} {Monte} {Carlo} {Samplers}},
+	url = {https://ui.adsabs.harvard.edu/abs/2024arXiv240812057S},
+	doi = {10.48550/arXiv.2408.12057},
+	abstract = {Annealed Sequential Monte Carlo (SMC) samplers are special cases of SMC samplers where the sequence of distributions can be embedded in a smooth path of distributions. Using this underlying path of distributions and a performance model based on the variance of the normalisation constant estimator, we systematically study dense schedule and large particle limits. From our theory and adaptive methods emerges a notion of global barrier capturing the inherent complexity of normalisation constant approximation under our performance model. We then turn the resulting approximations into surrogate objective functions of algorithm performance, and use them for methodology development. We obtain novel adaptive methodologies, Sequential SMC (SSMC) and Sequential AIS (SAIS) samplers, which address practical difficulties inherent in previous adaptive SMC methods. First, our SSMC algorithms are predictable: they produce a sequence of increasingly precise estimates at deterministic and known times. Second, SAIS, a special case of SSMC, enables schedule adaptation at a memory cost constant in the number of particles and require much less communication. Finally, these characteristics make SAIS highly efficient on GPUs. We develop an open-source, high-performance GPU implementation based on our methodology and demonstrate up to a hundred-fold speed improvement compared to state-of-the-art adaptive AIS methods.},
+	urldate = {2025-09-20},
+	publisher = {arXiv},
+	author = {Syed, Saifuddin and Bouchard-Côté, Alexandre and Chern, Kevin and Doucet, Arnaud},
+	month = aug,
+	year = {2024},
+	note = {ADS Bibcode: 2024arXiv240812057S},
+	keywords = {Statistics - Computation},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\X2VXXQJQ\\Syed et al. - 2024 - Optimised Annealed Sequential Monte Carlo Samplers.pdf:application/pdf},
+}
+
+@inproceedings{gonzalez_parallel_2011,
+	title = {Parallel {Gibbs} {Sampling}: {From} {Colored} {Fields} to {Thin} {Junction} {Trees}},
+	shorttitle = {Parallel {Gibbs} {Sampling}},
+	url = {https://proceedings.mlr.press/v15/gonzalez11a.html},
+	abstract = {We explore the task of constructing a parallel Gibbs sampler, to both improve mixing and the exploration of high likelihood states. Recent work in parallel Gibbs sampling has focused on update schedules which do not guarantee convergence to the intended stationary distribution.  In this work, we propose two methods to construct parallel Gibbs samplers guaranteed to draw from the targeted distribution. The first method, called the Chromatic sampler, uses graph coloring to construct a direct parallelization of the classic sequential scan Gibbs sampler.  In the case of 2-colorable models we relate the Chromatic sampler to the Synchronous Gibbs sampler (which draws all variables simultaneously in parallel), and reveal new ergodic properties of Synchronous Gibbs chains.  Our second method, the Splash sampler, is a complementary strategy which can be used when the variables are tightly coupled. This constructs and samples multiple blocks in parallel, using a novel locking protocol and an iterative junction tree generation algorithm.  We further improve the Splash sampler through adaptive tree construction.  We demonstrate the benefits of our two sampling algorithms on large synthetic and real-world models using a 32 processor multi-core system.},
+	language = {en},
+	urldate = {2025-09-20},
+	booktitle = {Proceedings of the {Fourteenth} {International} {Conference} on {Artificial} {Intelligence} and {Statistics}},
+	publisher = {JMLR Workshop and Conference Proceedings},
+	author = {Gonzalez, Joseph and Low, Yucheng and Gretton, Arthur and Guestrin, Carlos},
+	month = jun,
+	year = {2011},
+	note = {ISSN: 1938-7228},
+	pages = {324--332},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\Q65I2WGI\\Gonzalez et al. - 2011 - Parallel Gibbs Sampling From Colored Fields to Thin Junction Trees.pdf:application/pdf},
+}
+
+@article{shih_parallel_2023,
+	title = {Parallel {Sampling} of {Diffusion} {Models}},
+	volume = {36},
+	url = {https://proceedings.neurips.cc/paper_files/paper/2023/hash/0d1986a61e30e5fa408c81216a616e20-Abstract-Conference.html},
+	language = {en},
+	urldate = {2025-09-20},
+	journal = {Advances in Neural Information Processing Systems},
+	author = {Shih, Andy and Belkhale, Suneel and Ermon, Stefano and Sadigh, Dorsa and Anari, Nima},
+	month = dec,
+	year = {2023},
+	pages = {4263--4276},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\Y4G558X7\\Shih et al. - 2023 - Parallel Sampling of Diffusion Models.pdf:application/pdf},
+}
+
+@inproceedings{phillips_particle_2024,
+	title = {Particle {Denoising} {Diffusion} {Sampler}},
+	url = {https://proceedings.mlr.press/v235/phillips24a.html},
+	abstract = {Denoising diffusion models have become ubiquitous for generative modeling. The core idea is to transport the data distribution to a Gaussian by using a diffusion. Approximate samples from the data distribution are then obtained by estimating the time-reversal of this diffusion using score matching ideas. We follow here a similar strategy to sample from unnormalized probability densities and compute their normalizing constants. However, the time-reversed diffusion is here simulated by using an original iterative particle scheme relying on a novel score matching loss. Contrary to standard denoising diffusion models, the resulting Particle Denoising Diffusion Sampler (PDDS) provides asymptotically consistent estimates under mild assumptions. We demonstrate PDDS on multimodal and high dimensional sampling tasks.},
+	language = {en},
+	urldate = {2025-09-20},
+	booktitle = {Proceedings of the 41st {International} {Conference} on {Machine} {Learning}},
+	publisher = {PMLR},
+	author = {Phillips, Angus and Dau, Hai-Dang and Hutchinson, Michael John and Bortoli, Valentin De and Deligiannidis, George and Doucet, Arnaud},
+	month = jul,
+	year = {2024},
+	note = {ISSN: 2640-3498},
+	pages = {40688--40724},
+}
+
+@misc{montanari_posterior_2024,
+	title = {Posterior {Sampling} in {High} {Dimension} via {Diffusion} {Processes}},
+	url = {http://arxiv.org/abs/2304.11449},
+	doi = {10.48550/arXiv.2304.11449},
+	abstract = {Sampling from the posterior is a key technical problem in Bayesian statistics. Rigorous guarantees are difficult to obtain for Markov Chain Monte Carlo algorithms of common use. In this paper, we study an alternative class of algorithms based on diffusion processes and variational methods. The diffusion is constructed in such a way that, at its final time, it approximates the target posterior distribution. The drift of this diffusion is given by the posterior expectation of the unknown parameter vector \$\{{\textbackslash}boldsymbol {\textbackslash}theta\}\$ given the data and the additional noisy observations. In order to construct an efficient sampling algorithm, we use a simple Euler discretization of the diffusion process, and leverage message passing algorithms and variational inference techniques to approximate the posterior expectation oracle. We apply this method to posterior sampling in two canonical problems in high-dimensional statistics: sparse regression and low-rank matrix estimation within the spiked model. In both cases we develop the first algorithms with accuracy guarantees in the regime of constant signal-to-noise ratios.},
+	urldate = {2025-09-20},
+	publisher = {arXiv},
+	author = {Montanari, Andrea and Wu, Yuchen},
+	month = aug,
+	year = {2024},
+	note = {arXiv:2304.11449 [math]},
+	keywords = {Mathematics - Statistics Theory, Statistics - Statistics Theory},
+	annote = {Comment: 70 pages; 3 pdf figures},
+	file = {Preprint PDF:C\:\\Users\\bani5\\Zotero\\storage\\77GA8B8S\\Montanari and Wu - 2024 - Posterior Sampling in High Dimension via Diffusion Processes.pdf:application/pdf;Snapshot:C\:\\Users\\bani5\\Zotero\\storage\\K67BEDSF\\2304.html:text/html},
+}
+
+@inproceedings{mcdonald_proposal_2022,
+	title = {Proposal of a {Score} {Based} {Approach} to {Sampling} {Using} {Monte} {Carlo} {Estimation} of {Score} and {Oracle} {Access} to {Target} {Density}},
+	url = {https://openreview.net/forum?id=ez2cB__DaTV},
+	booktitle = {{NeurIPS} 2022 {Workshop} on {Score}-{Based} {Methods}},
+	author = {McDonald, Curtis James and Barron, Andrew R.},
+	year = {2022},
+}
+
+@inproceedings{frey_protein_2024,
+	title = {Protein {Discovery} with {Discrete} {Walk}-{Jump} {Sampling}},
+	url = {https://openreview.net/forum?id=zMPHKOmQNb},
+	booktitle = {The {Twelfth} {International} {Conference} on {Learning} {Representations}},
+	author = {Frey, Nathan C. and Berenberg, Dan and Zadorozhny, Karina and Kleinhenz, Joseph and Lafrance-Vanasse, Julien and Hotzel, Isidro and Wu, Yan and Ra, Stephen and Bonneau, Richard and Cho, Kyunghyun and Loukas, Andreas and Gligorijevic, Vladimir and Saremi, Saeed},
+	year = {2024},
+}
+
+@inproceedings{huang_reverse_2024,
+	title = {Reverse {Diffusion} {Monte} {Carlo}},
+	url = {https://openreview.net/forum?id=kIPEyMSdFV},
+	booktitle = {The {Twelfth} {International} {Conference} on {Learning} {Representations}},
+	author = {Huang, Xunpeng and Dong, Hanze and HAO, Yifan and Ma, Yian and Zhang, Tong},
+	year = {2024},
+}
+
+@inproceedings{chen_sampling_2023,
+	title = {Sampling is as easy as learning the score: theory for diffusion models with minimal data assumptions},
+	url = {https://openreview.net/forum?id=zyLVMgsZ0U_},
+	booktitle = {The {Eleventh} {International} {Conference} on {Learning} {Representations}},
+	author = {Chen, Sitan and Chewi, Sinho and Li, Jerry and Li, Yuanzhi and Salim, Adil and Zhang, Anru},
+	year = {2023},
+}
+
+@misc{montanari_sampling_2023,
+	title = {Sampling, {Diffusions}, and {Stochastic} {Localization}},
+	url = {https://ui.adsabs.harvard.edu/abs/2023arXiv230510690M},
+	doi = {10.48550/arXiv.2305.10690},
+	abstract = {Diffusions are a successful technique to sample from high-dimensional distributions. The target distribution can be either explicitly given or learnt from a collection of samples. They implement a diffusion process whose endpoint is a sample from the target distribution. The drift of the diffusion process is typically represented as a neural network. Stochastic localization is a successful technique to prove mixing of Markov Chains and other functional inequalities in high dimension. An algorithmic version of stochastic localization was recently proposed in order to sample from certain statistical mechanics models. This expository article has three objectives: \$(i)\${\textasciitilde}Generalize the algorithmic construction to other stochastic localization processes. This construction is both simple and broadly applicable; \$(ii)\${\textasciitilde}Clarify the connection between diffusions and stochastic localization. This allows to derive several known sampling schemes in a unified fashion; \$(iii)\${\textasciitilde}Describe the insights that follow from this unified viewpoint.},
+	urldate = {2025-09-20},
+	publisher = {arXiv},
+	author = {Montanari, Andrea},
+	month = may,
+	year = {2023},
+	note = {ADS Bibcode: 2023arXiv230510690M},
+	keywords = {Machine Learning},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\J4W4D27H\\Montanari - 2023 - Sampling, Diffusions, and Stochastic Localization.pdf:application/pdf},
+}
+
+@inproceedings{song_score-based_2021,
+	title = {Score-{Based} {Generative} {Modeling} through {Stochastic} {Differential} {Equations}},
+	url = {https://openreview.net/forum?id=PxTIG12RRHS},
+	booktitle = {International {Conference} on {Learning} {Representations}},
+	author = {Song, Yang and Sohl-Dickstein, Jascha and Kingma, Diederik P. and Kumar, Abhishek and Ermon, Stefano and Poole, Ben},
+	year = {2021},
+}
+
+@article{pethick_stable_2023,
+	title = {Stable {Nonconvex}-{Nonconcave} {Training} via {Linear} {Interpolation}},
+	volume = {36},
+	url = {https://proceedings.neurips.cc/paper_files/paper/2023/hash/9c256fa1965318b7fcb9ed104c265540-Abstract-Conference.html},
+	language = {en},
+	urldate = {2025-09-20},
+	journal = {Advances in Neural Information Processing Systems},
+	author = {Pethick, Thomas and Xie, Wanyun and Cevher, Volkan},
+	month = dec,
+	year = {2023},
+	pages = {49830--49841},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\PGRW9YSP\\Pethick et al. - 2023 - Stable Nonconvex-Nonconcave Training via Linear Interpolation.pdf:application/pdf},
+}
+
+@inproceedings{grenioux_stochastic_2024,
+	title = {Stochastic {Localization} via {Iterative} {Posterior} {Sampling}},
+	url = {https://proceedings.mlr.press/v235/grenioux24a.html},
+	abstract = {Building upon score-based learning, new interest in stochastic localization techniques has recently emerged. In these models, one seeks to noise a sample from the data distribution through a stochastic process, called observation process, and progressively learns a denoiser associated to this dynamics. Apart from specific applications, the use of stochastic localization for the problem of sampling from an unnormalized target density has not been explored extensively. This work contributes to fill this gap. We consider a general stochastic localization framework and introduce an explicit class of observation processes, associated with flexible denoising schedules. We provide a complete methodology, Stochastic Localization via Iterative Posterior Sampling (SLIPS), to obtain approximate samples of these dynamics, and as a by-product, samples from the target distribution. Our scheme is based on a Markov chain Monte Carlo estimation of the denoiser and comes with detailed practical guidelines. We illustrate the benefits and applicability of SLIPS on several benchmarks of multi-modal distributions, including Gaussian mixtures in increasing dimensions, Bayesian logistic regression and a high-dimensional field system from statistical-mechanics.},
+	language = {en},
+	urldate = {2025-09-20},
+	booktitle = {Proceedings of the 41st {International} {Conference} on {Machine} {Learning}},
+	publisher = {PMLR},
+	author = {Grenioux, Louis and Noble, Maxence and Gabrié, Marylou and Durmus, Alain Oliviero},
+	month = jul,
+	year = {2024},
+	note = {ISSN: 2640-3498},
+	pages = {16337--16376},
+}
+
+@inproceedings{xiao_tackling_2022,
+	title = {Tackling the {Generative} {Learning} {Trilemma} with {Denoising} {Diffusion} {GANs}},
+	url = {https://openreview.net/forum?id=JprM0p-q0Co},
+	booktitle = {International {Conference} on {Learning} {Representations}},
+	author = {Xiao, Zhisheng and Kreis, Karsten and Vahdat, Arash},
+	year = {2022},
+}
+
+@inproceedings{hsieh_limits_2021,
+	title = {The {Limits} of {Min}-{Max} {Optimization} {Algorithms}: {Convergence} to {Spurious} {Non}-{Critical} {Sets}},
+	shorttitle = {The {Limits} of {Min}-{Max} {Optimization} {Algorithms}},
+	url = {https://proceedings.mlr.press/v139/hsieh21a.html},
+	abstract = {Compared to minimization, the min-max optimization in machine learning applications is considerably more convoluted because of the existence of cycles and similar phenomena. Such oscillatory behaviors are well-understood in the convex-concave regime, and many algorithms are known to overcome them. In this paper, we go beyond this basic setting and characterize the convergence properties of many popular methods in solving non-convex/non-concave problems. In particular, we show that a wide class of state-of-the-art schemes and heuristics may converge with arbitrarily high probability to attractors that are in no way min-max optimal or even stationary. Our work thus points out a potential pitfall among many existing theoretical frameworks, and we corroborate our theoretical claims by explicitly showcasing spurious attractors in simple two-dimensional problems.},
+	language = {en},
+	urldate = {2025-09-20},
+	booktitle = {Proceedings of the 38th {International} {Conference} on {Machine} {Learning}},
+	publisher = {PMLR},
+	author = {Hsieh, Ya-Ping and Mertikopoulos, Panayotis and Cevher, Volkan},
+	month = jul,
+	year = {2021},
+	note = {ISSN: 2640-3498},
+	pages = {4337--4348},
+	file = {Full Text PDF:C\:\\Users\\bani5\\Zotero\\storage\\FNI559QG\\Hsieh et al. - 2021 - The Limits of Min-Max Optimization Algorithms Convergence to Spurious Non-Critical Sets.pdf:application/pdf;Supplementary PDF:C\:\\Users\\bani5\\Zotero\\storage\\IA2R2TL3\\Hsieh et al. - 2021 - The Limits of Min-Max Optimization Algorithms Convergence to Spurious Non-Critical Sets.pdf:application/pdf},
+}
+
+@article{roberts_updating_1997,
+	title = {Updating {Schemes}, {Correlation} {Structure}, {Blocking} and {Parameterization} for the {Gibbs} {Sampler}},
+	volume = {59},
+	issn = {0035-9246},
+	url = {https://www.jstor.org/stable/2346048},
+	abstract = {In this paper many convergence issues concerning the implementation of the Gibbs sampler are investigated. Exact computable rates of convergence for Gaussian target distributions are obtained. Different random and non-random updating strategies and blocking combinations are compared using the rates. The effect of dimensionality and correlation structure on the convergence rates are studied. Some examples are considered to demonstrate the results. For a Gaussian image analysis problem several updating strategies are described and compared. For problems in Bayesian linear models several possible parameterizations are analysed in terms of their convergence rates characterizing the optimal choice.},
+	number = {2},
+	urldate = {2025-09-20},
+	journal = {Journal of the Royal Statistical Society. Series B (Methodological)},
+	author = {Roberts, G. O. and Sahu, S. K.},
+	year = {1997},
+	note = {Publisher: [Royal Statistical Society, Oxford University Press]},
+	pages = {291--317},
+}
+
+@inproceedings{he_zeroth-order_2024,
+	title = {Zeroth-{Order} {Sampling} {Methods} for {Non}-{Log}-{Concave} {Distributions}: {Alleviating} {Metastability} by {Denoising} {Diffusion}},
+	url = {https://openreview.net/forum?id=X3Aljulsw5},
+	booktitle = {The {Thirty}-eighth {Annual} {Conference} on {Neural} {Information} {Processing} {Systems}},
+	author = {He, Ye and Rojas, Kevin and Tao, Molei},
+	year = {2024},
+}
+
+
 @article{perez_film_2018,
 	title = {{FiLM}: {Visual} {Reasoning} with a {General} {Conditioning} {Layer}},
 	volume = {32},
@@ -24,40 +689,6 @@
 	pages = {78--86},
 }
 
-
-@inproceedings{sahoo_diffusion_2025,
-	title = {The {Diffusion} {Duality}},
-	url = {https://openreview.net/forum?id=CB0Ub2yXjC},
-	booktitle = {{ICLR} 2025 {Workshop} on {Deep} {Generative} {Model} in {Machine} {Learning}: {Theory}, {Principle} and {Efficacy}},
-	author = {Sahoo, Subham Sekhar and Deschenaux, Justin and Gokaslan, Aaron and Wang, Guanghan and Chiu, Justin T. and Kuleshov, Volodymyr},
-	year = {2025},
-}
-
-@inproceedings{karras_style-based_2019,
-	title = {A style-based generator architecture for generative adversarial networks},
-	booktitle = {Proceedings of the {IEEE}/{CVF} conference on computer vision and pattern recognition},
-	author = {Karras, Tero and Laine, Samuli and Aila, Timo},
-	year = {2019},
-	pages = {4401--4410},
-}
-
-@article{krizhevsky_learning_2009,
-	title = {Learning multiple layers of features from tiny images},
-	author = {Krizhevsky, Alex and Hinton, Geoffrey and {others}},
-	year = {2009},
-}
-	%note = {Publisher: Toronto, ON, Canada}}
-
-@inproceedings{choi_stargan_2020,
-	title = {{StarGAN} v2: {Diverse} {Image} {Synthesis} for {Multiple} {Domains}},
-	doi = {10.1109/CVPR42600.2020.00821},
-	booktitle = {2020 {IEEE}/{CVF} {Conference} on {Computer} {Vision} and {Pattern} {Recognition} ({CVPR})},
-	author = {Choi, Yunjey and Uh, Youngjung and Yoo, Jaejun and Ha, Jung-Woo},
-	year = {2020},
-	keywords = {Animals, Generators, Image generation, Image reconstruction, Training, Transforms, Visualization},
-	pages = {8185--8194},
-}
-
 @phdthesis{dadi_noisy_2025,
 	address = {Lausanne},
 	type = {{PhD} {Thesis}},
@@ -69,14 +700,6 @@
 	year = {2025},
 	doi = {},
 	keywords = {},
-}
-
-@inproceedings{dadi_improving_2025,
-	title = {Improving {Single} {Noise} {Level} {Denoising} {Samplers} with {Restricted} {Gaussian} {Oracles}},
-	url = {https://openreview.net/forum?id=xkiI5tou6J},
-	booktitle = {{ICLR} 2025 {Workshop} on {Deep} {Generative} {Model} in {Machine} {Learning}: {Theory}, {Principle} and {Efficacy}},
-	author = {Dadi, Leello Tadesse and Janchevski, Andrej and Cevher, Volkan},
-	year = {2025},
 }
 
 @phdthesis{krawczuk_graph_2024,
@@ -896,7 +1519,7 @@ Publisher: Nature Publishing Group},
 @inproceedings{epasto_ego-splitting_2017,
 	address = {New York, NY, USA},
 	series = {{KDD} '17},
-	title = {Ego-{Splitting} {Framework}: from {Non}-{Overlapping} to {Overlapping} {Clusters}},
+	title = {Ego-{Splitting} {Framework}: from {Non} {Overlapping} to {Overlapping} {Clusters}},
 	isbn = {978-1-4503-4887-4},
 	shorttitle = {Ego-{Splitting} {Framework}},
 	url = {https://doi.org/10.1145/3097983.3098054},
@@ -1673,7 +2296,7 @@ url={https://openreview.net/forum?id=rJXMpikCZ},
 }
 
 @article{chen_entity-agnostic_2023,
-	title = {Entity-{Agnostic} {Representation} {Learning} for {Parameter}-{Efficient} {Knowledge} {Graph} {Embedding}},
+	title = {Entity-{Agnostic} {Representation} {Learning} for {Parameter} {Efficient} {Knowledge} {Graph} {Embedding}},
 	volume = {37},
 	copyright = {Copyright (c) 2023 Association for the Advancement of Artificial Intelligence},
 	issn = {2374-3468},
@@ -1794,64 +2417,6 @@ url={https://openreview.net/forum?id=rJXMpikCZ},
 	file = {Preprint PDF:/Users/admin/Zotero/storage/9MPUR5TM/Thanapalasingam et al. - 2023 - IntelliGraphs Datasets for Benchmarking Knowledge.pdf:application/pdf;Snapshot:/Users/admin/Zotero/storage/7FATPVQW/2307.html:text/html},
 }
 
-@article{ramakrishnan_quantum_2014,
-	title = {Quantum chemistry structures and properties of 134 kilo molecules},
-	volume = {1},
-	copyright = {2014 The Author(s)},
-	issn = {2052-4463},
-	url = {https://www.nature.com/articles/sdata201422},
-	doi = {10.1038/sdata.2014.22},
-	abstract = {Computational de novo design of new drugs and materials requires rigorous and unbiased exploration of chemical compound space. However, large uncharted territories persist due to its size scaling combinatorially with molecular size. We report computed geometric, energetic, electronic, and thermodynamic properties for 134k stable small organic molecules made up of CHONF. These molecules correspond to the subset of all 133,885 species with up to nine heavy atoms (CONF) out of the GDB-17 chemical universe of 166 billion organic molecules. We report geometries minimal in energy, corresponding harmonic frequencies, dipole moments, polarizabilities, along with energies, enthalpies, and free energies of atomization. All properties were calculated at the B3LYP/6-31G(2df,p) level of quantum chemistry. Furthermore, for the predominant stoichiometry, C7H10O2, there are 6,095 constitutional isomers among the 134k molecules. We report energies, enthalpies, and free energies of atomization at the more accurate G4MP2 level of theory for all of them. As such, this data set provides quantum chemical properties for a relevant, consistent, and comprehensive chemical space of small organic molecules. This database may serve the benchmarking of existing methods, development of new methods, such as hybrid quantum mechanics/machine learning, and systematic identification of structure-property relationships.},
-	language = {en},
-	number = {1},
-	urldate = {2025-01-30},
-	journal = {Scientific Data},
-	author = {Ramakrishnan, Raghunathan and Dral, Pavlo O. and Rupp, Matthias and von Lilienfeld, O. Anatole},
-	month = aug,
-	year = {2014},
-	note = {Publisher: Nature Publishing Group},
-	keywords = {Computational chemistry, Density functional theory, Quantum chemistry},
-	pages = {140022},
-	file = {Full Text PDF:/Users/admin/Zotero/storage/YP3JUGEF/Ramakrishnan et al. - 2014 - Quantum chemistry structures and properties of 134.pdf:application/pdf},
-}
-
-@article{gretton_kernel_2012,
-	title = {A {Kernel} {Two}-{Sample} {Test}},
-	volume = {13},
-	issn = {1533-7928},
-	url = {http://jmlr.org/papers/v13/gretton12a.html},
-	abstract = {We propose a framework for analyzing and comparing distributions, which we use to construct statistical tests to determine if two samples are drawn from different distributions.  Our test statistic is the largest difference in expectations over functions in the unit ball of a reproducing kernel Hilbert space (RKHS), and is called the maximum mean discrepancy (MMD).  We present two distribution-free tests based on large deviation bounds for the MMD, and a third test based on the asymptotic distribution of this statistic.  The MMD can be computed in quadratic time, although efficient linear time approximations are available.  Our statistic is an instance of an integral probability metric, and various classical metrics on distributions are obtained when alternative function classes are used in place of an RKHS.  We apply our two-sample tests  to a variety of problems, including attribute matching for databases using the Hungarian marriage method, where they perform strongly.  Excellent performance is also obtained when comparing distributions over graphs, for which these are the first such tests.},
-	number = {25},
-	urldate = {2025-01-30},
-	journal = {Journal of Machine Learning Research},
-	author = {Gretton, Arthur and Borgwardt, Karsten M. and Rasch, Malte J. and Schölkopf, Bernhard and Smola, Alexander},
-	year = {2012},
-	pages = {723--773},
-	file = {Full Text PDF:/Users/admin/Zotero/storage/C3XMWJUM/Gretton et al. - 2012 - A Kernel Two-Sample Test.pdf:application/pdf},
-}
-
-@inproceedings{liao_efficient_2019,
-	title = {Efficient {Graph} {Generation} with {Graph} {Recurrent} {Attention} {Networks}},
-	volume = {32},
-	url = {https://proceedings.neurips.cc/paper_files/paper/2019/hash/d0921d442ee91b896ad95059d13df618-Abstract.html},
-	abstract = {We propose a new family of efficient and expressive deep generative models of graphs, called Graph Recurrent Attention Networks (GRANs).
-Our model generates graphs one block of nodes and associated edges at a time.
-The block size and sampling stride allow us to trade off sample quality for efficiency.
-Compared to previous RNN-based graph generative models, our framework better captures the auto-regressive conditioning between the already-generated and to-be-generated parts of the graph using Graph Neural Networks (GNNs) with attention.
-This not only reduces the dependency on node ordering but also bypasses the long-term bottleneck caused by the sequential nature of RNNs.
-Moreover, we parameterize the output distribution per block using a mixture of Bernoulli, which captures the correlations among generated edges within the block. 
-Finally, we propose to handle node orderings in generation by marginalizing over a family of canonical orderings.
-On standard benchmarks, we achieve state-of-the-art time efficiency and sample quality compared to previous models.
-Additionally, we show our model is capable of generating large graphs of up to 5K nodes with good quality.
-Our code is released at: {\textbackslash}url\{https://github.com/lrjconan/GRAN\}.},
-	urldate = {2025-01-30},
-	booktitle = {Advances in {Neural} {Information} {Processing} {Systems}},
-	publisher = {Curran Associates, Inc.},
-	author = {Liao, Renjie and Li, Yujia and Song, Yang and Wang, Shenlong and Hamilton, Will and Duvenaud, David K and Urtasun, Raquel and Zemel, Richard},
-	year = {2019},
-	file = {Full Text PDF:/Users/admin/Zotero/storage/NKPFLA6R/Liao et al. - 2019 - Efficient Graph Generation with Graph Recurrent At.pdf:application/pdf},
-}
-
 @inproceedings{vignac_digress_2022,
 	title = {{DiGress}: {Discrete} {Denoising} diffusion for graph generation},
 	shorttitle = {{DiGress}},
@@ -1862,388 +2427,6 @@ Our code is released at: {\textbackslash}url\{https://github.com/lrjconan/GRAN\}
 	author = {Vignac, Clement and Krawczuk, Igor and Siraudin, Antoine and Wang, Bohan and Cevher, Volkan and Frossard, Pascal},
 	month = sep,
 	year = {2022},
-	file = {Full Text PDF:/Users/admin/Zotero/storage/223W58SX/Vignac et al. - 2022 - DiGress Discrete Denoising diffusion for graph ge.pdf:application/pdf},
-}
-
-@article{saremi_multimeasurement_2021,
-	title = {Multimeasurement generative models},
-	journal = {arXiv preprint arXiv:2112.09822},
-	author = {Saremi, Saeed and Srivastava, Rupesh Kumar},
-	year = {2021},
-}
-
-@article{frey_protein_2023,
-	title = {Protein discovery with discrete walk-jump sampling},
-	journal = {arXiv preprint arXiv:2306.12360},
-	author = {Frey, Nathan C and Berenberg, Daniel and Zadorozhny, Karina and Kleinhenz, Joseph and Lafrance-Vanasse, Julien and Hotzel, Isidro and Wu, Yan and Ra, Stephen and Bonneau, Richard and Cho, Kyunghyun and {others}},
-	year = {2023},
-}
-
-@article{chehab_practical_2024,
-	title = {A {Practical} {Diffusion} {Path} for {Sampling}},
-	journal = {arXiv preprint arXiv:2406.14040},
-	author = {Chehab, Omar and Korba, Anna},
-	year = {2024},
-}
-
-@inproceedings{jain_journey_2022,
-	title = {Journey to the {BAOAB}-limit: finding effective {MCMC} samplers for score-based models},
-	booktitle = {{NeurIPS} 2022 {Workshop} on {Score}-{Based} {Methods}},
-	author = {Jain, Ajay and Poole, Ben},
-	year = {2022},
-}
-
-@article{saremi_neural_2019,
-	title = {Neural empirical bayes},
-	volume = {20},
-	number = {181},
-	journal = {Journal of Machine Learning Research},
-	author = {Saremi, Saeed and Hyvärinen, Aapo},
-	year = {2019},
-	pages = {1--23},
-}
-
-@inproceedings{huang_reverse_2023,
-	title = {Reverse diffusion monte carlo},
-	booktitle = {The {Twelfth} {International} {Conference} on {Learning} {Representations}},
-	author = {Huang, Xunpeng and Dong, Hanze and Yifan, HAO and Ma, Yian and Zhang, Tong},
-	year = {2023},
-}
-
-@article{chen_diffusive_2024,
-	title = {Diffusive {Gibbs} {Sampling}},
-	journal = {arXiv preprint arXiv:2402.03008},
-	author = {Chen, Wenlin and Zhang, Mingtian and Paige, Brooks and Hernández-Lobato, José Miguel and Barber, David},
-	year = {2024},
-}
-
-@article{vargas_denoising_2023,
-	title = {Denoising diffusion samplers},
-	journal = {arXiv preprint arXiv:2302.13834},
-	author = {Vargas, Francisco and Grathwohl, Will and Doucet, Arnaud},
-	year = {2023},
-}
-
-@article{mcdonald_proposal_2022,
-	title = {Proposal of a score based approach to sampling using {Monte} {Carlo} estimation of score and oracle access to target density},
-	journal = {arXiv preprint arXiv:2212.03325},
-	author = {McDonald, Curtis and Barron, Andrew},
-	year = {2022},
-}
-
-@article{he_zeroth-order_2024,
-	title = {Zeroth-order sampling methods for non-log-concave distributions: {Alleviating} metastability by denoising diffusion},
-	journal = {arXiv preprint arXiv:2402.17886},
-	author = {He, Ye and Rojas, Kevin and Tao, Molei},
-	year = {2024},
-}
-
-@article{phillips_particle_2024,
-	title = {Particle {Denoising} {Diffusion} {Sampler}},
-	journal = {arXiv preprint arXiv:2402.06320},
-	author = {Phillips, Angus and Dau, Hai-Dang and Hutchinson, Michael John and De Bortoli, Valentin and Deligiannidis, George and Doucet, Arnaud},
-	year = {2024},
-}
-
-@inproceedings{grenioux_stochastic_2024,
-	title = {Stochastic {Localization} via {Iterative} {Posterior} {Sampling}},
-	booktitle = {Forty-first {International} {Conference} on {Machine} {Learning}},
-	author = {Grenioux, Louis and Noble, Maxence and Gabrié, Marylou and Durmus, Alain Oliviero},
-	year = {2024},
-}
-
-@article{sabour_align_2024,
-	title = {Align your steps: {Optimizing} sampling schedules in diffusion models},
-	journal = {arXiv preprint arXiv:2404.14507},
-	author = {Sabour, Amirmojtaba and Fidler, Sanja and Kreis, Karsten},
-	year = {2024},
-}
-
-@article{akhound-sadegh_iterated_2024,
-	title = {Iterated denoising energy matching for sampling from {Boltzmann} densities},
-	journal = {arXiv preprint arXiv:2402.06121},
-	author = {Akhound-Sadegh, Tara and Rector-Brooks, Jarrid and Bose, Avishek Joey and Mittal, Sarthak and Lemos, Pablo and Liu, Cheng-Hao and Sendera, Marcin and Ravanbakhsh, Siamak and Gidel, Gauthier and Bengio, Yoshua and {others}},
-	year = {2024},
-}
-
-@article{shen_composite_2020,
-	title = {Composite logconcave sampling with a restricted {Gaussian} oracle},
-	journal = {arXiv preprint arXiv:2006.05976},
-	author = {Shen, Ruoqi and Tian, Kevin and Lee, Yin Tat},
-	year = {2020},
-}
-
-@article{chen_importance_2023,
-	title = {On the importance of noise scheduling for diffusion models},
-	journal = {arXiv preprint arXiv:2301.10972},
-	author = {Chen, Ting},
-	year = {2023},
-}
-
-@inproceedings{ho_denoising_2020,
-	title = {Denoising {Diffusion} {Probabilistic} {Models}},
-	volume = {33},
-	booktitle = {Advances in {Neural} {Information} {Processing} {Systems}},
-	publisher = {Curran Associates, Inc.},
-	author = {Ho, Jonathan and Jain, Ajay and Abbeel, Pieter},
-	editor = {Larochelle, H. and Ranzato, M. and Hadsell, R. and Balcan, M. F. and Lin, H.},
-	year = {2020},
-	pages = {6840--6851},
-}
-
-@article{xiao_tackling_2021,
-	title = {Tackling the generative learning trilemma with denoising diffusion gans},
-	journal = {arXiv preprint arXiv:2112.07804},
-	author = {Xiao, Zhisheng and Kreis, Karsten and Vahdat, Arash},
-	year = {2021},
-}
-
-@inproceedings{rombach_high-resolution_2022,
-	title = {High-resolution image synthesis with latent diffusion models},
-	booktitle = {Proceedings of the {IEEE}/{CVF} conference on computer vision and pattern recognition},
-	author = {Rombach, Robin and Blattmann, Andreas and Lorenz, Dominik and Esser, Patrick and Ommer, Björn},
-	year = {2022},
-	pages = {10684--10695},
-}
-
-@inproceedings{song_denoising_2021,
-	title = {Denoising {Diffusion} {Implicit} {Models}},
-	booktitle = {International {Conference} on {Learning} {Representations}},
-	author = {Song, Jiaming and Meng, Chenlin and Ermon, Stefano},
-	year = {2021},
-}
-
-@article{lu_dpm-solver_2022,
-	title = {Dpm-solver: {A} fast ode solver for diffusion probabilistic model sampling in around 10 steps},
-	volume = {35},
-	journal = {Advances in Neural Information Processing Systems},
-	author = {Lu, Cheng and Zhou, Yuhao and Bao, Fan and Chen, Jianfei and Li, Chongxuan and Zhu, Jun},
-	year = {2022},
-}
-
-@article{shih_parallel_2024,
-	title = {Parallel sampling of diffusion models},
-	volume = {36},
-	journal = {Advances in Neural Information Processing Systems},
-	author = {Shih, Andy and Belkhale, Suneel and Ermon, Stefano and Sadigh, Dorsa and Anari, Nima},
-	year = {2024},
-}
-
-@inproceedings{gonzalez_parallel_2011,
-	title = {Parallel gibbs sampling: {From} colored fields to thin junction trees},
-	booktitle = {Proceedings of the {Fourteenth} {International} {Conference} on {Artificial} {Intelligence} and {Statistics}},
-	publisher = {JMLR Workshop and Conference Proceedings},
-	author = {Gonzalez, Joseph and Low, Yucheng and Gretton, Arthur and Guestrin, Carlos},
-	year = {2011},
-	pages = {324--332},
-}
-
-@article{dhariwal_diffusion_2021,
-	title = {Diffusion models beat gans on image synthesis},
-	volume = {34},
-	journal = {Advances in neural information processing systems},
-	author = {Dhariwal, Prafulla and Nichol, Alexander},
-	year = {2021},
-	pages = {8780--8794},
-}
-
-@article{song_score-based_2020,
-	title = {Score-based generative modeling through stochastic differential equations},
-	journal = {arXiv preprint arXiv:2011.13456},
-	author = {Song, Yang and Sohl-Dickstein, Jascha and Kingma, Diederik P and Kumar, Abhishek and Ermon, Stefano and Poole, Ben},
-	year = {2020},
-}
-
-@inproceedings{karras_analyzing_2024,
-	title = {Analyzing and improving the training dynamics of diffusion models},
-	booktitle = {Proceedings of the {IEEE}/{CVF} {Conference} on {Computer} {Vision} and {Pattern} {Recognition}},
-	author = {Karras, Tero and Aittala, Miika and Lehtinen, Jaakko and Hellsten, Janne and Aila, Timo and Laine, Samuli},
-	year = {2024},
-	pages = {24174--24184},
-}
-
-@article{karras_elucidating_2022,
-	title = {Elucidating the design space of diffusion-based generative models},
-	volume = {35},
-	journal = {Advances in neural information processing systems},
-	author = {Karras, Tero and Aittala, Miika and Aila, Timo and Laine, Samuli},
-	year = {2022},
-	pages = {26565--26577},
-}
-
-@article{balaji_ediff-i_2022,
-	title = {ediff-i: {Text}-to-image diffusion models with an ensemble of expert denoisers},
-	journal = {arXiv preprint arXiv:2211.01324},
-	author = {Balaji, Yogesh and Nah, Seungjun and Huang, Xun and Vahdat, Arash and Song, Jiaming and Zhang, Qinsheng and Kreis, Karsten and Aittala, Miika and Aila, Timo and Laine, Samuli and {others}},
-	year = {2022},
-}
-
-@article{lu_dpm-solver_2022-1,
-	title = {Dpm-solver++: {Fast} solver for guided sampling of diffusion probabilistic models},
-	journal = {arXiv preprint arXiv:2211.01095},
-	author = {Lu, Cheng and Zhou, Yuhao and Bao, Fan and Chen, Jianfei and Li, Chongxuan and Zhu, Jun},
-	year = {2022},
-}
-
-@article{sabour_align_2024-1,
-	title = {Align your steps: {Optimizing} sampling schedules in diffusion models},
-	journal = {arXiv preprint arXiv:2404.14507},
-	author = {Sabour, Amirmojtaba and Fidler, Sanja and Kreis, Karsten},
-	year = {2024},
-}
-
-@article{syed_optimised_2024,
-	title = {Optimised {Annealed} {Sequential} {Monte} {Carlo} {Samplers}},
-	journal = {arXiv preprint arXiv:2408.12057},
-	author = {Syed, Saifuddin and Bouchard-Côté, Alexandre and Chern, Kevin and Doucet, Arnaud},
-	year = {2024},
-}
-
-@article{ho_cascaded_2022,
-	title = {Cascaded diffusion models for high fidelity image generation},
-	volume = {23},
-	number = {47},
-	journal = {Journal of Machine Learning Research},
-	author = {Ho, Jonathan and Saharia, Chitwan and Chan, William and Fleet, David J and Norouzi, Mohammad and Salimans, Tim},
-	year = {2022},
-	pages = {1--33},
-}
-
-@article{saremi_chain_2023,
-	title = {Chain of log-concave {Markov} chains},
-	journal = {arXiv preprint arXiv:2305.19473},
-	author = {Saremi, Saeed and Park, Ji Won and Bach, Francis},
-	year = {2023},
-}
-
-@article{pethick_stable_2024,
-	title = {Stable nonconvex-nonconcave training via linear interpolation},
-	volume = {36},
-	journal = {Advances in Neural Information Processing Systems},
-	author = {Pethick, Thomas and Xie, Wanyun and Cevher, Volkan},
-	year = {2024},
-}
-
-@inproceedings{hsieh_limits_2021,
-	title = {The limits of min-max optimization algorithms: {Convergence} to spurious non-critical sets},
-	booktitle = {International {Conference} on {Machine} {Learning}},
-	publisher = {PMLR},
-	author = {Hsieh, Ya-Ping and Mertikopoulos, Panayotis and Cevher, Volkan},
-	year = {2021},
-	pages = {4337--4348},
-}
-
-@article{kim_consistency_2023,
-	title = {Consistency trajectory models: {Learning} probability flow ode trajectory of diffusion},
-	journal = {arXiv preprint arXiv:2310.02279},
-	author = {Kim, Dongjun and Lai, Chieh-Hsin and Liao, Wei-Hsiang and Murata, Naoki and Takida, Yuhta and Uesaka, Toshimitsu and He, Yutong and Mitsufuji, Yuki and Ermon, Stefano},
-	year = {2023},
-}
-
-@inproceedings{yang_diffusion_2023,
-	title = {Diffusion probabilistic model made slim},
-	booktitle = {Proceedings of the {IEEE}/{CVF} {Conference} on computer vision and pattern recognition},
-	author = {Yang, Xingyi and Zhou, Daquan and Feng, Jiashi and Wang, Xinchao},
-	year = {2023},
-	pages = {22552--22562},
-}
-
-@article{rissanen_generative_2022,
-	title = {Generative modelling with inverse heat dissipation},
-	journal = {arXiv preprint arXiv:2206.13397},
-	author = {Rissanen, Severi and Heinonen, Markus and Solin, Arno},
-	year = {2022},
-}
-
-@misc{dieleman_diffusion_2024,
-	title = {Diffusion is spectral autoregression},
-	url = {https://sander.ai/2024/09/02/spectral-autoregression.html},
-	author = {Dieleman, Sander},
-	year = {2024},
-}
-
-@article{roberts_updating_1997,
-	title = {Updating schemes, correlation structure, blocking and parameterization for the {Gibbs} sampler},
-	volume = {59},
-	number = {2},
-	journal = {Journal of the Royal Statistical Society Series B: Statistical Methodology},
-	author = {Roberts, Gareth O and Sahu, Sujit K},
-	year = {1997},
-	note = {Publisher: Oxford University Press},
-	pages = {291--317},
-}
-
-@book{koller_probabilistic_2009,
-	title = {Probabilistic graphical models: principles and techniques},
-	publisher = {MIT press},
-	author = {Koller, Daphne and Friedman, Nir},
-	year = {2009},
-}
-
-@article{rosenthal_minorization_1995,
-	title = {Minorization conditions and convergence rates for {Markov} chain {Monte} {Carlo}},
-	volume = {90},
-	number = {430},
-	journal = {Journal of the American Statistical Association},
-	author = {Rosenthal, Jeffrey S},
-	year = {1995},
-	note = {Publisher: Taylor \& Francis},
-	pages = {558--566},
-}
-
-@inproceedings{chen_improved_2023,
-	title = {Improved analysis of score-based generative modeling: {User}-friendly bounds under minimal smoothness assumptions},
-	booktitle = {International {Conference} on {Machine} {Learning}},
-	publisher = {PMLR},
-	author = {Chen, Hongrui and Lee, Holden and Lu, Jianfeng},
-	year = {2023},
-	pages = {4735--4763},
-}
-
-@article{chen_sampling_2022,
-	title = {Sampling is as easy as learning the score: theory for diffusion models with minimal data assumptions},
-	journal = {arXiv preprint arXiv:2209.11215},
-	author = {Chen, Sitan and Chewi, Sinho and Li, Jerry and Li, Yuanzhi and Salim, Adil and Zhang, Anru R},
-	year = {2022},
-}
-
-@article{benton_linear_2023,
-	title = {Linear convergence bounds for diffusion models via stochastic localization},
-	journal = {arXiv preprint arXiv:2308.03686},
-	author = {Benton, Joe and De Bortoli, Valentin and Doucet, Arnaud and Deligiannidis, George},
-	year = {2023},
-}
-
-@article{casella_explaining_1992,
-	title = {Explaining the {Gibbs} sampler},
-	volume = {46},
-	number = {3},
-	journal = {The American Statistician},
-	author = {Casella, George and George, Edward I},
-	year = {1992},
-	note = {Publisher: Taylor \& Francis},
-	pages = {167--174},
-}
-
-@article{gao_learning_2020,
-	title = {Learning energy-based models by diffusion recovery likelihood},
-	journal = {arXiv preprint arXiv:2012.08125},
-	author = {Gao, Ruiqi and Song, Yang and Poole, Ben and Wu, Ying Nian and Kingma, Diederik P},
-	year = {2020},
-}
-
-@article{montanari_posterior_2023,
-	title = {Posterior sampling from the spiked models via diffusion processes},
-	journal = {arXiv preprint arXiv:2304.11449},
-	author = {Montanari, Andrea and Wu, Yuchen},
-	year = {2023},
-}
-
-@article{montanari_sampling_2023,
-	title = {Sampling, diffusions, and stochastic localization},
-	journal = {arXiv preprint arXiv:2305.10690},
-	author = {Montanari, Andrea},
-	year = {2023},
 }
 
 @article{ruddigkeit_enumeration_2012,
