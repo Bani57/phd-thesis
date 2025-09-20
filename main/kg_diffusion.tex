@@ -49,21 +49,21 @@ $\mathbf{x}_i \in \mathbb{R}^{n \times F}$ (or $\mathbb{R}^{2n \times F}$ when t
 
 Due to the node permutation group symmetry of graphs \cite{bronstein_geometric_2021}, the entity-to-subgraph assignment cannot be performed with a default entity ID permutation, and to preserve edge locality within subgraphs, we chose to employ depth-first-search-based topological sorting and subgraph splitting based on cutting DFS spanning tree branches. The full dataset construction procedure is detailed in Algorithm \ref{alg:knowledge_correction_dataset}. Note that for computational feasibility and relevance, we only consider sufficiently dense adjacency blocks as valid samples (arbitrarily, we chose the cutoff of 5 edges). 
 
-\begin{algorithm}[ht!]%[H]
+\begin{algorithm}[hb!]%[H]
     \caption{Knowledge correction dataset sampling}
     \label{alg:knowledge_correction_dataset}
     \begin{algorithmic}
         \STATE{\textbf{input}: knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$, maximal subgraph size $n<|V|$}
         \STATE{$\of{k, l} \gets \of{1, 0}$}
-        \STATE{$s:V \to \mathbb{N} \gets$ empty map}
+        \STATE{$s:V \to \mathbb{N} \gets$ Map$\of{}$}
         \FOR{$v \in V$}
-        \IF{$c(v)$ does not exist}
+        \IF{$s\of{v}$ does not exist}
         \STATE{$S\gets\text{Stack}\of{}$}
         \STATE{$\text{StackPush}\of{S,v}$}
         \WHILE{$S$ not empty}
         \STATE{$u\gets\text{StackPop}\of{S}$}
-        \IF{$c(u)$ does not exist}
-        \STATE{$c(u)\gets k$}
+        \IF{$s\of{u}$ does not exist}
+        \STATE{$s\of{u}\gets k$}
         \STATE{$l \gets l+1$}
         \IF{$l=n$}
         \STATE{$\of{k,l}\gets \of{k+1,0}$}
@@ -76,11 +76,11 @@ Due to the node permutation group symmetry of graphs \cite{bronstein_geometric_2
         \STATE{$\of{k,l}\gets \of{k+1,0}$}
         \ENDIF
         \ENDFOR
-        \FOR{$i \gets 1$ to $k$}
-        \FOR{$j \gets 1$ to $k$}
-        \STATE{$E_{i,j}\gets\offf{\of{h,r,t} \in E_R \mid c(h)=i,c(t)=j}$}
+        \FOR{$i \gets 1$ to $k-1$}
+        \FOR{$j \gets 1$ to $k-1$}
+        \STATE{$E_{i,j}\gets\offf{\of{h,r,t} \in E_R \mid s\of{h}=i,s\of{t}=j}$}
         \IF{$\abs{E_{i,j}} \geq 5$}
-        \STATE{$\mathbf{v}\gets\offf{u\in V \mid c(u) \in \offf{i,j}}$}
+        \STATE{$\mathbf{v}\gets\offf{u\in V \mid s\of{u} \in \offf{i,j}}$}
         \STATE{$\mathbf{x}\gets\off{\mathbf{X}_u}_{u \in \mathbf{v}}$}
         \STATE{$A\gets\text{ToDense}\of{E_{i,j}}$}
         \STATE{\textbf{yield} $\of{\mathbf{x},A,\mathbf{v}}$}
