@@ -185,7 +185,7 @@ Algorithm \ref{algorithm:balanced_partition} details the optimal solution to the
 \begin{algorithmic}[1]
 \STATE{\textbf{input} $\offf{p_k}_{k=1}^{K+1}$, $U=\offf{u_1,u_2,\dots}$}
 \STATE{$S \gets \sum_{k=1}^{K+1}{p_k}$}
-\STATE{MEMO$\gets\offf{}$}
+\STATE{MEMO: $\mathbb{N}\times\mathbb{N}^{\abs{U}-1}\to\mathbb{N}\gets\text{Map}\of{}$}
 \STATE{\textbf{function} $\text{MinCost}\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}$:}
 % \bindent
 \IF{$\of{k,\offf{s_j}_{j=1}^{\abs{U}-1}}\notin$ MEMO}

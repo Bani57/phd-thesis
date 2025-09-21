@@ -57,14 +57,14 @@ Given a dense representation of a graph sample $\of{\mathbf{X},A}$, where $n$ is
     \item $M^{\of{l}} \in \offf{0,1}^{n^{\of{l+1}} \times n^{\of{l}}}$ is the community assignment matrix, dictating how to coarsen the $l$-th level nodes into the $l+1$-th level nodes:
     \begin{align}
         \begin{split}
-            \mathbf{X}^{\of{l+1}}&=M^{\of{l}} \cdot \mathbf{X}^{\of{l}} \\
+            \mathbf{X}^{\of{l+1}}&=\of{M^{\of{l}} \cdot \mathbf{X}^{\of{l}}} \oslash \of{M^{\of{l}} \cdot \mathbf{1}_{n^{\of{l}}}} \\
             A^{\of{l+1}}&=\begin{cases}
                 M^{\of{l}} \cdot A^{\of{l}} \cdot {M^{\of{l}}}^T, & l>1 \\
                 M^{\of{l}} \cdot \bar{A}^{\of{l}} \cdot {M^{\of{l}}}^T, & l=1
             \end{cases},
         \end{split}
     \end{align}
-    where $\forall i,j, \bar{A}^{\of{l}}_{i,j}=\mathbb{I}\of{A^{\of{l}}_{i,j}>0}$
+    where $\forall i,j, \bar{A}^{\of{l}}_{i,j}=\mathbb{I}\of{A^{\of{l}}_{i,j}>0}$;
     \item $G^{\of{1}}=\of{\mathbf{X}^{\of{1}},A^{\of{1}}}=\of{\mathbf{X},A}$, the original input graph is on the lowest level;
     \item $G_R=G^{\of{L}}=\of{\mathbf{X}^{\of{L}}, A^{\of{L}}}$ is the \emph{root graph}, the top level of the hierarchy that does not have further coarsenings;
     \item $\offf{C^{\of{l}}_{k}}_{k=1}^{n^{\of{l+1}}}$ is the set of \emph{community subgraphs} of the graph at level $l$;
