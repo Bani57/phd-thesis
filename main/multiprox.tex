@@ -203,6 +203,6 @@ For an explanation, we hypothesize that the issue arises from the argmax project
 
 \subsection{Summary}
 
-To conclude, we showed how by applying multimeasurement theory to denoising diffusion samplers, we can reproduce state-of-the-art performance metrics with much fewer denoising steps. Specifically, our MultiProxAn sampler can yield a speed-up factor of around $\frac{T}{t-t'+1}$, but experiments have shown that the values of the two fixed noise levels $t$ and $t'$ must be carefully validated. 
+To conclude, we showed how by applying multimeasurement theory to denoising diffusion samplers, we can reproduce state-of-the-art performance metrics with much fewer denoising steps. Specifically, our MultiProxAn sampler can yield a speed-up factor of around $\frac{T}{t-t'+1}$ if we accept an increase in memory complexity by a factor of $m$, but experiments have shown that the values of the two fixed noise levels $t$ and $t'$ must be carefully validated. 
 
 We again rise above purely reductionist and holistic approaches by taking a bit of each, this time to provide the best methods for sampling from multimodal distributions. We mix annealing approaches that assume it is enough to model noise step-by-step, and multimeasurement results that predict all relevant information lies in a single noise level. 
