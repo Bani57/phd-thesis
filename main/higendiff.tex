@@ -1,29 +1,29 @@
 \section{Hierarchical Generative Graph Diffusion}
 \label{sec: higendiff}
 
-In the previous section, we discussed how GGG-CRP, an autoregressive permutation equivariant GAN, was able to come close to the performance of the baseline network with much less memory complexity. However, the approach still suffered from lower generalization to certain graph structures, an issue common with autoregressive models for graphs \cite{krawczuk_gg-gan_2020}. 
+In the previous section, we discussed how GGG-CRP, an autoregressive permutation equivariant GAN, was able to come close to the performance of the baseline network with much less memory complexity. However, the approach still suffered from lower generalization to certain graph structures, an issue common with autoregressive models for graphs~\cite{krawczuk_gg-gan_2020}. 
 
 We predict this is due to the overly holistic idea of sampling the community structures via simple categorical distributions and integer partition probabilities, as well as the general difficulty of GAN fine-tuning. 
 
 The correct approach, no matter the task, as hinted in the introduction, is always to assign complete machine learning models for both coarse and fine levels of graph data, i.e., learn the distribution of community graphs, inter-community graphs, and further coarsenings in order to sample all these graph views accurately, and it was not believed that a collection of conditional GANs could tackle this challenge. In fact, shortly after the work on GGG-CRP, a different class of generative models arose as state-of-the-art for graph generation performance: \emph{diffusion models}. 
 
-The text in this section thus introduces HiGenDiff (Hierarchical Generative Diffusion) models for both highly scalable and powerful graph distribution representation, even when graph samples reach non-elementary sizes. Specifically, we will extend the work of \cite{vignac_digress_2022}, \cite{karami_higen_2024}, \cite{karami_multi-resolution_2024}, and \cite{krawczuk_graph_2024} with new model designs, theoretical analyses, and improved experimental results.
+The text in this section thus introduces HiGenDiff (Hierarchical Generative Diffusion) models for both highly scalable and powerful graph distribution representation, even when graph samples reach non-elementary sizes. Specifically, we will extend the work of~\cite{vignac_digress_2022},~\cite{karami_higen_2024},~\cite{karami_multi-resolution_2024}, and~\cite{krawczuk_graph_2024} with new model designs, theoretical analyses, and improved experimental results.
 
 \subsection{As above, so below}
-Despite remarkable achievements on small and medium-sized graphs (e.g., molecules, proteins) encounter scalability challenges when applied to larger, more complex structures like social networks, financial networks, road networks, and electronic circuits \cite{krawczuk_graph_2024}. 
+Despite remarkable achievements on small and medium-sized graphs (e.g., molecules, proteins) encounter scalability challenges when applied to larger, more complex structures like social networks, financial networks, road networks, and electronic circuits~\cite{krawczuk_graph_2024}. 
 
 Real-world networks often exhibit locally heterogeneous patterns, where communities of nodes tightly connect within themselves, but there exist sparse inter-connections between groups.
 This naturally forms a hierarchical multi-resolution structure in graphs, with smaller communities nested within larger ones. In such a structure, lower levels capture fine-grained local interactions within communities, while higher levels represent broader relationships between communities and
 the overall network structure. 
 
-Therefore, to truly capture the complexity of such graphs, it is crucial for an expressive graph generative network to not only learn these community structures but also to model how they interact across different levels. By incorporating this inductive bias into the model architecture, we can train an expressive generative model that can effectively capture the hierarchical structure inherent in graphs \cite{karami_multi-resolution_2024}. 
+Therefore, to truly capture the complexity of such graphs, it is crucial for an expressive graph generative network to not only learn these community structures but also to model how they interact across different levels. By incorporating this inductive bias into the model architecture, we can train an expressive generative model that can effectively capture the hierarchical structure inherent in graphs~\cite{karami_multi-resolution_2024}. 
 
 This work thus introduces HiGenDiff (Hierarchical Generative Diffusion), which exploits the community structure and multi-resolution hierarchy inherent in many real-world graph datasets to tackle this complexity while preserving expressiveness.
 
 \subsection{Background}
 
 \begin{definition}
-    Given a set of samples $\mathcal{D}=\offf{\mathbf{X}_i}_{i=1}^{N}$ and $T\in\mathbb{N}$, a \emph{diffusion model} \cite{sohl-dickstein_deep_2015} $\mathcal{M}=\offf{\offf{f_t}_{t=1}^{T},\offf{g_t}_{t=1}^{T}}$ assumes that there exists a finite $T$-step Markov stochastic process $\offf{\mathbf{X}_t}_{t=0}^{T}$, where $\mathbf{X}_0 \in \mathcal{D}$ and $\mathbf{X}_T \sim Z$ (i.i.d. random noise). 
+    Given a set of samples $\mathcal{D}=\offf{\mathbf{X}_i}_{i=1}^{N}$ and $T\in\mathbb{N}$, a \emph{diffusion model}~\cite{sohl-dickstein_deep_2015} $\mathcal{M}=\offf{\offf{f_t}_{t=1}^{T},\offf{g_t}_{t=1}^{T}}$ assumes that there exists a finite $T$-step Markov stochastic process $\offf{\mathbf{X}_t}_{t=0}^{T}$, where $\mathbf{X}_0 \in \mathcal{D}$ and $\mathbf{X}_T \sim Z$ (i.i.d. random noise). 
 
     In the most common design, the stochastic process is defined as $\mathbf{X}_t=\alpha_t \mathbf{X}_{0} + \beta_t \varepsilon_t $, with $\varepsilon_t \sim Z$, $\offf{\alpha_t}_{t=0}^{T}$ non-increasing, $\offf{\beta_t}_{t=0}^{T}$ non-decreasing.
     
@@ -41,7 +41,7 @@ This work thus introduces HiGenDiff (Hierarchical Generative Diffusion), which e
     \end{align}
 \end{definition}
 
-As an extension of DiGress \cite{vignac_digress_2022}, HiGenDiff sub-models also employ the non-standard \emph{discrete stochastic process}. Namely, it is standard to employ standard Gaussian noise $Z\sim N\of{\mathbf{0},\mathbf{I}_F}$ for the latent noise distribution of diffusion models and one-dimensional reals for $\alpha_t,\beta_t$. However, all models based on DiGress acknowledge the discrete nature of graph distributions and use the following formula for the Markov chain of e.g., a given node feature value:
+As an extension of DiGress~\cite{vignac_digress_2022}, HiGenDiff sub-models also employ the non-standard \emph{discrete stochastic process}. Namely, it is standard to employ standard Gaussian noise $Z\sim N\of{\mathbf{0},\mathbf{I}_F}$ for the latent noise distribution of diffusion models and one-dimensional reals for $\alpha_t,\beta_t$. However, all models based on DiGress acknowledge the discrete nature of graph distributions and use the following formula for the Markov chain of e.g., a given node feature value:
 \begin{align}
 \begin{split}
     \of{\mathbf{X}_i}_t &\sim \text{Categorical}\of{Q_t \cdot \text{OneHot}\of{\of{\mathbf{X}_i}_0}} \\
@@ -73,16 +73,16 @@ Given a dense representation of a graph sample $\of{\mathbf{X},A}$, where $n$ is
     \item $B^{\of{l}}_{j,k}=\of{\mathbf{X}_{j,k}^{\of{l}},A_{j,k}^{\of{l}}}$, where $\mathbf{X}_{j,k}^{\of{l}}=\off{\mathbf{X}_{j}^{\of{l}},\mathbf{X}_{k}^{\of{l}}}$ and $A_{j,k}^{\of{l}}=\off{A_{h,i}^{\of{l}}}_{M^{\of{l}}_{j,h}=M^{\of{l}}_{k,i}=1}$.
 \end{itemize}
 
-Figure \ref{fig:higendiff} provides a visual representation of an example hierarchical structure, to aid the understanding of the above description.
+Figure~\ref{fig:higendiff} provides a visual representation of an example hierarchical structure, to aid the understanding of the above description.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.45\linewidth]{figures/higendiff/hierarchical_graph.png}
     \hfill
     \includegraphics[width=0.45\linewidth]{figures/higendiff/hierarchical_adj.png}
-    \caption[Node-edge drawing and adjacency block visualization of a hierarchical graph structure.]{Node-edge drawing and adjacency block visualization of a hierarchical graph structure, with labeled aggregate node and edge counts, the additional features that HiGenDiff employs. Color-shaded areas denote the community subgraphs, gray shaded areas are the bipartites (mirrored on the lower triangular), and unshaded areas are skipped during diffusion of the current level, according to the result of the previous level. Credit to \cite{karami_multi-resolution_2024}.}
+    \caption[Node-edge drawing and adjacency block visualization of a hierarchical graph structure.]{Node-edge drawing and adjacency block visualization of a hierarchical graph structure, with labeled aggregate node and edge counts, the additional features that HiGenDiff employs. Color-shaded areas denote the community subgraphs, gray shaded areas are the bipartites (mirrored on the lower triangular), and unshaded areas are skipped during diffusion of the current level, according to the result of the previous level. Credit to~\cite{karami_multi-resolution_2024}.}
     \label{fig:higendiff}
 \end{figure}
-Given a dataset $\mathcal{D}=\offf{G_i}_{i=1}^{N}$ of such hierarchical graph structures, HiGenDiff employs MRGrad's model architecture \cite{karami_multi-resolution_2024} to learn that distribution. Namely, HiGenDiff is comprised of $2L-1$ diffusion models: $\mathcal{M}=\of{\mathcal{M}_P,\off{\of{\mathcal{M}^{\of{l}}_C,\mathcal{M}^{\of{l}}_B}}_{l=1}^{L-1}}$, where $\mathcal{M}_P$ learns to sample from the distribution of root graphs, while $\mathcal{M}^{\of{l}}_C$ and $\mathcal{M}^{\of{l}}_B$ learn the $l$-th level's community and bipartite distributions, respectively, $\forall l<L$. 
+Given a dataset $\mathcal{D}=\offf{G_i}_{i=1}^{N}$ of such hierarchical graph structures, HiGenDiff employs MRGrad's model architecture~\cite{karami_multi-resolution_2024} to learn that distribution. Namely, HiGenDiff is comprised of $2L-1$ diffusion models: $\mathcal{M}=\of{\mathcal{M}_P,\off{\of{\mathcal{M}^{\of{l}}_C,\mathcal{M}^{\of{l}}_B}}_{l=1}^{L-1}}$, where $\mathcal{M}_P$ learns to sample from the distribution of root graphs, while $\mathcal{M}^{\of{l}}_C$ and $\mathcal{M}^{\of{l}}_B$ learn the $l$-th level's community and bipartite distributions, respectively, $\forall l<L$. 
 
 For the likelihood modeling, we employ the independence property between community and bipartite graphs when conditioning on a given upper-level coarsening, yielding:
 \begin{equation}
@@ -91,9 +91,9 @@ For the likelihood modeling, we employ the independence property between communi
 
 For the sampling models, similar to MRGrad:
 \begin{itemize}
-    \item $\mathcal{M}_P$ is a DiGress diffusion model \cite{vignac_digress_2022}, modified to support generation of general weighted graphs. Root graphs are sampled with such an architecture independently, as the first step of HiGenDiff. We will present the different methods for modeling and diffusing edge weights in the next subsection, as this was found to be a very important ablation dimension. 
-    \item Each $\mathcal{M}^{\of{l}}_C$ community generator is a graph transformer model with the architecture of \cite{dwivedi_generalization_2021}, modified to support conditioning on the features of a parent graph. For each level, community graphs are sampled independently before the bipartites.
-    \item Each $\mathcal{M}^{\of{l}}_B$ bipartite generator is a GraphGPS model \cite{rampasek_recipe_2022}, customized to have a linear complexity of adjacency matrix generation w.r.t. the number of input nodes and to support conditioning on the features of a parent graph. Bipartites are generated jointly after the communities for each level, in order to align the inter-community edges more accurately.
+    \item $\mathcal{M}_P$ is a DiGress diffusion model~\cite{vignac_digress_2022}, modified to support generation of general weighted graphs. Root graphs are sampled with such an architecture independently, as the first step of HiGenDiff. We will present the different methods for modeling and diffusing edge weights in the next subsection, as this was found to be a very important ablation dimension. 
+    \item Each $\mathcal{M}^{\of{l}}_C$ community generator is a graph transformer model with the architecture of~\cite{dwivedi_generalization_2021}, modified to support conditioning on the features of a parent graph. For each level, community graphs are sampled independently before the bipartites.
+    \item Each $\mathcal{M}^{\of{l}}_B$ bipartite generator is a GraphGPS model~\cite{rampasek_recipe_2022}, customized to have a linear complexity of adjacency matrix generation w.r.t. the number of input nodes and to support conditioning on the features of a parent graph. Bipartites are generated jointly after the communities for each level, in order to align the inter-community edges more accurately.
 \end{itemize}
 
 \subsection{Contributions}
@@ -118,7 +118,7 @@ From how we described the likelihood modeling of HiGenDiff in the previous subse
 \begin{center}
     \emph{What is the computational cost of adding an extra graph coarsening layer on top, and when is this feasibly faster than the standard baseline?}
 \end{center}
-Proposition \ref{proposition:complexity_higendiff} provides an answer to the first question, under certain assumptions. The proof is available in Appendix \ref{sec:appendix_higendiff_theory}. Note that the quadratic cost of generating the dense adjacency matrices dominates the cost of sampling node features, which is linear (w.r.t. number of nodes). Thus, when discussing the computational complexity of dense graph generation, we only focus on how the cost for edges is affected.
+Proposition~\ref{proposition:complexity_higendiff} provides an answer to the first question, under certain assumptions. The proof is available in Appendix~\ref{sec:appendix_higendiff_theory}. Note that the quadratic cost of generating the dense adjacency matrices dominates the cost of sampling node features, which is linear (w.r.t. number of nodes). Thus, when discussing the computational complexity of dense graph generation, we only focus on how the cost for edges is affected.
 
 \begin{proposition}
     \label{proposition:complexity_higendiff}
@@ -134,17 +134,17 @@ So $O\of{{n^{\of{L}}}^{\frac{4}{3}}}$ is the best sub-quadratic cost we can achi
 
 However, if the current root graph has a highly dense inter-community interaction graph, then unfortunately HiGenDiff will have a \emph{twice} greater cost to generate it. 
 
-The threshold for feasibility is quantified by Proposition \ref{proposition:feasibility_higendiff} below.
+The threshold for feasibility is quantified by Proposition~\ref{proposition:feasibility_higendiff} below.
 
 \begin{proposition}
 \label{proposition:feasibility_higendiff}
-     Let $L \geq 1$ be the current top level of the graph hierarchy. Under the assumption of Proposition \ref{proposition:complexity_higendiff}, coarsening the graph once again and adding an $L+1$-st level is feasible if and only if:
+     Let $L \geq 1$ be the current top level of the graph hierarchy. Under the assumption of Proposition~\ref{proposition:complexity_higendiff}, coarsening the graph once again and adding an $L+1$-st level is feasible if and only if:
      \begin{equation}
             p < 1 - \frac{\mathbb{E}\off{{n^{\of{L+1}}}^2}}{\mathbb{E}\off{{n^{\of{L}}}^2}}
      \end{equation}
 \end{proposition}
 \begin{proof}
-    By Proposition \ref{proposition:complexity_higendiff}, $\mathbb{E}\off{{n^{\of{L+1}}}^2} + p \mathbb{E}\off{{n^{\of{L}}}^2}$ is the expected cost for HiGenDiff, while we know the baseline cost is just $\mathbb{E}\off{{n^{\of{L}}}^2}$. So we are faster in expectation when:
+    By Proposition~\ref{proposition:complexity_higendiff}, $\mathbb{E}\off{{n^{\of{L+1}}}^2} + p \mathbb{E}\off{{n^{\of{L}}}^2}$ is the expected cost for HiGenDiff, while we know the baseline cost is just $\mathbb{E}\off{{n^{\of{L}}}^2}$. So we are faster in expectation when:
     \begin{align}
         \begin{split}
             \mathbb{E}\off{{n^{\of{L+1}}}^2} + p \mathbb{E}\off{{n^{\of{L}}}^2} &< \mathbb{E}\off{{n^{\of{L}}}^2} \\
@@ -156,25 +156,25 @@ The threshold for feasibility is quantified by Proposition \ref{proposition:feas
 
 \subsubsection{Experiments}
 
-Our experiment setup for HiGenDiff follows closely that of \cite{karami_multi-resolution_2024}. 
+Our experiment setup for HiGenDiff follows closely that of~\cite{karami_multi-resolution_2024}. 
 
-This includes computing hierarchical structures of graphs using the Louvain community detection algorithm \cite{blondel_fast_2008}, and measuring generation performance by comparing sampled and true distributions of degrees, clustering coefficients, eigenvalues, and orbit sizes. We employ the standard Maximum Mean Discrepancy (MMD) test \cite{gretton_kernel_2012} for evaluating distribution distance. 
+This includes computing hierarchical structures of graphs using the Louvain community detection algorithm~\cite{blondel_fast_2008}, and measuring generation performance by comparing sampled and true distributions of degrees, clustering coefficients, eigenvalues, and orbit sizes. We employ the standard Maximum Mean Discrepancy (MMD) test~\cite{gretton_kernel_2012} for evaluating distribution distance. 
 
 As notable differences, we single out our more extensive model ablation and the addition of two new datasets of graphs with interesting community structure.
 
 Namely, we have the choice of building 5 different diffusion configurations: Simple, Integer, Integer-Bucketized, Ordinal, and Ordinal-Bucketized. We also investigated the need whether bipartite graphs really need to be diffused jointly, as well as the need for conditional probability modeling between hierarchy levels, thus the need for three different modified graph transformers. As an alternative, we thus constructed the Naive setup, where all HiGenDiff sub-models are independent DiGress instances, generating graph parts independently, which are then stitched into a final graph with simple concatenation.
 
-Each of the model configurations, except the Naive, was trained and evaluated on the 4 datasets chosen by MRGrad: a dataset of Stochastic Block Model (SBM) samples provided by \cite{martinkus_spectre_2022}, the CiteSeer ego networks of \cite{sen_collective_2008}, and the 2 protein structure datasets enzyme \cite{schomburg_brenda_2004} and DD2 \cite{dobson_distinguishing_2003}, classical for drug discovery. 
+Each of the model configurations, except the Naive, was trained and evaluated on the 4 datasets chosen by MRGrad: a dataset of Stochastic Block Model (SBM) samples provided by~\cite{martinkus_spectre_2022}, the CiteSeer ego networks of~\cite{sen_collective_2008}, and the 2 protein structure datasets enzyme~\cite{schomburg_brenda_2004} and DD2~\cite{dobson_distinguishing_2003}, classical for drug discovery. 
 
 We also present HiGenDiff performance results on datasets of:
 \begin{itemize}
     \item 1000 sampled ring-of-cliques graphs, with the number of cliques ranging from 3 and 10 and the clique size ranging from 3 to 5, referred to as RoC;
-    \item 1000 sampled graphs according to the LFR benchmark \cite{lancichinetti_finding_2011}, with parameters $\tau_1=3$, $\tau_2=1.5$, $n \sim \text{Uniform}\of{\off{100, 250}}$, $\mu \sim \text{Uniform}\of{\off{0.03, 0.75}}$.
+    \item 1000 sampled graphs according to the LFR benchmark~\cite{lancichinetti_finding_2011}, with parameters $\tau_1=3$, $\tau_2=1.5$, $n \sim \text{Uniform}\of{\off{100, 250}}$, $\mu \sim \text{Uniform}\of{\off{0.03, 0.75}}$.
 \end{itemize}
 
 \subsection{Results}
 
-We begin by presenting the results of the Louvain community detection for each of the 6 datasets in Table \ref{tab:higendiff_datasets}. 
+We begin by presenting the results of the Louvain community detection for each of the 6 datasets in Table~\ref{tab:higendiff_datasets}. 
 
 The main important finding is that only 2 levels were sufficient for each dataset, and this is due to the relative scale of the graph sizes involved. 
 
@@ -182,13 +182,13 @@ Nevertheless, with graph sizes in the hundreds, as the ones we considered, non-h
 
 The outliers are the SBM graphs, which had almost surely cliques as their root graphs, and thus, the set of bipartite graphs to be generated grew quadratically.
 
-For the same reason, SBM graphs are highly likely to be infeasible. We stress, however, that only for the SBM graphs and rings of cliques can one prove that the Bernoulli assumption of Propositions \ref{proposition:complexity_higendiff} and \ref{proposition:feasibility_higendiff} is satisfied. 
+For the same reason, SBM graphs are highly likely to be infeasible. We stress, however, that only for the SBM graphs and rings of cliques can one prove that the Bernoulli assumption of Propositions~\ref{proposition:complexity_higendiff} and~\ref{proposition:feasibility_higendiff} is satisfied. 
 
 Regardless, the theoretical result provides us with a rough estimate of the true feasibility, which is highly invaluable: the important protein structure datasets are shown to be almost surely very appropriate candidates for HiGenDiff speed-ups.
 
 \begin{table}[H]
     \centering
-    \caption[Statistics from the hierarchical structure of the HiGenDiff datasets.]{Statistics from the hierarchical structure of the HiGenDiff datasets. Left to right: number of nodes, number of communities, root graph density, speed-up factor compared to the baseline cost, and the probability of a graph satisfying Proposition \ref{proposition:feasibility_higendiff}.}
+    \caption[Statistics from the hierarchical structure of the HiGenDiff datasets.]{Statistics from the hierarchical structure of the HiGenDiff datasets. Left to right: number of nodes, number of communities, root graph density, speed-up factor compared to the baseline cost, and the probability of a graph satisfying Proposition~\ref{proposition:feasibility_higendiff}.}
     \label{tab:higendiff_datasets}
 \begin{tabular}{lrrrrr}
 \toprule
@@ -204,7 +204,7 @@ LFR & 181.92 $\pm$ 44.33 & 30.71 $\pm$ 7.51 & 0.38 $\pm$ 0.15 & 1.7 $\pm$ 0.31 &
 \end{tabular}
 \end{table}
 
-We move on to present the best MMD metrics achieved by HiGenDiff for each dataset in Table \ref{tab:higendiff_best}. We can observe that the performance is exceptional overall, though it was evidently the hardest to model the clustering coefficients of the rings of cliques. The reason for this is that these graphs have the strict condition that exactly one \emph{edge} of each clique must form the ring, while we discovered that it was common for our model to connect a clique to the ring just via a single node. These types of strict conditions for graph structures are still are challenge for generative models, but such conditioning is highly relevant to drug design.
+We move on to present the best MMD metrics achieved by HiGenDiff for each dataset in Table~\ref{tab:higendiff_best}. We can observe that the performance is exceptional overall, though it was evidently the hardest to model the clustering coefficients of the rings of cliques. The reason for this is that these graphs have the strict condition that exactly one \emph{edge} of each clique must form the ring, while we discovered that it was common for our model to connect a clique to the ring just via a single node. These types of strict conditions for graph structures are still are challenge for generative models, but such conditioning is highly relevant to drug design.
 
 \begin{table}[H]
     \centering
@@ -224,7 +224,7 @@ LFR & 0.022 & 0.05 & 0.12 & 0.004 \\
 \end{tabular}
 \end{table}
 
-We did observe, however, that choosing the best diffusion configuration across different datasets is highly non-trivial. As can be perceived from our Table \ref{tab:higendiff_full} in the appendix, containing the full ablation experiment results, changing the root weight diffusion process or employing bucketization can have a drastic impact on performance. Figure \ref{fig:higendiff_ablation} attempts to discover causality in the ablation results by averaging the metrics across datasets. However, we can observe very wide error bars and no clear patterns. With a rough argument based on the means, however, we might be able to conclude that overfitting is a bigger problem, as more often adding bucketization or even reducing edge weights to the Simple (binary) configuration does lower MMD values.
+We did observe, however, that choosing the best diffusion configuration across different datasets is highly non-trivial. As can be perceived from our Table~\ref{tab:higendiff_full} in the appendix, containing the full ablation experiment results, changing the root weight diffusion process or employing bucketization can have a drastic impact on performance. Figure~\ref{fig:higendiff_ablation} attempts to discover causality in the ablation results by averaging the metrics across datasets. However, we can observe very wide error bars and no clear patterns. With a rough argument based on the means, however, we might be able to conclude that overfitting is a bigger problem, as more often adding bucketization or even reducing edge weights to the Simple (binary) configuration does lower MMD values.
 
 \begin{figure}[H]
     \centering
@@ -234,10 +234,10 @@ We did observe, however, that choosing the best diffusion configuration across d
     \label{fig:higendiff_ablation}
 \end{figure}
 
-Next, to contextualize our best achieved performance, we provide a comparison to baselines in Table \ref{tab:higendiff_baselines}, namely DiGress \cite{vignac_digress_2022}, the HiGen networks of \cite{karami_higen_2024}, and MRGrad \cite{karami_multi-resolution_2024}. From the comparison table, it is evident that most often HiGenDiff is the top performer. If not, almost surely the second best, and this is most prominent with the DD2 dataset, where, although HiGen is still unbeatable, the best results of HiGenDiff are much more competitive than those of MRGrad. Observe also that the Naive HiGenDiff learning setup also ranks decently high among the competition.
+Next, to contextualize our best achieved performance, we provide a comparison to baselines in Table~\ref{tab:higendiff_baselines}, namely DiGress~\cite{vignac_digress_2022}, the HiGen networks of~\cite{karami_higen_2024}, and MRGrad~\cite{karami_multi-resolution_2024}. From the comparison table, it is evident that most often HiGenDiff is the top performer. If not, almost surely the second best, and this is most prominent with the DD2 dataset, where, although HiGen is still unbeatable, the best results of HiGenDiff are much more competitive than those of MRGrad. Observe also that the Naive HiGenDiff learning setup also ranks decently high among the competition.
 
 \begin{table}[H]
-    \caption[Best HiGenDiff MMDs compared to previous baselines.]{Best HiGenDiff MMDs compared to previous baselines (lower is better). The metric value for the best model for each metric is highlighted in bold font, while the second best is underlined. Credit to \cite{karami_multi-resolution_2024} for most of the values.}
+    \caption[Best HiGenDiff MMDs compared to previous baselines.]{Best HiGenDiff MMDs compared to previous baselines (lower is better). The metric value for the best model for each metric is highlighted in bold font, while the second best is underlined. Credit to~\cite{karami_multi-resolution_2024} for most of the values.}
     \label{tab:higendiff_baselines}
     \centering
     \begin{tabular}{llrrrr}
@@ -268,7 +268,7 @@ Next, to contextualize our best achieved performance, we provide a comparison to
     \end{tabular}
 \end{table}
 
-Before concluding, we provide visual examples from the graph datasets in Figure \ref{fig:higendiff_examples}. An appearance-based comparison also verifies the generally high quality of artificially generated hierarchical graph structures. 
+Before concluding, we provide visual examples from the graph datasets in Figure~\ref{fig:higendiff_examples}. An appearance-based comparison also verifies the generally high quality of artificially generated hierarchical graph structures. 
 
 \begin{figure}[ht!]
     \centering

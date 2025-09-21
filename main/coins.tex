@@ -50,7 +50,7 @@ Figure~\ref{fig:query_structures} visualizes the computational structures of the
 \end{equation}
 where $v_1,v_2 \in V, r_1,r_2,r_3 \in R$ are any entities and relations from $G$.
 
-\begin{figure}[H]
+\begin{figure}[!t]
     \centering
     \includegraphics[width=0.75\textwidth]{figures/coins/query\_structures.pdf}
     \caption[Various possible computational graph structures of conjunctive knowledge graph queries.]{Various possible computational graph structures of conjunctive knowledge graph queries. Blue nodes indicate query anchors/inputs, green ones are their answers, while the rest are intermediate results. Solid edges represent relation projections, dashed edges represent intersection operations.}
@@ -172,9 +172,11 @@ COINs requires the optimization of the following models sampled from $\mathcal{F
 
 Additional parameters are: a {node feature embedding matrix} $\mathbf{W} \in \mathbb{R}^{D \times F}$ and {node/relation embedding aggregation weights} $\mathbf{w} \in \mathbb{R}^{3}, \mathbf{w}_R \in \mathbb{R}^{2}$.
 
-Algorithm~\ref{algorithm:baseline} presents the baseline inference steps required, Algorithm~\ref{algorithm:coins} details the knowledge graph query representation steps for COINs, utilizing the constructed sub-models, while Figure~\ref{fig:community_preprocessing} provides a visualization of our community-based preprocessing and query representation on a small example. 
+Algorithm~\ref{algorithm:baseline} presents the baseline inference steps required, Algorithm~\ref{algorithm:coins} details the knowledge graph query representation steps for COINs, utilizing the constructed sub-models. 
 
-\begin{algorithm}%[H]
+Figure~\ref{fig:community_preprocessing} provides a visualization of our community-based preprocessing and query representation on a small example. 
+
+\begin{algorithm}[ht!]%[H]
     \caption{Base knowledge graph representation}
     \label{algorithm:baseline}
     \begin{algorithmic}[1]
@@ -186,7 +188,7 @@ Algorithm~\ref{algorithm:baseline} presents the baseline inference steps require
     \end{algorithmic}
 \end{algorithm}
  
-\begin{algorithm}%[H]
+\begin{algorithm}[ht!]%[H]
 \caption{COINs knowledge graph representation}
 \label{algorithm:coins}
 \begin{algorithmic}[1]
@@ -256,7 +258,7 @@ Namely, the COINs submodel structure naturally permits partial model parallelism
 
 The distributed COINs architecture is proposed to be as follows. Let $U$ be a finite set of compute units available to the application, and let $\mathcal{M} \subset \mathcal{F}$ be the full set of COINs submodels. The assignment of COINs models to units will be represented through the mapping $u: \mathcal{M} \to U$. First, select a machine $u^* \in U$ to serve as the \emph{leader} node. The leader performs Step 1, sends and receives data between itself and the other machines to orchestrate Step 2, and performs the final aggregation steps. Formally, we fix these assignments:
 \begin{equation}
-u\of{g_V^{\of{C}}}=u\of{g_R^{\of{C}}}=u\of{g_P^{\of{C}}}=u\of{g_I^{\of{C}}}=u\of{g_R}=u\of{g_P}=u\of{g_I}=u\of{\mathbf{W}}=u\of{\mathbf{w}}=u\of{\mathbf{w}_R}=u^*.
+u\of{g_{V,R,P,I}^{\of{C}}}=u\of{g_{R,P,I}}=u\of{\mathbf{W}}=u\of{\mathbf{w}}=u\of{\mathbf{w}_R}=u^*.
 \end{equation}
 Then, with this setup, Algorithm~\ref{algorithm:coins_distributed} details the distributed version of Algorithms~\ref{algorithm:coins}. For easier comparison, I color-highlight the required changes for the distributed extension.
 
@@ -395,9 +397,10 @@ We note the inability to bring down $K$ and $\abs{V^*}$ further for the FB15k-23
 \subsubsection{Performance \& Feasibility}
 
 Tables~\ref{tab:performance_query_answering_mrr} and~\ref{tab:performance_query_answering_q2b} contain our MRR metric query answering results and the comparison with the baselines, where KBGAT baselines were retrieved from~\cite{nathani_learning_2019}, Query2Box metrics were obtained by integrating the base algorithm with our experiment code that has COINs integration deactivated, while for all other models, metrics were calculated by running the implementation provided with~\cite{sun_rotate_2019}\footnote{Available at \url{https://github.com/DeepGraphLearning/KnowledgeGraphEmbedding}}. 
+
 One can observe that, on average, the relative error of the metric to the baseline decreases with the model complexity. This is to be expected, as more representation power means better embedding of the complicated community-node interactions. In a third of the single-hop cases and the majority of multi-hop ones, we even improve upon the baseline results. Refer to Tables~\ref{tab:performance_query_answering} and~\ref{tab:performance_query_answering_2} in Appendix~\ref{sec:appendix_results} for the full details on the query answering metrics. Here, we also provide a decomposition of the ranking scores separately for Step I and II of COINs.
 
-\begin{table}[H]
+\begin{table}[ht!]
   \caption[Computed MRR metric of single-hop query answering experiments.]{Computed MRR metric (higher is better) of single-hop query answering experiments for comparison of COINs results to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}
   \label{tab:performance_query_answering_mrr}
   \centering
@@ -416,7 +419,7 @@ KBGAT     &              ${{0.518}}$ &            ${{0.245}_{\pm 0.015}}$ &     
 \end{tabular}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[ht!]
   \caption[Computed MRR metric of Query2Box query answering experiments.]{Computed per-query-structure MRR metric (higher is better) of Query2Box query answering experiments to compare our results with COINs training and evaluation to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}
   \label{tab:performance_query_answering_q2b}
   \centering
@@ -440,10 +443,8 @@ Average &  ${{0.154}_{\pm 0.004}}$ &     $\mathbf{{0.261}_{\pm 0.002}}$ &  ${{0.
 \end{tabular}
 \end{adjustbox}
 \end{table}
-To add further context to our obtained results, in Table~\ref{tab:performance_query_answering_related_work} we compared COINs-RotatE's performance to that reported by NodePiece~\cite{galkin_nodepiece_2022} and EARL~\cite{chen_entity-agnostic_2023}, the previously-mentioned related work that also provides scalable model-based solutions at the cost of some performance. From the table, we can infer that in all cases, our approach either beats the baseline or is the one that preserves the most of its strength.
-
-\begin{table}[H]
-  \caption[Comparison of Hits@10 and MRR values for query answering between the RotatE baseline, NodePiece, EARL, and COINs.]{Comparison of Hits@10 and MRR values (averaged across seeds) for RotatE query answering between the baseline results in~\cite{sun_rotate_2019}, previous results by the related work NodePiece and EARL provided in~\cite{chen_entity-agnostic_2023}, and this work. The top model is in bold, while the second best is underlined.}
+\begin{table}[ht!]
+  \caption[Comparison of Hits@10 and MRR values for query answering between the RotatE baseline, NodePiece, EARL, and COINs.]{Comparison of Hits@10 and MRR values (averaged across seeds) for RotatE query answering between the baseline results in~\cite{sun_rotate_2019}, previous results by related work provided in~\cite{chen_entity-agnostic_2023}, and this work. The top model is in bold, the second best is underlined.}
   \label{tab:performance_query_answering_related_work}
   \centering
 \begin{tabular}{lrrrr}
@@ -471,10 +472,11 @@ COINs     &     \underline{0.552} &  \textbf{0.586} &     \underline{0.381} &  \
 % \bottomrule
 % \end{tabular}
 \end{table}
+To add further context to our obtained results, in Table~\ref{tab:performance_query_answering_related_work} we compared COINs-RotatE's performance to that reported by NodePiece~\cite{galkin_nodepiece_2022} and EARL~\cite{chen_entity-agnostic_2023}, the previously-mentioned related work that also provides scalable model-based solutions at the cost of some performance. From the table, we can infer that in all cases, our approach either beats the baseline or is the one that preserves the most of its strength.
 
 However, a relevant comparison to the baseline is difficult to perform without the aid of an additional scalability-dependent investigation of the applicability of our proposed approach. Unlike~\cite{chen_entity-agnostic_2023}, which only evaluated the ratio of absolute MRR to model size, we believe the more direct and robust scalability comparison is one between the relative error and speed-up. Thus, we plot our values for the relative error in MRR to the baseline against acceleration (reduction in computational complexity) in Figure~\ref{fig:feasibility}. 
 
-\begin{figure}[H]
+\begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=\textwidth]{figures/coins/feasibility_2.pdf}
 \end{center}
@@ -486,9 +488,8 @@ From the top plots, one can observe that almost all COINs experiments lie deep i
 
 \subsection{Summary}
 
-In this section, we introduced COINs, a method for accelerating link prediction and query answering models for knowledge graphs, to be applicable even in low computational resource settings. COINs featured a two-step prediction procedure: query answer prediction via community prediction and within-community localization. 
-We theoretically and empirically elaborated that the quality of the community structure of the knowledge graph has a broad-reaching influence on the possible scalability improvements provided by our method, as well as its prediction performance compared to baselines. As such, one can conclude that before selecting COINs to accelerate the embedding of a knowledge graph, it is important to study and evaluate its community structure. 
+In this section, we introduced COINs, a method for accelerating link prediction and query answering models for knowledge graphs, to be applicable even in low computational resource settings. COINs featured a two-step prediction procedure: query answer prediction via community prediction and within-community localization. We theoretically and empirically elaborated that the quality of the community structure of the knowledge graph has a broad-reaching influence on the possible scalability improvements provided by our method, as well as its prediction performance compared to baselines. 
 
-The achieved impressive accuracy and acceleration benefits strongly motivate modeling and predicting over both the community-level coarsened version of a knowledge graph, in addition to the local structures, no matter the task. We would, in such a way, apply both holistic and reductionist techniques to solve a knowledge graph problem, perhaps otherwise computationally intractable.
+As such, one can conclude that before selecting COINs to accelerate the embedding of a knowledge graph, it is important to study and evaluate its community structure. The achieved impressive accuracy and acceleration benefits strongly motivate modeling and predicting over both the community-level coarsened version of a knowledge graph, in addition to the local structures, no matter the task. We would, in such a way, apply both holistic and reductionist techniques to solve a knowledge graph problem, perhaps otherwise computationally intractable.
 
 As relevant future work in scalable knowledge graph reasoning, we propose attempting the integration of COINs with algorithms for general first-order logical knowledge graph query answering, like BetaE~\cite{ren_beta_2020}, and obtaining comparisons to baseline models on larger non-standard knowledge graphs.
