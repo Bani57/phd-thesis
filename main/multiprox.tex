@@ -1,9 +1,7 @@
 \section{Multi-measurement Methods for Graph Diffusion Acceleration}
 \label{sec: multiprox}
 
-In the previous section, we discussed how HiGenDiff can reduce the number of edge probabilities to compute during graph generation and thus reduce time complexity, while preserving very strong generalization performance. However, the choice of employing diffusion models has a negative effect on scalability, as unlike most generative machines, they require $T$ inference steps to produce a sample instead of simple one-shot generation.
-
-This part of the thesis will argue that it is possible to reduce the number of denoising steps required, while also preserving baseline performance. Multi-measurement sampling theory is the key knowledge we must apply to achieve those effects. The content presented in this section is published as~\cite{dadi_improving_2025} and is also discussed in~\cite{dadi_noisy_2025}.
+In the previous section, we discussed how HiGenDiff can reduce the number of edge probabilities to compute during graph generation and thus reduce time complexity, while preserving very strong generalization performance. However, the choice of employing diffusion models has a negative effect on scalability, as unlike most generative machines, they require $T$ inference steps to produce a sample instead of simple one-shot generation. This part of the thesis will argue that it is possible to reduce the number of denoising steps required, while also preserving baseline performance. Multi-measurement sampling theory is the key knowledge we must apply to achieve those effects. The content presented in this section is published as~\cite{dadi_improving_2025} and is also discussed in~\cite{dadi_noisy_2025}.
 
 \subsection{The One True Step}
 
@@ -39,7 +37,7 @@ Recall that, for a data distribution $\mathbf{X}_0 \sim p_0$ over $\mathbb{R}^F$
 where $Z_t \sim N\of{\mathbf{0}, \mathbf{I}_F}$ is an independently sampled standard Gaussian; and $\mathbf{X}_0$ is a sample from the data distribution $p_0$. Given these noisy measurements, a network $g_t:\mathbb{R}^F\to\mathbb{R}^F$ is trained to denoise $\mathbf{X}_t$ by learning to predict the noise $Z_t$ given $\mathbf{X}_t$. This boils down to approximating the rescaled score of $\mathbf{X}_t$ given by $-\beta_t \nabla \log p_t$. With simple algebra, we can show that the network is merely a reparametrized approximation to the conditional expectation of $\mathbf{X}_0|\mathbf{X}_t$. In other words, we can show that
 \begin{equation}
 \label{eq:reparam}
-\frac{1}{\alpha_t}\off{X_t - \beta_t g_t\of{\mathbf{X}_t}} = \mathbb{E}\off{\mathbf{X}_0|\mathbf{X}_t}.
+\frac{1}{\alpha_t}\off{\mathbf{X}_t - \beta_t g_t\of{\mathbf{X}_t}} = \mathbb{E}\off{\mathbf{X}_0|\mathbf{X}_t}.
 \end{equation}
 Once the network is trained, diffusion models use this network to progressively denoise a standard Gaussian to generate new samples. The network has learned to compute conditional expectations, and the goal of the denoising process is to exploit these conditional expectations to output a new sample. 
 
@@ -169,7 +167,7 @@ Thus, when evaluating our MultiProx sampler on these discrete distributions, we 
 
 For an explanation, we hypothesize that the issue arises from the argmax projection of the Gaussian logits, which would require different guarantees on the modeling accuracy of its distribution. The higher noise level moves the Gibbs chain with a sufficiently high velocity so as to cover more modes, while the annealing steps to the lower noise level make sure there are fewer warm-up steps. We refer to the work by~\cite{sahoo_diffusion_2025} for a potential solution on how to remain in the single-noise-level configuration even for complex discrete distributions. 
 
-\begin{table}[H]
+\begin{table}[!ht]
     \centering
     \caption[MultiProxAn sampling metrics for the QM9 dataset of molecule graphs.]{Sampling metrics for each noise level hyperparameter configuration we tested for the QM9 dataset of molecule graphs. Left to right: MultiProxAn fixed noise level $t$ and final output noise level $t' \leq t$ (as percentages of $T$), percentage of valid molecule graphs, percentage of unique valid molecules, percentage of novel unique valid molecules (not present in the dataset), and total execution time of sampling. Arrows indicate whether higher or lower values of a metric are better. Best values per metric are in bold, while second-best values are underlined.}
     % \resizebox{\textwidth}{!}{
@@ -193,7 +191,7 @@ For an explanation, we hypothesize that the issue arises from the argmax project
     \label{tab:qm9_stats}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{figures/multiprox/qm9_grid_image.png}
     \caption[Best chain of molecule graphs obtained with MultiProxAn.]{Best chain of molecule graphs obtained with MultiProxAn and a ConGress denoiser. For this QM9 chain $n=10$, $m=100$, $t=250$ and $t'=2$ (50\% and 0.4\% of $T$, respectively).

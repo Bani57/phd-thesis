@@ -25,7 +25,7 @@ It is very easy to deduce the huge computational cost of this approach, even wit
 
 The cause of the high-degree polynomial computational complexity of this \emph{exact} knowledge graph anomaly correction algorithm is the model's lack of likelihood estimation power \emph{beyond the range of a single edge} and the lack of \emph{intrinsic estimates of the noise level} in the data. Without these properties, for this difficult application, simple transductive classification models have to behave exactly like the deterministic algorithms they emulate.
 
-On the other hand, imagine if a graph generative model had been trained on a dataset of known clean $n \times n$ graph blocks, where artificial noise was added during training in order to instill denoising behaviour, then applied to perform the anomaly correction on our noisy set as evaluation. Specifically, diffusion models would be the most powerful, due to possessing one denoising model for each noise level in a large range. We will obtain in just $O(n^2 T)$ steps a candidate corrected graph from a wide range of possible noisy inputs, although the output will be stochastic and effectively an approximation of the true \emph{optimal} graph. These kinds of experiments are exactly what this penultimate section of this work will describe.
+On the other hand, imagine if a graph generative model had been trained on a dataset of known clean $n \times n$ graph blocks, where artificial noise was added during training in order to instill denoising behavior, then applied to perform the anomaly correction on our noisy set as evaluation. Specifically, diffusion models would be the most powerful, due to possessing one denoising model for each noise level in a large range. We will obtain in just $O(n^2 T)$ steps a candidate corrected graph from a wide range of possible noisy inputs, although the output will be stochastic and effectively an approximation of the true \emph{optimal} graph. These kinds of experiments are exactly what this penultimate section of this work will describe.
 
 \subsection{Related work}
 
@@ -35,7 +35,7 @@ Previous literature on knowledge graph subgraph generation is expectedly sparse,
 
 \cite{mahmoudzadeh_deep_2024} proposes Variational Auto-Encoder (VAE) models for the task, but the approach is still only used to answer queries generatively and not to estimate the graph distribution. We also believe the state-of-the-art performance of diffusion models for graphs motivates the higher relevance of the investigation of the application of these models, as well as their natural compatibility with the problem. 
 
-A very interesting recent approach is detailed in \cite{dong_refining_2025}, where the next-token prediction power of Large Language Models (LLMs) was applied to estimate noise in collections of candidate triplets by assuming their concatenations of entities and relations are fragments of a bigger story, whose internal consistency the model should classify. We support the soundness of the approach; however, generalization is an issue, as not infrequently entity and relation labels in knowledge graphs are partly symbolic keys, and inferring the story immediately is difficult, so the most general approach should also perform graph structure modelling as well.
+A very interesting recent approach is detailed in \cite{dong_refining_2025}, where the next-token prediction power of Large Language Models (LLMs) was applied to estimate noise in collections of candidate triplets by assuming their concatenations of entities and relations are fragments of a bigger story, whose internal consistency the model should classify. We support the soundness of the approach; however, generalization is an issue, as not infrequently, entity and relation labels in knowledge graphs are partly symbolic keys, and inferring the story immediately is difficult, so the most general approach should also perform graph structure modeling as well.
 
 \subsection{Experiment setup}
 
@@ -49,7 +49,7 @@ $\mathbf{x}_i \in \mathbb{R}^{n \times F}$ (or $\mathbb{R}^{2n \times F}$ when t
 
 Due to the node permutation group symmetry of graphs \cite{bronstein_geometric_2021}, the entity-to-subgraph assignment cannot be performed with a default entity ID permutation, and to preserve edge locality within subgraphs, we chose to employ depth-first-search-based topological sorting and subgraph splitting based on cutting DFS spanning tree branches. The full dataset construction procedure is detailed in Algorithm \ref{alg:knowledge_correction_dataset}. Note that for computational feasibility and relevance, we only consider sufficiently dense adjacency blocks as valid samples (arbitrarily, we chose the cutoff of 5 edges). 
 
-\begin{algorithm}[hb!]%[H]
+\begin{algorithm}[!hb]%[H]
     \caption{Knowledge correction dataset sampling}
     \label{alg:knowledge_correction_dataset}
     \begin{algorithmic}
@@ -93,18 +93,16 @@ Due to the node permutation group symmetry of graphs \cite{bronstein_geometric_2
 As base knowledge graphs to sample from, for this task, we again choose the three classical knowledge graphs which were also evaluating COINs: FB15k-237 \cite{toutanova_observed_2015}, WN18RR \cite{dettmers_convolutional_2018}, and NELL-995 \cite{xiong_deeppath_2017}. The $n \times n$ block datasets sampled from each graph were train-val-test split uniformly at random. For Wordnet, we set $n=10$, while $n=20$ for the other two graphs.
 
 \subsubsection{Model}
-The denoising model we employed to perform the anomaly correct is a modified variant of the state-of-the-art graph diffuser DiGress \cite{vignac_digress_2022}, discussed many times before during this chapter. The required modifications arise due to the need for \emph{conditional} diffusion in our setting, as we will focus on denoising adjacency matrices, dependent on the node features and IDs for each subgraph. 
+The denoising model we employed to perform the anomaly correction is a modified variant of the state-of-the-art graph diffuser DiGress \cite{vignac_digress_2022}, discussed many times before during this chapter. The required modifications arise due to the need for \emph{conditional} diffusion in our setting, as we will focus on denoising adjacency matrices, dependent on the node features and IDs for each subgraph. 
 Namely, first on the likelihood modeling side, for each scorer in $\offf{f_t}_{t=1}^T$:
 \begin{equation}
     \mathbb{P}\of{A_{t-1} \mid A_t, \mathbf{x}, \mathbf{v}}=\sigma\of{f_t\of{A_{t-1},A_t,\mathbf{x}, \mathbf{v}}}
 \end{equation}
 Each generator in $\offf{g_t}_{t=1}^T$ thus is trained to maximize the same likelihood:
 \begin{equation}
-    g_t=\argmin_g{\mathbb{E}_{\mathcal{D},Z_A}\off{-\log\of{\mathbb{P}\of{A_{t-1} \mid A_t, \mathbf{x}, \mathbf{v}}}}},
+    g_t=\argmin_g{\mathbb{E}_{\mathcal{D},Z_A}\off{-\log\of{\mathbb{P}\of{g\of{A_t, \mathbf{x}, \mathbf{v}} \mid A_t, \mathbf{x}, \mathbf{v}}}}},
 \end{equation}
-where, now internally the graph transformer models of \cite{dwivedi_generalization_2021} employed by the generators possess a knowledge graph entity embedding model $g_V:V\to\mathbb{R}^F$ used to embed the novel input $\mathbf{v}$. 
-
-The entity embeddings are a new hidden state passed through the whole graph transformer, enhancing especially the representation that the FiLM \cite{perez_film_2018} graph attention layers learn.
+where, now internally the graph transformer models of \cite{dwivedi_generalization_2021} employed by the generators possess a knowledge graph entity embedding model $g_V:V\to\mathbb{R}^F$ used to embed $\mathbf{v}$. The entity embeddings are a new hidden state passed through the whole graph transformer, enhancing especially the representation that the FiLM \cite{perez_film_2018} graph attention layers learn.
 
 As a simpler auxiliary knowledge correction task, we also explore \emph{context-based} generation, where, by applying masking during the noising process, only the lower right region of the adjacency samples is denoised, while the remaining three quadrants always remain fixed, serving thus as additional conditioning to help guide more accurate corrections. 
 
@@ -112,7 +110,7 @@ Formally, in this setting:
 \begin{align}
     \begin{split}
         A_t &\sim \mathbf{M} \odot \text{Categorical}\of{Q_t \cdot \text{OneHot}\of{A_0}} + \of{1-\mathbf{M}} \odot A_0, \\
-        \hat{A}_{t-1} &= \mathbf{M} \odot g_t(\hat{A}_t) + \of{1-\mathbf{M}} \odot A_0, \\
+        \hat{A}_{t-1} &= \mathbf{M} \odot g_t\of{\hat{A}_t,\mathbf{x},\mathbf{v}} + \of{1-\mathbf{M}} \odot A_0, \\
         \forall i,j, \mathbf{M}_{i,j}&=\mathbb{I}\of{i \geq \frac{n}{2}, j \geq \frac{n}{2}}
     \end{split}
 \end{align}
@@ -163,10 +161,6 @@ Thus, we hypothesize that, unfortunately, this is due to the difficulty of the p
 
 Figure \ref{fig:kg_diffusion_loss} provides perhaps the best alternative summary to our experiment results, as well as proving the benefits of employing diffusion models to the task. The plots visualize the distribution of the contrastive loss of the current state of the subgraphs against the number of denoisers applied thus far. 
 
-While achieving the range of TransE loss values of the clean data is often out of reach, during training, the DiGress generators are able to almost monotonically decrease the contrastive loss over time. This is very relevant, as this implies almost all proposed edge flips by DiGress are valid corrections when the model is able to learn and generalize. 
-
-As the examples provided in Figure \ref{fig:kg_diffusion_examples} show, in some cases the quality of the corrected graphs can be extremely high, with very few spurious entity relations.
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.49\linewidth]{figures/kg_generation/chain_likelihood_freebase.pdf}
@@ -182,7 +176,11 @@ As the examples provided in Figure \ref{fig:kg_diffusion_examples} show, in some
     \label{fig:kg_diffusion_loss}
 \end{figure}
 
-\begin{figure}[H]
+While achieving the range of TransE loss values of the clean data is often out of reach, during training, the DiGress generators are able to almost monotonically decrease the contrastive loss over time. This is very relevant, as this implies almost all proposed edge flips by DiGress are valid corrections when the model is able to learn and generalize. 
+
+As the examples provided in Figure \ref{fig:kg_diffusion_examples} show, in some cases the quality of the corrected graphs can be extremely high, with very few spurious entity relations.
+
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=0.16\linewidth]{figures/kg_generation/freebase_noisy.png}
     \hfill

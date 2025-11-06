@@ -212,7 +212,7 @@ R_{i,l}^{\of{k}} = \begin{cases} z_i||\Phi_{i,C_{i,k,l}}, & l \leq c_{i,k} \\ 0,
 \end{equation}
 The autoregressive architecture of GGG-CRP is facilitated through a new edge readout function $r'$, modified to accept the discriminator features of the current graph in addition to the trunk's output for the current block. 
 
-With this setup in mind, GGG-CRP's generator pipeline design is given in Algorithm~\ref{algorithm:crp_generator}. The main scalability benefits of autoregressive generation techniques for graphs lie in the reduction in memory complexity, as with this setup, only one CRP block of a graph is processed at a time.
+With this setup in mind, GGG-CRP's generator pipeline design is given in Algorithm~\ref{algorithm:crp_generator} and a visual example is also given in Figure~\ref{fig:ggg_crp}. The main scalability benefits of autoregressive generation techniques for graphs lie in the reduction in memory complexity, as with this setup, only one CRP block of a graph is processed at a time.
 
 \begin{algorithm}%[H]
 \caption{GGG-CRP graph generation}
@@ -228,11 +228,16 @@ With this setup in mind, GGG-CRP's generator pipeline design is given in Algorit
 \end{algorithmic}
 \end{algorithm} 
 
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.65\linewidth]{figures/gggcrp/ggg_crp.pdf}
+    \caption[Visual example of an adjacency matrix being generated with GGG-CRP.]{Visual example of a graph adjacency matrix being generated with GGG-CRP, one community at a time. We observe 3 communities (red, green, and blue), and thus 3 CRP rounds were required. Each of the communities was of size 3, but the green community had also one node overlapping with the red community and another with the blue one, thus those entries in the matrix were generated (and colored) twice.}
+    \label{fig:ggg_crp}
+\end{figure}
+
 Regarding scaling up performance to larger graphs, observe that if there were overlapping nodes present, each would have been added in the generated graph with exactly as many copies as its number of communities. 
 
-This is intentional and we believe natural, as nodes belonging to multiple communities should have their representation refined multiple times as well. Due to this decision, however, all but the last-added copy of these nodes needs to be pruned from the final readout output, as well as the non-trailing zero-padding entries.
-
-In addition, to mitigate a discovered vanishing gradient issue with the CRP generator (expected due to the now recurrent architecture), a BatchNorm layer was added after the trunk output in each round, and the readout attention layers were configured to use ReLU activation instead of Softmax.
+This is intentional and we believe natural, as nodes belonging to multiple communities should have their representation refined multiple times as well. Due to this decision, however, all but the last-added copy of these nodes needs to be pruned from the final readout output, as well as the non-trailing zero-padding entries. In addition, to mitigate a discovered vanishing gradient issue with the CRP generator (expected due to the now recurrent architecture), a BatchNorm layer was added after the trunk output in each round, and the readout attention layers were configured to use ReLU activation instead of Softmax.
 
 \subsubsection{Multi-level connectivity regularization}
 With the computation of community-based metadata for the graphs, we obtain a unique opportunity to add a special type of regularization for the generator. Namely, one can compute a coarsening of each graph, the connectivity between communities as nodes themselves. The generator would be evaluated now with an additional Wasserstein score added to the discriminator loss, computed based on this higher-level connectivity, with a dedicated regularization parameter. 
@@ -258,7 +263,7 @@ Generation novelty was evaluated by studying the number of different isomorphism
 \subsection{Results \& Discussion}
 \label{sec:results_gggcrp}
 
-Table~\ref{tab:expressive_power} contains the MMD scores obtained by the current best-performing model configurations of each type. Unfortunately, we observe that even though GGG-CRP currently, for most metrics, can provide a comparable performance to GG-GAN for each dataset, a select few graph features prove difficult to train. A special case is perhaps the HouseFloorplan dataset, for which we obtain impressive performance with GGG-CRP, while GG-GAN could not scale to it at all.
+Table~\ref{tab:expressive_power} contains the MMD scores obtained by the current best-performing model configurations of each type. Unfortunately, we observe that even though GGG-CRP currently, for most metrics, can provide a comparable performance to GG-GAN for each dataset, a select few graph features remain difficult. A special case is perhaps the HouseFloorplan dataset, for which we obtain impressive performance with GGG-CRP, while GG-GAN could not scale to it.
 
 \begin{table}[ht!]
 \centering
@@ -283,7 +288,7 @@ HouseFloorplan & GGG-CRP & 0.0033 & 0.0369 & 0.0129 & 7.3910E-6 & 0.0204 \\
 %}
 \end{table}
 
-We observe this visually as well: Figures \labelcref{fig:qm9,fig:community_20,fig:chordal9,fig:house} present visualizations of a set of sampled graphs from the CRP generator, as well as the real and fake degree and cycle distributions for each dataset. We observe that the HouseFloorplan distribution is learned well; however, a persistent lack of a few connecting edges can be observed for the other three datasets.
+We observe this visually as well: Figures~\labelcref{fig:qm9,fig:community_20,fig:chordal9,fig:house} present visualizations of a set of sampled graphs from the CRP generator, as well as the real and fake degree and cycle distributions for each dataset. We observe that the HouseFloorplan distribution is learned well; however, a persistent lack of a few connecting edges can be observed for the other three datasets.
 
 \begin{figure}[!ht]
     \centering
