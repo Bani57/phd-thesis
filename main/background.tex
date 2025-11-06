@@ -47,7 +47,7 @@ For directed graphs, due to the asymmetry of edges, the separate notions of \emp
 \end{definition}
 
 \begin{definition}
-Given a graph $G=\of{V, E}$, the \emph{neighbourhood} of a node $v \in V$ is the defined as the set of nodes $v$ is directly connected to with an edge: \begin{equation}
+Given a graph $G=\of{V, E}$, the \emph{neighbourhood} of a node $v \in V$ is defined as the set of nodes $v$ is directly connected to with an edge: \begin{equation}
 N\of{v}=\offf{u \mid u\in V, \of{v,u} \in E \vee \of{u,v} \in E }
 \end{equation} 
 Analogously to node degree, the notions of \emph{in-neighbourhood} and \emph{out-neighbourhood} can be defined. Observe that $d\of{v}=\abs{N\of{v}}$.
@@ -86,7 +86,7 @@ A directed graph is \emph{strongly connected} if a path exists between all pairs
 
 \subsection{Importance measures}
 
-Network science teaches that networks have specific relevant computable attributes that can be used to analyze the network in order to summarize, characterize, and model it. One class of these metrics deals with the problem of how to assign an \enquote{importance} score to nodes and edges, but different metrics encode different contexts in doing this.
+Network science teaches that networks have specific relevant computable attributes that can be used to analyse the network in order to summarize, characterize, and model it. One class of these metrics deals with the problem of how to assign an \enquote{importance} score to nodes and edges, but different metrics encode different contexts in doing this.
 
 For example, there exist several so-called \emph{centrality} indices that attempt to rank nodes or edges for different purposes, such as \emph{degree centrality}, \emph{betweenness centrality}, \emph{closeness centrality}, etc. Generally, these metrics give more importance to nodes/edges, which contribute more to the graph's connectivity and are derived from the node degree, number of paths, or other elementary properties.
 

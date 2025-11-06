@@ -5,7 +5,7 @@ The task of generative models is to learn from empirical observations how to mod
 
 Namely, what is the best approach to further improve the scalability of the current state-of-the-art graph generation models, as the current best performance drops for larger graphs, while preserving their high expressive power and exchangeability?
 
-In this section, we will present an approach to integrating permutation-invariant community-detection-based metrics into a Chinese Restaurant Process to perform exchangeable sequence modeling for graph generation. This approach, when integrated into the current-best graph GAN, yielded a new variation of the model, named GGG-CRP. Current results will be shown as comparable to the base model in the wake of strong resource reduction, demonstrating promise for improvement in immediate future work.
+In this section, we will present an approach to integrating permutation-invariant community-detection-based metrics into a Chinese Restaurant Process to perform exchangeable sequence modelling for graph generation. This approach, when integrated into the current-best graph GAN, yielded a new variation of the model, named GGG-CRP. Current results will be shown as comparable to the base model in the wake of strong resource reduction, demonstrating promise for improvement in immediate future work.
 
 \subsection{Equivariant \& autoregressive}
 
@@ -25,7 +25,7 @@ As noted by~\cite{krawczuk_gg-gan_2020}, a graph generator $g$ should possess 4 
 
 To satisfy these properties,~\cite{krawczuk_gg-gan_2020} proposed such an exchangeable geometric generator called GG-GAN. Surprisingly, classical geometric approaches have so far found limited adoption in the context of deep generative graph models. GG-GAN precisely bridges this gap, showing how deep geometric approaches can perform well. It sheds light on some basic limits and challenges of geometric graph generators and solves these problems with a novel latent state, while retaining consistency through equivariance.
 
-This research is still ongoing, to attempt to answer remaining questions posed by some experiment results, namely: what is the best approach to further improve the scalability of the GG-GAN graph generation model, as the current best performance drops for larger graphs, while preserving its high expressive power and exchangeability. The work for this project consisted of focusing on the implementation of one of the proposed approaches: exchangeable sequence modeling with Chinese Restaurant Processes (CRPs), assisted by overlap-agnostic community detection, to incur the distribution modelling benefits of autoregressive models without sacrificing generation novelty and diversity. 
+This research is still ongoing, to attempt to answer remaining questions posed by some experiment results, namely: what is the best approach to further improve the scalability of the GG-GAN graph generation model, as the current best performance drops for larger graphs, while preserving its high expressive power and exchangeability. The work for this project consisted of focusing on the implementation of one of the proposed approaches: exchangeable sequence modelling with Chinese Restaurant Processes (CRPs), assisted by overlap-agnostic community detection, to incur the distribution modelling benefits of autoregressive models without sacrificing generation novelty and diversity. 
 
 \subsection{Background}
 \label{sec:background_gggcrp}
@@ -58,13 +58,13 @@ Formally, $\mathcal{M}$ samples graph sizes $n$, models the likelihood as $\math
 \subsubsection{Geometric Graph Generation with GG-GAN}
 Two main issues plague current top non-equivariant graph generators: 
 \begin{itemize}
-\item Even though they can approximate any distribution arbitrarily up to their constraints, they can \emph{waste a significant portion of capacity} modeling graphs that are isomorphic to each other - the isomorphism consistency property guaranteed by models like GG-GAN is a solution;
+\item Even though they can approximate any distribution arbitrarily up to their constraints, they can \emph{waste a significant portion of capacity} modelling graphs that are isomorphic to each other - the isomorphism consistency property guaranteed by models like GG-GAN is a solution;
 \item In general, they are not \emph{injective} functions; they have no guarantee that two random latent vectors will not be mapped to the same graph (\emph{collisions}) - GG-GAN's novel generator latent state helps to mitigate this problem, though not yet completely.  
 \end{itemize}
 
 GG-GAN~\cite{krawczuk_gg-gan_2020} is an LP-penalty Wasserstein GAN~\cite{gulrajani_improved_2017} with a permutation-equivariant generator and discriminator duo. GG-GAN's generator $g$ conceptually consists of three serially-connected parts; its architecture is visually represented in Figure~\ref{fig:gg_gan_g}. The \emph{root} constructs the node latent state used as initialization from the generator. Here the novel alternative to the standard Gaussian latent state, $Z_i \in \mathbb{R}^{n_i \times D} \sim N\of{0,\mathbf{I}}$, is the idea to leave $P<D$ of the latent dimensions as \emph{fixed}, while the remaining a part of a single random context vector $z \in \mathbb{R}^{D-P}$. This fixed point set $\Phi_i \in \mathbb{R}^{n_i \times P}$ could either be a fully-learnable parameter set or, e.g., chosen fixed points in a higher-dimensional binary or spherical embedding space. With this setup, the collision avoidance task is addressed together with the instability issues of GAN training at the same time. 
 
-The \emph{trunk} is a permutation-equivariant function $t: \mathbb{R}^D \to \mathbb{R}^{F}$ that computes a further embedding of the node set, $X_i \in \mathbb{R}^{n_i \times F}$, which is given to the \emph{edge readout} function $r: \mathbb{R}^{n_i \times F} \to \mathbb{R}^{n_i \times n_i}$ to transform it into a probabilistic adjacency matrix. The final adjacency output $A_i$ is obtained by sampling the sigmoid-activated readout values as Bernoulli random variables. A \emph{node readout} function with a similar structure can generate node features $\mathbf{X}_i$ if required. To guarantee equivariance, both the trunk and readouts utilize provably-equivariant deep layers such as (multi-head) attention or point-wise MLPs. To allow the generator \emph{adaptability} to variable graph sizes $n_i$, this single graph meta-variable is modeled and sampled as a categorical random variable whose probability mass function and range are estimated from the dataset.
+The \emph{trunk} is a permutation-equivariant function $t: \mathbb{R}^D \to \mathbb{R}^{F}$ that computes a further embedding of the node set, $X_i \in \mathbb{R}^{n_i \times F}$, which is given to the \emph{edge readout} function $r: \mathbb{R}^{n_i \times F} \to \mathbb{R}^{n_i \times n_i}$ to transform it into a probabilistic adjacency matrix. The final adjacency output $A_i$ is obtained by sampling the sigmoid-activated readout values as Bernoulli random variables. A \emph{node readout} function with a similar structure can generate node features $\mathbf{X}_i$ if required. To guarantee equivariance, both the trunk and readouts utilize provably-equivariant deep layers such as (multi-head) attention or point-wise MLPs. To allow the generator \emph{adaptability} to variable graph sizes $n_i$, this single graph meta-variable is modelled and sampled as a categorical random variable whose probability mass function and range are estimated from the dataset.
 
 The discriminator $d$, represented in Figure~\ref{fig:gg_gan_d}, passes each graph input to two heads, whose output features are concatenated before a MLP classifier: one is a known permutation-equivariant Message Passing Neural Network (MPNN) from previous work, while the other computes classical handcrafted graph features in a differentiable manner - to preserve both universality and exchangeability of the discriminator.
 
@@ -127,7 +127,7 @@ In the following text, we will present our approach on how to integrate permutat
 \textbf{Notes on notation:} $\mathbb{N}_{m} = \offf{1,\dots,m}$ will denote the set of the first $m$ natural numbers; the index $i$ will denote a batch sample (graph); $j$ will denote the \emph{cardinality} of an overlapping region, defined as the number of different communities that are overlapping to form the region; $k$ will denote a community and $l$ will denote a single node.
 
 \subsubsection{Data augmentation}
-The first step required for the new graph distribution modeling approach for GG-GAN is to run a selected overlapping community detection algorithm on each graph in the dataset. The dataset for GG-GAN is represented as the set $\mathcal{D} = \offf{\of{\mathbf{X}_i, A_i}}_{i=1}^{N}$, where $\mathbf{X}_i$ are the node feature vectors, $A_i$ are the graph adjacency matrices, i.e., we do not consider global graph features. We condense and represent the output of the graph partitioning algorithm through the matrix $M_i = \text{OCD}\of{A_i} \in \offf{0, 1}^{n_i \times k_i}$, which from here on shall be referred to as the \emph{membership matrix}. $k_i \leq n_i$ is the number of detected communities and $M_{i,l,k}=1$ denotes that in graph $i$, node $l$ is a member of community $k$.
+The first step required for the new graph distribution modelling approach for GG-GAN is to run a selected overlapping community detection algorithm on each graph in the dataset. The dataset for GG-GAN is represented as the set $\mathcal{D} = \offf{\of{\mathbf{X}_i, A_i}}_{i=1}^{N}$, where $\mathbf{X}_i$ are the node feature vectors, $A_i$ are the graph adjacency matrices, i.e., we do not consider global graph features. We condense and represent the output of the graph partitioning algorithm through the matrix $M_i = \text{OCD}\of{A_i} \in \offf{0, 1}^{n_i \times k_i}$, which from here on shall be referred to as the \emph{membership matrix}. $k_i \leq n_i$ is the number of detected communities and $M_{i,l,k}=1$ denotes that in graph $i$, node $l$ is a member of community $k$.
 
 The membership matrix in the general case has two natural constraints: all communities must be non-empty, $\forall k \in \mathbb{N}_{k_i}, \of{M^T_i \cdot \mathbf{1}_{n_i}}_k > 0$; all nodes must be assigned $\forall l \in \mathbb{N}_{n_i}, \of{M_i \cdot \mathbf{1}_{k_i}}_l > 0$. In the special case of disjoint communities, this property is represented by $M_i$ satisfying additionally: $M_i \cdot \mathbf{1}_{k_i} = \mathbf{1}_{n_i}$.
 
@@ -142,7 +142,7 @@ c_i = M^T_i \cdot \mathbf{1}_{n_i} = O_i^T \cdot \mathbf{1}_{k_i}
 In the special case of disjoint communities, we have only cardinality-1 nodes (each nodes belongs to only one community): $O_{i,1}=c_i, O_{i,2}=\dots=O_{i,k_i}=\mathbf{0}_{k_i}$.
 The final augmented dataset is thus the collection: $\mathcal{D}^* = \offf{\of{\mathbf{X}_i, A_i, k_i, c_i, O_i, M_i}}_{i=1}^{B}$.
 
-\subsubsection{Modeling and sampling of permutation-invariant graph meta-variables}
+\subsubsection{Modelling and sampling of permutation-invariant graph meta-variables}
 Recall that in order for GG-GAN's generator to be robust to variation in graph size in a dataset, the graph size is estimated and sampled as a categorical random variable. We can now naturally improve the adaptability of the model by estimating and sampling the newly available community-related statistics as well.
 
 \paragraph{Estimated distribution}
@@ -154,7 +154,7 @@ Instead of just the maximum graph size, the full list of estimated order statist
 \item Maximum overlapping region size: $o_{\max}=\max_{i=1}^{N}\max_{j=1}^{k_i}\max_{k=1}^{k_i}{O_{i,j,k}}$
 \end{itemize}
 
-The full list of random variables and vectors that need to be modeled and sampled for GGG-CRP is:
+The full list of random variables and vectors that need to be modelled and sampled for GGG-CRP is:
 
 \begin{itemize}
 \item Number of nodes / graph size: $n \in \mathbb{N}_{n_{\max}}$
@@ -164,7 +164,7 @@ The full list of random variables and vectors that need to be modeled and sample
 \item Overlapping region size: $O \in \of{\mathbb{N}_{o_{\max}} \cup \offf{0}}^{k_{\max} \times k_{\max}}$
 \end{itemize}
 
-The collection of graph meta-variables is thus $\of{N, K^c, N^c, K, O}$ and to generalize GG-GAN's approach, is modeled with a jointly-categorical distribution $\mathcal{F}$ whose probabilities are estimated from the data as relative frequencies. In this manner, no independence assumptions are introduced, though for larger graphs, due to potential memory issues, a sparse implementation of the estimated probability tensors is recommended.
+The collection of graph meta-variables is thus $\of{N, K^c, N^c, K, O}$ and to generalize GG-GAN's approach, is modelled with a jointly-categorical distribution $\mathcal{F}$ whose probabilities are estimated from the data as relative frequencies. In this manner, no independence assumptions are introduced, though for larger graphs, due to potential memory issues, a sparse implementation of the estimated probability tensors is recommended.
 
 \paragraph{Graph meta-variable sampling}
 
@@ -345,4 +345,4 @@ Autoregressive models in general are known to show greater performance when such
 \subsection{Summary}
 \label{sec:conclusion}
 
-In this section, we presented an approach on how to integrate permutation invariant metrics based on community detection into a Chinese Restaurant Process to perform exchangeable sequence modeling for graph generation. This approach, when integrated into the current best graph GAN model, GG-GAN, yielded a new variation of the model named GGG-CRP. Current results were shown to be comparable to the base model in the wake of strong resource reduction, demonstrating promise. 
+In this section, we presented an approach on how to integrate permutation invariant metrics based on community detection into a Chinese Restaurant Process to perform exchangeable sequence modelling for graph generation. This approach, when integrated into the current best graph GAN model, GG-GAN, yielded a new variation of the model named GGG-CRP. Current results were shown to be comparable to the base model in the wake of strong resource reduction, demonstrating promise. 

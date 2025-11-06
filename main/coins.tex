@@ -6,11 +6,11 @@ In this section, we present a new method, called COINs for \textbf{CO}mmunity \t
 The work described in this section has been accepted for publication as~\cite{janchevski_coins_2025}.
 
 \subsection{Big Data with Small Compute}
-Knowledge graphs are a type of database where the general structure is a \emph{network} of \emph{entities}, their semantic \emph{types}, \emph{properties}, and \emph{relationships}; relations are \emph{flexible} through the use of \emph{abstract classes} to represent real-world data from potentially multiple topical domains~\cite{ehrlinger_towards_2016,hogan_knowledge_2020}. Organizations often use knowledge graphs to catalog and analyze relational data. However, scalability becomes a challenge as the graphs can become very large and require significant computational resources.
+Knowledge graphs are a type of database where the general structure is a \emph{network} of \emph{entities}, their semantic \emph{types}, \emph{properties}, and \emph{relationships}; relations are \emph{flexible} through the use of \emph{abstract classes} to represent real-world data from potentially multiple topical domains~\cite{ehrlinger_towards_2016,hogan_knowledge_2020}. Organizations often use knowledge graphs to catalogue and analyse relational data. However, scalability becomes a challenge as the graphs can become very large and require significant computational resources.
 
 Almost all existing scaling approaches involve \emph{splitting the enormous graph into disjoint subsets}, followed by distributed training.
 For instance, PyTorch-BigGraph~\cite{lerer_pytorch-biggraph_2019} and DGL-KE~\cite{zheng_dgl-ke_2020} are distributed-algorithm-system frameworks that can scale the implementation of graph neural networks with distributed execution over billion-scale graphs.
-On the other hand, SMORE~\cite{ren_smore_2021} focuses on model parallelization and employs an efficient algorithm for sampling data. CARL-G~\cite{shiao_carl-g_2023} provides similar speed-ups in data sampling to SMORE, but applies only to a non-contrastive setting, and both guarantee acceleration only during training. tf-GNN~\cite{ferludin_tf-gnn_2022} mainly focuses on accelerating the sampling of k-hop neighborhoods of nodes during distributed training.
+On the other hand, SMORE~\cite{ren_smore_2021} focuses on model parallelization and employs an efficient algorithm for sampling data. CARL-G~\cite{shiao_carl-g_2023} provides similar speed-ups in data sampling to SMORE, but applies only to a non-contrastive setting, and both guarantee acceleration only during training. tf-GNN~\cite{ferludin_tf-gnn_2022} mainly focuses on accelerating the sampling of k-hop neighbourhoods of nodes during distributed training.
 
 To this end, we present COINs ({\bf CO}mmunity {\bf IN}formed graph embedding{\bf s}) in a distinct, low-resource setting for transductive knowledge graph reasoning model optimization, inference, and evaluation in the contrastive learning setting. We contend that this setting remains elusive to the scalable approaches above, which require a minimum (but still a formidable) level of computational power, and offers new insights to accelerate graph inference. 
 
@@ -23,7 +23,7 @@ Before explicitly stating our contributions below, we will first establish the b
 \label{sec:background}
 \subsubsection{Problem and Challenges}
 
-Performing knowledge graph inference requires solving link prediction and query answering. Given a dataset of entity-relation-entity triplets, labeled positive or negative according to whether they have originated from the knowledge graph or not, link prediction involves predicting these labels. 
+Performing knowledge graph inference requires solving link prediction and query answering. Given a dataset of entity-relation-entity triplets, labelled positive or negative according to whether they have originated from the knowledge graph or not, link prediction involves predicting these labels. 
 
 On the other hand, given a list of logical queries extracted from the knowledge graph, the query answering task requires ranking for \emph{each} query \emph{all} of the entities in the graph according to how likely they are to be its correct answer. Thus, compared to link prediction, this task is much more computationally complex, as the largest contributor to the number of model inference calls is the size of the graph. Our work aims to reduce this factor significantly.
 
@@ -33,13 +33,13 @@ Mathematically, we can represent knowledge graphs with AMHENs:
 \begin{definition}
 An \emph{Attributed Multiplex HEterogeneous Network (AMHEN)} is a graph where each entity (node) in a set $V$ has attributes and each relation (edge) in a set $E$ has a type label~\cite{liu_ahng_2019,cen_representation_2019}. 
 
-Formally, first, a finite set of \emph{relation types} is defined $R = \offf{r_1,r_2,\dots}$, and the edge labeling is represented through the mathematical relation $E_R \subseteq V \times R \times V$, called the \emph{set of relation triplets}:  $E_R = \offf{\of{h,r,t} \mid h,t \in V, \of{h,t} \in E, r \in R}$. Entity/node attributes can be collected, e.g., in a matrix $\mathbf{X} \in \mathbb{R}^{\abs{V} \times F}$, with $F$ as the feature dimension. 
+Formally, first, a finite set of \emph{relation types} is defined $R = \offf{r_1,r_2,\dots}$, and the edge labelling is represented through the mathematical relation $E_R \subseteq V \times R \times V$, called the \emph{set of relation triplets}:  $E_R = \offf{\of{h,r,t} \mid h,t \in V, \of{h,t} \in E, r \in R}$. Entity/node attributes can be collected, e.g., in a matrix $\mathbf{X} \in \mathbb{R}^{\abs{V} \times F}$, with $F$ as the feature dimension. 
 
 Usually, the nodes $h$ and $t$ in the triplets are referred to as the \emph{head} and \emph{tail} of the relations, respectively. The attributed multiplex heterogeneous network is the new collection $\of{V, E_R, R, \mathbf{X}}$.
 \end{definition}
 
 \begin{definition}
-    A \emph{query} of the knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$ is the collection $q=\of{\mathcal{A}_q, G_q}$ of a set $\mathcal{A}_q \subseteq V$ of \emph{anchor} (input) entities and $G_q: \mathcal{A}_q \to \mathcal{P}\of{V}$, a mapping visualized via a \emph{computational graph} in the form of a DAG informing how to obtain \emph{answer} entities to the query starting from the anchors, where during this process all of the nodes in $q$ get labeled with sets of entities from $V$. 
+    A \emph{query} of the knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$ is the collection $q=\of{\mathcal{A}_q, G_q}$ of a set $\mathcal{A}_q \subseteq V$ of \emph{anchor} (input) entities and $G_q: \mathcal{A}_q \to \mathcal{P}\of{V}$, a mapping visualized via a \emph{computational graph} in the form of a DAG informing how to obtain \emph{answer} entities to the query starting from the anchors, where during this process all of the nodes in $q$ get labelled with sets of entities from $V$. 
     
     In the special case of \emph{conjunctive logical queries}, the edges in $q$ represent either \emph{relation projection} operations $P: \mathcal{P}\of{V} \times R \to \mathcal{P}\of{V}$ (map head to tail along a relation) or \emph{intersection} operations $I: \mathcal{P}\of{\mathcal{P}\of{V}} \to \mathcal{P}\of{V}$ (classical $\cap$), specializing the query mapping as $G_q\of{\mathcal{A}_q;P,I}$~\cite{ren_query2box_2020}.
     \label{def:query}
@@ -105,7 +105,7 @@ With $c$, we construct an alternative two-step query answering procedure:
 
 First note that the mapping $c$ induces a \emph{disjoint partition} of the entity set $V$. Namely, if we construct the sets $C_k = \offf{v \in V \mid c\of{v}=k}, k \in \mathcal{C}$, then $\bigcup_{k=1}^{K}{C_k}=V$ and $\forall i,j \in \mathcal{C},i \neq j, C_i \cap C_j = \emptyset$. 
 
-By analyzing in detail the computational complexity of our new evaluation method, one can easily assess the quality of any such disjoint partition. 
+By analysing in detail the computational complexity of our new evaluation method, one can easily assess the quality of any such disjoint partition. 
 Proposition~\ref{proposition:complexity} provides our main result. The proof is available in Appendix~\ref{sec:appendix_proofs}.
 \begin{proposition}
 \label{proposition:complexity}
@@ -126,7 +126,7 @@ V^*\of{c}=\offf{v \in V \mid \exists \of{u,r}, E_R \cap \offf{\of{v,r,u}, \of{u,
 \end{equation}
 of entities that participate in between-group relations, then we must have both minimal $\abs{V^*\of{c}}$ as well as minimal total evaluation cost (Proposition~\ref{proposition:complexity}). 
 
-In this case, the search for the true answer to a query will be most often localized to a small neighborhood in the knowledge graph, a significantly easier problem. Equivalently, one prefers a mapping $c$ such that more relations are present \emph{within} the entity sets $C_k$ than \emph{between} them. 
+In this case, the search for the true answer to a query will be most often localized to a small neighbourhood in the knowledge graph, a significantly easier problem. Equivalently, one prefers a mapping $c$ such that more relations are present \emph{within} the entity sets $C_k$ than \emph{between} them. 
 
 Unfortunately, achieving good localization is an NP-hard problem, but research in the fields of \emph{community detection} and \emph{minimal cuts} for graphs has yielded efficient heuristic algorithms. 
 
@@ -221,7 +221,7 @@ Observe that the total number of COINs node embeddings for a graph is
 \end{equation}
 compared to just $\abs{V}$ node embeddings in the baseline. Thus, using a partitioning that keeps $\abs{V^*} \ll \abs{V}$ has benefits in limiting model size as well. 
 
-Let now $S_C$ denote a learned scoring model for community-level query-answer pairs, obtained after extending the community-level COINs sub-models into a classifier, with $S_V$ the analog for the final node-level query answer scoring. Then, one can implement the proposed novel scalable query answering procedure via Algorithm~\ref{algorithm:scalable_query_answering}.
+Let now $S_C$ denote a learned scoring model for community-level query-answer pairs, obtained after extending the community-level COINs sub-models into a classifier, with $S_V$ the analogue for the final node-level query answer scoring. Then, one can implement the proposed novel scalable query answering procedure via Algorithm~\ref{algorithm:scalable_query_answering}.
 
 \begin{algorithm}[H]
 \caption{COINs query answering evaluation}
@@ -241,11 +241,11 @@ Let now $S_C$ denote a learned scoring model for community-level query-answer pa
 \end{algorithmic}
 \end{algorithm} 
 
-\subsubsection{Tradeoff analysis}
+\subsubsection{Trade-off analysis}
 
 The primary limitation of the COINs evaluation procedure is that incorrect community prediction can result in many nodes being returned as false positives (large $F_i$ term in Algorithm~\ref{algorithm:scalable_query_answering}). This conditional nature of the prediction is the main reason for expecting lower performance compared to the baseline. 
 
-However, as community ranks approach 1, we can much more quickly obtain model predictions with fewer and fewer drawbacks for large graphs. Thus, we prove Proposition~\ref{proposition:condition_applicability}, which quantifies under which conditions the application of COINs is feasible, by theoretically analyzing the tradeoff between the possible scalability benefits and performance losses. 
+However, as community ranks approach 1, we can much more quickly obtain model predictions with fewer and fewer drawbacks for large graphs. Thus, we prove Proposition~\ref{proposition:condition_applicability}, which quantifies under which conditions the application of COINs is feasible, by theoretically analysing the trade-off between the possible scalability benefits and performance losses. 
 
 The general takeaway is that one must \emph{per-community} consider the ratio between acceleration factors and relative error in performance metrics, with specific weight values for aggregating these comparisons to obtain a final conclusion through a simple inequality test.
 
@@ -254,13 +254,13 @@ The general takeaway is that one must \emph{per-community} consider the ratio be
 
 As previously mentioned, previous work mainly solves the problem of query answering scalability by distributing the knowledge graph embedding model across many compute units. Both data and model parallelism are almost fully achieved in this manner; however, the acceleration is always only at best linear with respect to the number of machines available. As such, to scale to very large knowledge graphs, a very large cluster of at least hundreds of machines is required. In this part of the thesis, I will suggest how to utilize available computational resources more efficiently by extending COINs to the distributed learning setting.
 
-Namely, the COINs submodel structure naturally permits partial model parallelism in addition to the acceleration incurred from the two-step inference process. The intra-community and inter-community models used during step 2 of the process are, by design, independent. This is due to the fact that each of those models trains and predicts over a disjoint subset of the knowledge graph edges. As such, Step 2 can be completely parallelized across multiple machines by assigning to each intra-community or inter-community model a dedicated compute unit. The only unavoidable bottleneck is having to sequentially wait for the community prediction of Step 1 to finish, in order to have the information to which machine a data point needs to be communicated.
+Namely, the COINs sub-model structure naturally permits partial model parallelism in addition to the acceleration incurred from the two-step inference process. The intra-community and inter-community models used during step 2 of the process are, by design, independent. This is due to the fact that each of those models trains and predicts over a disjoint subset of the knowledge graph edges. As such, Step 2 can be completely parallelized across multiple machines by assigning to each intra-community or inter-community model a dedicated compute unit. The only unavoidable bottleneck is having to sequentially wait for the community prediction of Step 1 to finish, in order to have the information to which machine a data point needs to be communicated.
 
-The distributed COINs architecture is proposed to be as follows. Let $U$ be a finite set of compute units available to the application, and let $\mathcal{M} \subset \mathcal{F}$ be the full set of COINs submodels. The assignment of COINs models to units will be represented through the mapping $u: \mathcal{M} \to U$. First, select a machine $u^* \in U$ to serve as the \emph{leader} node. The leader performs Step 1, sends and receives data between itself and the other machines to orchestrate Step 2, and performs the final aggregation steps. Formally, we fix these assignments:
+The distributed COINs architecture is proposed to be as follows. Let $U$ be a finite set of compute units available to the application, and let $\mathcal{M} \subset \mathcal{F}$ be the full set of COINs sub-models. The assignment of COINs models to units will be represented through the mapping $u: \mathcal{M} \to U$. First, select a machine $u^* \in U$ to serve as the \emph{leader} node. The leader performs Step 1, sends and receives data between itself and the other machines to orchestrate Step 2, and performs the final aggregation steps. Formally, we fix these assignments:
 \begin{equation}
 u\of{g_{V,R,P,I}^{\of{C}}}=u\of{g_{R,P,I}}=u\of{\mathbf{W}}=u\of{\mathbf{w}}=u\of{\mathbf{w}_R}=u^*.
 \end{equation}
-Then, with this setup, Algorithm~\ref{algorithm:coins_distributed} details the distributed version of Algorithms~\ref{algorithm:coins}. For easier comparison, I color-highlight the required changes for the distributed extension.
+Then, with this setup, Algorithm~\ref{algorithm:coins_distributed} details the distributed version of Algorithms~\ref{algorithm:coins}. For easier comparison, I colour-highlight the required changes for the distributed extension.
 
 \begin{algorithm}[ht!]
 \caption{Distributed COINs knowledge graph representation}
@@ -365,32 +365,32 @@ Binary classification evaluation metrics are utilized for the link prediction ta
 
 \subsubsection{Communities \& Scalability}
 
-Table~\ref{tab:datasets} summarizes the three knowledge graphs via their basic statistics, as well as those of the best-performing community partitioning that we obtained. We present the computational complexity improvements via the \emph{acceleration} factor: ratio of the number of query embeddings computed during evaluation between the baseline and COINs. On the other hand, the effects on model complexity were analyzed via the ratio of total node embeddings between COINs and baseline models, referenced as the \emph{overparametrization} factor. 
+Table~\ref{tab:datasets} summarizes the three knowledge graphs via their basic statistics, as well as those of the best-performing community partitioning that we obtained. We present the computational complexity improvements via the \emph{acceleration} factor: ratio of the number of query embeddings computed during evaluation between the baseline and COINs. On the other hand, the effects on model complexity were analysed via the ratio of total node embeddings between COINs and baseline models, referenced as the \emph{overparameterization} factor. 
 
 \begin{table}[H]
-  \caption[Knowledge graph datasets summary.]{Knowledge graph datasets summary. Left to right: number of nodes, edges, node features, edge types, communities, inter-community nodes; acceleration factor (decrease in evaluation time complexity, higher is better), overparametrization factor (increase in memory complexity, lower is better).}
+  \caption[Knowledge graph datasets summary.]{Knowledge graph datasets summary. Left to right: number of nodes, edges, node features, edge types, communities, inter-community nodes; acceleration factor (decrease in evaluation time complexity, higher is better), overparameterization factor (increase in memory complexity, lower is better).}
   \label{tab:datasets}
   \centering
   \begin{adjustbox}{width=\textwidth}
   \begin{tabular}{lccccrrrr}
     \toprule
-    Dataset & $\abs{V}$ & $\abs{E_R}$ & $F$ & $\abs{R}$ & $K$ & $\abs{V^*}$ & Acceleration $\uparrow$ & Overparametr. $\downarrow$ \\ %& $\frac{N \abs{V}}{\sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k}}$ & $\frac{\abs{V} + K + \abs{V^*} + 1}{\abs{V}}$ \\
+    Dataset & $\abs{V}$ & $\abs{E_R}$ & $F$ & $\abs{R}$ & $K$ & $\abs{V^*}$ & Acceleration $\uparrow$ & Overparameter. $\downarrow$ \\ %& $\frac{N \abs{V}}{\sum_{k=1}^{K}{\of{K+\abs{C_k}}N_k}}$ & $\frac{\abs{V} + K + \abs{V^*} + 1}{\abs{V}}$ \\
     \midrule
-    FB15k-237 & 14,541 & 310,116 & 1 & 237 & 1,025 & 13,407 & x 4.366 & x 1.993 \\
-    WN18RR & 41,105 & 93,003 & 5 & 11 & 88 & 6,323 & x 4.583 & x 1.156 \\
-    NELL-995 & 75,492 & 154,213 & 269 & 200 & 275 & 4,910 & x 10.289 & x 1.069 \\
+    FB15k-237 & 14,541 & 310,116 & 1 & 237 & 1,025 & 13,407 & $\times$ 4.366 & $\times$ 1.993 \\
+    WN18RR & 41,105 & 93,003 & 5 & 11 & 88 & 6,323 & $\times$ 4.583 & $\times$ 1.156 \\
+    NELL-995 & 75,492 & 154,213 & 269 & 200 & 275 & 4,910 & $\times$ 10.289 & $\times$ 1.069 \\
     \bottomrule
   \end{tabular}
   \end{adjustbox}
 \end{table}
 
-We note the inability to bring down $K$ and $\abs{V^*}$ further for the FB15k-237 graph due to its higher edge density, yielding the worst scalability effects. Nevertheless, we provide evidence that through elementary validation of the resolution hyperparameter, one can optimize the scalability according to desired preferences, due to a surprisingly strong correlation of the factors with the resolution value. Figure~\ref{fig:scalability_resolution} illustrates this through a joint plot of both factors, and one can notice the common pattern across the datasets: there's a critical point for optimal acceleration, while overparametrization simply increases with the resolution.
+We note the inability to bring down $K$ and $\abs{V^*}$ further for the FB15k-237 graph due to its higher edge density, yielding the worst scalability effects. Nevertheless, we provide evidence that through elementary validation of the resolution hyperparameter, one can optimize the scalability according to desired preferences, due to a surprisingly strong correlation of the factors with the resolution value. Figure~\ref{fig:scalability_resolution} illustrates this through a joint plot of both factors, and one can notice the common pattern across the datasets: there's a critical point for optimal acceleration, while overparameterization simply increases with the resolution.
 
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{figures/coins/scalability_leiden_resolution}
 \end{center}
-\caption[Dependence of time and memory scalability on the value of the resolution hyperparameter of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the value of the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Chosen hyperparameter values that yielded an optimal balance between scalability and performance for each dataset are annotated via vertical lines.}
+\caption[Dependence of time and memory scalability on the value of the resolution hyperparameter of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparameterization factors) on the value of the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Chosen hyperparameter values that yielded an optimal balance between scalability and performance for each dataset are annotated via vertical lines.}
 \label{fig:scalability_resolution}
 \end{figure}
 
@@ -461,7 +461,7 @@ COINs     &     \underline{0.552} &  \textbf{0.586} &     \underline{0.381} &  \
 \end{tabular}
 % \begin{tabular}{lrrrrrr}
 % \toprule
-% {} & \multicolumn{2}{l}{MRR} & \multicolumn{2}{l}{Overparametrization} & \multicolumn{2}{l}{Ratio} \\
+% {} & \multicolumn{2}{l}{MRR} & \multicolumn{2}{l}{overparameterization} & \multicolumn{2}{l}{Ratio} \\
 % Dataset & FB15k-237 & WN18RR &           FB15k-237 & WN18RR & FB15k-237 & WN18RR \\
 % Value     &           &        &                     &        &           &        \\
 % \midrule
@@ -490,6 +490,6 @@ From the top plots, one can observe that almost all COINs experiments lie deep i
 
 In this section, we introduced COINs, a method for accelerating link prediction and query answering models for knowledge graphs, to be applicable even in low computational resource settings. COINs featured a two-step prediction procedure: query answer prediction via community prediction and within-community localization. We theoretically and empirically elaborated that the quality of the community structure of the knowledge graph has a broad-reaching influence on the possible scalability improvements provided by our method, as well as its prediction performance compared to baselines. 
 
-As such, one can conclude that before selecting COINs to accelerate the embedding of a knowledge graph, it is important to study and evaluate its community structure. The achieved impressive accuracy and acceleration benefits strongly motivate modeling and predicting over both the community-level coarsened version of a knowledge graph, in addition to the local structures, no matter the task. We would, in such a way, apply both holistic and reductionist techniques to solve a knowledge graph problem, perhaps otherwise computationally intractable.
+As such, one can conclude that before selecting COINs to accelerate the embedding of a knowledge graph, it is important to study and evaluate its community structure. The achieved impressive accuracy and acceleration benefits strongly motivate modelling and predicting over both the community-level coarsened version of a knowledge graph, in addition to the local structures, no matter the task. We would, in such a way, apply both holistic and reductionist techniques to solve a knowledge graph problem, perhaps otherwise computationally intractable.
 
 As relevant future work in scalable knowledge graph reasoning, we propose attempting the integration of COINs with algorithms for general first-order logical knowledge graph query answering, like BetaE~\cite{ren_beta_2020}, and obtaining comparisons to baseline models on larger non-standard knowledge graphs.

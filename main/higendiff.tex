@@ -50,7 +50,7 @@ As an extension of DiGress~\cite{vignac_digress_2022}, HiGenDiff sub-models also
 \end{align}
 where $\hat{Q} \in \off{0,1}^{F \times F}$ is a transition matrix representing staying in the state of the \emph{estimated marginal distribution} of the features in $\mathcal{D}$, i.e. $\forall i,j,\hat{Q}_{i,j} = \hat{p}_j$, $\sum_{j=1}^{F}{\hat{p}_j}=1$. For the edge features, analogously replace $F$ with $\abs{R}+1$. In this manner, the diffusion model learns to smoothly interpolate between graphs with random node and edge features sampled according to marginal probabilities and graphs with structure, through the probabilistic flipping of random nodes or edges.
 
-Given a dense representation of a graph sample $\of{\mathbf{X},A}$, where $n$ is the number of nodes, $\mathbf{X} \in \mathbb{R}^{n \times F}$ are the node features and $A \in \offf{0,1,\dots,\abs{R}}^{n \times n}$ is the labeled adjacency matrix, HiGenDiff represents the graph's \emph{hierarchical community structure} $\off{G^{\of{l}}}_{l=1}^{L}=\off{\of{\mathbf{X}^{\of{l}},A^{\of{l}}}}_{l=1}^{L}$ as the collection $G=\of{G_R,\off{\of{M^{\of{l}}, \offf{C^{\of{l}}_{k}}_{k=1}^{n^{\of{l+1}}},\offf{B^{\of{l}}_{j,k}}_{j \neq k}}}_{l=1}^{L-1}}$, where:
+Given a dense representation of a graph sample $\of{\mathbf{X},A}$, where $n$ is the number of nodes, $\mathbf{X} \in \mathbb{R}^{n \times F}$ are the node features and $A \in \offf{0,1,\dots,\abs{R}}^{n \times n}$ is the labelled adjacency matrix, HiGenDiff represents the graph's \emph{hierarchical community structure} $\off{G^{\of{l}}}_{l=1}^{L}=\off{\of{\mathbf{X}^{\of{l}},A^{\of{l}}}}_{l=1}^{L}$ as the collection $G=\of{G_R,\off{\of{M^{\of{l}}, \offf{C^{\of{l}}_{k}}_{k=1}^{n^{\of{l+1}}},\offf{B^{\of{l}}_{j,k}}_{j \neq k}}}_{l=1}^{L-1}}$, where:
 \begin{itemize}
     \item $L \in \mathbb{N}$ is the number of levels in the hierarchy;
     \item $n^{\of{l}}$ is the number of nodes in the $l$-th level of the hierarchy, $n^{\of{1}}=n$;
@@ -79,19 +79,19 @@ Figure~\ref{fig:higendiff} provides a visual representation of an example hierar
     \includegraphics[width=0.45\linewidth]{figures/higendiff/hierarchical_graph.png}
     \hfill
     \includegraphics[width=0.45\linewidth]{figures/higendiff/hierarchical_adj.png}
-    \caption[Node-edge drawing and adjacency block visualization of a hierarchical graph structure.]{Node-edge drawing and adjacency block visualization of a hierarchical graph structure, with labeled aggregate node and edge counts, the additional features that HiGenDiff employs. Color-shaded areas denote the community subgraphs, gray shaded areas are the bipartites (mirrored on the lower triangular), and unshaded areas are skipped during diffusion of the current level, according to the result of the previous level. Credit to~\cite{karami_multi-resolution_2024}.}
+    \caption[Node-edge drawing and adjacency block visualization of a hierarchical graph structure.]{Node-edge drawing and adjacency block visualization of a hierarchical graph structure, with labelled aggregate node and edge counts, the additional features that HiGenDiff employs. Color-shaded areas denote the community subgraphs, gray shaded areas are the bipartites (mirrored on the lower triangular), and unshaded areas are skipped during diffusion of the current level, according to the result of the previous level. Credit to~\cite{karami_multi-resolution_2024}.}
     \label{fig:higendiff}
 \end{figure}
 Given a dataset $\mathcal{D}=\offf{G_i}_{i=1}^{N}$ of such hierarchical graph structures, HiGenDiff employs MRGrad's model architecture~\cite{karami_multi-resolution_2024} to learn that distribution. Namely, HiGenDiff is comprised of $2L-1$ diffusion models: $\mathcal{M}=\of{\mathcal{M}_P,\off{\of{\mathcal{M}^{\of{l}}_C,\mathcal{M}^{\of{l}}_B}}_{l=1}^{L-1}}$, where $\mathcal{M}_P$ learns to sample from the distribution of root graphs, while $\mathcal{M}^{\of{l}}_C$ and $\mathcal{M}^{\of{l}}_B$ learn the $l$-th level's community and bipartite distributions, respectively, $\forall l<L$. 
 
-For the likelihood modeling, we employ the independence property between community and bipartite graphs when conditioning on a given upper-level coarsening, yielding:
+For the likelihood modelling, we employ the independence property between community and bipartite graphs when conditioning on a given upper-level coarsening, yielding:
 \begin{equation}
 \mathbb{P}\of{G \in \mathcal{D}}=\mathbb{P}\of{G^{\of{L}}}\prod_{l=1}^{L-1}{\mathbb{P}\of{G^{\of{l}} \mid G^{\of{l+1}}}}=\mathbb{P}\of{G_R}\prod_{l=1}^{L-1}\prod_{k=1}^{n^{\of{l+1}}}{\mathbb{P}\of{C_{k}^{\of{l}} \mid G^{\of{l+1}}}}\prod_{j \neq k}{\mathbb{P}\of{B_{j,k}^{\of{l}} \mid G^{\of{l+1}}}}     
 \end{equation}
 
 For the sampling models, similar to MRGrad:
 \begin{itemize}
-    \item $\mathcal{M}_P$ is a DiGress diffusion model~\cite{vignac_digress_2022}, modified to support generation of general weighted graphs. Root graphs are sampled with such an architecture independently, as the first step of HiGenDiff. We will present the different methods for modeling and diffusing edge weights in the next subsection, as this was found to be a very important ablation dimension. 
+    \item $\mathcal{M}_P$ is a DiGress diffusion model~\cite{vignac_digress_2022}, modified to support generation of general weighted graphs. Root graphs are sampled with such an architecture independently, as the first step of HiGenDiff. We will present the different methods for modelling and diffusing edge weights in the next subsection, as this was found to be a very important ablation dimension. 
     \item Each $\mathcal{M}^{\of{l}}_C$ community generator is a graph transformer model with the architecture of~\cite{dwivedi_generalization_2021}, modified to support conditioning on the features of a parent graph. For each level, community graphs are sampled independently before the bipartites.
     \item Each $\mathcal{M}^{\of{l}}_B$ bipartite generator is a GraphGPS model~\cite{rampasek_recipe_2022}, customized to have a linear complexity of adjacency matrix generation w.r.t. the number of input nodes and to support conditioning on the features of a parent graph. Bipartites are generated jointly after the communities for each level, in order to align the inter-community edges more accurately.
 \end{itemize}
@@ -99,13 +99,13 @@ For the sampling models, similar to MRGrad:
 \subsection{Contributions}
 
 \subsubsection{Model}
-We extend MRGrad's model design with a more detailed exploration of the same variables in the diffusion model architecture. Namely, we also agree on the significance of the first, root graph, diffusion step on the overall quality of the final sampled hierarchical graph structures. As such, we describe the $\mathcal{M}_R$ model variations below, where the differences lie in how accurately the edge weights of the root graph, $A^{\of{L}}$, are modeled:
+We extend MRGrad's model design with a more detailed exploration of the same variables in the diffusion model architecture. Namely, we also agree on the significance of the first, root graph, diffusion step on the overall quality of the final sampled hierarchical graph structures. As such, we describe the $\mathcal{M}_R$ model variations below, where the differences lie in how accurately the edge weights of the root graph, $A^{\of{L}}$, are modelled:
 \begin{itemize}
     \item \textbf{Simple}: In this setting, we completely replace $A^{\of{L}}$ with $\bar{A}^{\of{L}} \in \offf{0,1}^{n^{\of{L}} \times n^{\of{L}}}$, the simple binary discretization of the root weights described previously. This thus has implications for the discrete stochastic process, where now $\hat{Q}\in\off{0,1}^{2 \times 2}$ for each adjacency entry of the root. This configuration is the one with the least representation power;
     \item \textbf{Integer}: In this setting, we acknowledge that the root graph's weights can be any non-negative integers from 0 to the number of edges in the graph $\abs{E}$. This is essentially the default setting, where we fully generate the original $A^{\of{L}} \in \offf{0,1,\dots,\abs{E}}^{n^{\of{L}} \times n^{\of{L}}}$, and $\hat{Q}\in\off{0,1}^{\of{\abs{E}+1} \times \of{\abs{E}+1}}$;
     \item \textbf{Ordinal}: The most accurate noising process of the root weights is the one that would acknowledge their \emph{ordered} nature, i.e., it should be very unlikely for a very high edge weight to be instantly flipped to 0 in one step. 
     
-    The ordinal setting acknowledges this and modifies $\hat{Q} \in \off{0,1}^{\of{\abs{E}+1} \times \of{\abs{E}+1}}$ to be \enquote{Markov-like} and allow only transitions to neighboring integers on the number line: 
+    The ordinal setting acknowledges this and modifies $\hat{Q} \in \off{0,1}^{\of{\abs{E}+1} \times \of{\abs{E}+1}}$ to be \enquote{Markov-like} and allow only transitions to neighbouring integers on the number line: 
     \begin{equation}
         \hat{Q}_{i,j}\propto\begin{cases}
             \hat{p}_j, & \abs{i-j}\leq 1 \\
@@ -116,7 +116,7 @@ We extend MRGrad's model design with a more detailed exploration of the same var
 \end{itemize}
 
 \subsubsection{Theory}
-From how we described the likelihood modeling of HiGenDiff in the previous subsection, the similarities with the COINs technique for scalable knowledge graph query-answer ranking are evident. What a bi-level HiGenDiff model performs to score and generate root graph, community, and bipartite adjacencies is analogous to the application of COINs' community, intra-community, and inter-community models for query-answer pair likelihood, respectively. Keeping this in mind, one can ask the same theoretical questions we posed for COINs: 
+From how we described the likelihood modelling of HiGenDiff in the previous subsection, the similarities with the COINs technique for scalable knowledge graph query-answer ranking are evident. What a bi-level HiGenDiff model performs to score and generate root graph, community, and bipartite adjacencies is analogous to the application of COINs' community, intra-community, and inter-community models for query-answer pair likelihood, respectively. Keeping this in mind, one can ask the same theoretical questions we posed for COINs: 
 \begin{center}
     \emph{What is the computational cost of adding an extra graph coarsening layer on top, and when is this feasibly faster than the standard baseline?}
 \end{center}
@@ -164,7 +164,7 @@ This includes computing hierarchical structures of graphs using the Louvain comm
 
 As notable differences, we single out our more extensive model ablation and the addition of two new datasets of graphs with interesting community structure.
 
-Namely, we have the choice of building 5 different diffusion configurations: Simple, Integer, Integer-Bucketized, Ordinal, and Ordinal-Bucketized. We also investigated the need whether bipartite graphs really need to be diffused jointly, as well as the need for conditional probability modeling between hierarchy levels, thus the need for three different modified graph transformers. As an alternative, we thus constructed the Naive setup, where all HiGenDiff sub-models are independent DiGress instances, generating graph parts independently, which are then stitched into a final graph with simple concatenation.
+Namely, we have the choice of building 5 different diffusion configurations: Simple, Integer, Integer-Bucketized, Ordinal, and Ordinal-Bucketized. We also investigated the need whether bipartite graphs really need to be diffused jointly, as well as the need for conditional probability modelling between hierarchy levels, thus the need for three different modified graph transformers. As an alternative, we thus constructed the Naive setup, where all HiGenDiff sub-models are independent DiGress instances, generating graph parts independently, which are then stitched into a final graph with simple concatenation.
 
 Each of the model configurations, except the Naive, was trained and evaluated on the 4 datasets chosen by MRGrad: a dataset of Stochastic Block Model (SBM) samples provided by~\cite{martinkus_spectre_2022}, the CiteSeer ego networks of~\cite{sen_collective_2008}, and the 2 protein structure datasets enzyme~\cite{schomburg_brenda_2004} and DD2~\cite{dobson_distinguishing_2003}, classical for drug discovery. 
 

@@ -78,7 +78,7 @@ In what follows, we will introduce an alternative approach to decomposing the sa
 \paragraph{Multi-measurement process} Using multiple correlated measurements appears in~\cite{saremi_multimeasurement_2022} and~\cite{saremi_chain_2024}. More generally, multi-measurements correspond to linear observation as defined in~\cite{montanari_posterior_2024} or posterior sampling in linear regression with fixed design.
 
 \subsection{The MultiProx samplers}
-In section~\ref{sec:appendix_gibbs} of the appendix, we theoretically show how a technique called Gibbs multimeasurement is an entirely log-concave single-noise-level sampling framework. Each individual Gibbs sampling step is also computationally tractable, and each sampling step in Algorithm~\ref{alg:pipeline} can be implemented exactly. We derive from this result an implementation of our framework we call the MultiProx sampler, as Algorithm~\ref{alg:multiprox}.
+In section~\ref{sec:appendix_gibbs} of the appendix, we theoretically show how a technique called Gibbs multi-measurement is an entirely log-concave single-noise-level sampling framework. Each individual Gibbs sampling step is also computationally tractable, and each sampling step in Algorithm~\ref{alg:pipeline} can be implemented exactly. We derive from this result an implementation of our framework we call the MultiProx sampler, as Algorithm~\ref{alg:multiprox}.
 
 \begin{algorithm}[H]
     \caption{The MultiProx sampler}
@@ -99,7 +99,7 @@ In section~\ref{sec:appendix_gibbs} of the appendix, we theoretically show how a
     \end{algorithmic}
 \end{algorithm}
 
-Figure~\ref{fig:multiprox} summarizes the MultiProx algorithm and its theoretical properties. Namely, note how with specific conditions on the number of multimeasurements $m$ and the fixed noise level $t$, Gibbs sampling provides us with a fully log-concave single-noise level denoising diffusion sampling framework. While the Gibbs sampling itself can easily be implemented with simple averaging and replacement of each multimeasurement one by one.
+Figure~\ref{fig:multiprox} summarizes the MultiProx algorithm and its theoretical properties. Namely, note how with specific conditions on the number of multi-measurements $m$ and the fixed noise level $t$, Gibbs sampling provides us with a fully log-concave single-noise level denoising diffusion sampling framework. While the Gibbs sampling itself can easily be implemented with simple averaging and replacement of each multi-measurement one by one.
 
 \begin{figure}[H]
     \centering
@@ -147,7 +147,7 @@ Figure~\ref{fig:multiprox_images} displays Gibbs chains of samples, obtained usi
 \end{figure} 
 
 \subsubsection{Graphs}
-In any case, the main experimental results that are relevant for this thesis work are those on discrete distributions. Modeling and sampling from discrete distributions such as graphs is a more complicated generative learning task. 
+In any case, the main experimental results that are relevant for this thesis work are those on discrete distributions. Modelling and sampling from discrete distributions such as graphs is a more complicated generative learning task. 
 
 We thus focused on evaluating our sampling technique on two classical graph distribution learning tasks: learning to generate novel small molecular structures using the QM9 dataset of 9-node graphs with 4 atom (node) types and 5 bond (edge) types~\cite{ruddigkeit_enumeration_2012, ramakrishnan_quantum_2014}, and Community20, a toy dataset of 100 2-block SBM-sampled random graphs. Evaluation metrics for molecules include measuring the sampling rates of valid, unique, and novel molecular structures. For the simpler Community20 dataset lacking graph interpretation, one can perform Maximum Mean Discrepancy (MMD) statistical tests for the difference between sampled and true distributions of various classical graph features as before~\cite{gretton_kernel_2012, liao_efficient_2019}.
 
@@ -165,7 +165,7 @@ From the figure, we can immediately discern issues not present in the image expe
 
 Thus, when evaluating our MultiProx sampler on these discrete distributions, we observed that results could be greatly improved when adding in annealing steps before outputting the final graphs, i.e., employing the more general MultiProxAn sampler instead. The choice of moving the chain at a higher noise level $t$, then annealing to lower and lower $t'$ is empirically validated, as e.g., from Table~\ref{tab:qm9_stats} one observes that this always results in more valid molecules, but nevertheless always with less compute cost when compared to the baseline. As shown by Figure~\ref{fig:qm9_better}, the improvement in sample quality is also visually discernible. 
 
-For an explanation, we hypothesize that the issue arises from the argmax projection of the Gaussian logits, which would require different guarantees on the modeling accuracy of its distribution. The higher noise level moves the Gibbs chain with a sufficiently high velocity so as to cover more modes, while the annealing steps to the lower noise level make sure there are fewer warm-up steps. We refer to the work by~\cite{sahoo_diffusion_2025} for a potential solution on how to remain in the single-noise-level configuration even for complex discrete distributions. 
+For an explanation, we hypothesize that the issue arises from the argmax projection of the Gaussian logits, which would require different guarantees on the modelling accuracy of its distribution. The higher noise level moves the Gibbs chain with a sufficiently high velocity so as to cover more modes, while the annealing steps to the lower noise level make sure there are fewer warm-up steps. We refer to the work by~\cite{sahoo_diffusion_2025} for a potential solution on how to remain in the single-noise-level configuration even for complex discrete distributions. 
 
 \begin{table}[!ht]
     \centering
@@ -201,6 +201,6 @@ For an explanation, we hypothesize that the issue arises from the argmax project
 
 \subsection{Summary}
 
-To conclude, we showed how by applying multimeasurement theory to denoising diffusion samplers, we can reproduce state-of-the-art performance metrics with much fewer denoising steps. Specifically, our MultiProxAn sampler can yield a speed-up factor of around $\frac{T}{t-t'+1}$ if we accept an increase in memory complexity by a factor of $m$, but experiments have shown that the values of the two fixed noise levels $t$ and $t'$ must be carefully validated. 
+To conclude, we showed how by applying multi-measurement theory to denoising diffusion samplers, we can reproduce state-of-the-art performance metrics with much fewer denoising steps. Specifically, our MultiProxAn sampler can yield a speed-up factor of around $\frac{T}{t-t'+1}$ if we accept an increase in memory complexity by a factor of $m$, but experiments have shown that the values of the two fixed noise levels $t$ and $t'$ must be carefully validated. 
 
-We again rise above purely reductionist and holistic approaches by taking a bit of each, this time to provide the best methods for sampling from multimodal distributions. We mix annealing approaches that assume it is enough to model noise step-by-step, and multimeasurement results that predict all relevant information lies in a single noise level. 
+We again rise above purely reductionist and holistic approaches by taking a bit of each, this time to provide the best methods for sampling from multimodal distributions. We mix annealing approaches that assume it is enough to model noise step-by-step, and multi-measurement results that predict all relevant information lies in a single noise level. 

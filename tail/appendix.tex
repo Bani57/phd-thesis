@@ -296,7 +296,7 @@ Table~\ref{tab:hyperparameters} lists the chosen values of the main hyperparamet
 
 Figure~\ref{fig:scalability_cut_size} illustrates an alternative method to optimize the scalability factors, through variation of the cut size (number of inter-community edges) heuristic of the METIS algorithm.
 
-For Leiden, one observes smooth curves with similar properties as in Figure~\ref{fig:scalability_resolution}, where we had the resolution parameter as the independent variable. For optimal acceleration, there seems to be a critical cut size, while having more inter-community edges implies more parameters for $g^{*}_V$. Curiously, we observed the METIS algorithm to yield a non-minimal cut size, and there are a lot of Leiden resolution values that achieve lower cut sizes. METIS clearly favors too large an increase in parameter number. 
+For Leiden, one observes smooth curves with similar properties as in Figure~\ref{fig:scalability_resolution}, where we had the resolution parameter as the independent variable. For optimal acceleration, there seems to be a critical cut size, while having more inter-community edges implies more parameters for $g^{*}_V$. Curiously, we observed the METIS algorithm to yield a non-minimal cut size, and there are a lot of Leiden resolution values that achieve lower cut sizes. METIS clearly favours too large an increase in parameter number. 
 
 The distribution of the metrics over a batch of 100 random uniform community assignments yielded extreme values: the best acceleration, however, the largest cut size, and most parameters.
 
@@ -304,25 +304,25 @@ The distribution of the metrics over a batch of 100 random uniform community ass
 \begin{center}
 \includegraphics[width=\textwidth]{figures/coins/scalability_leiden_cut_size}
 \end{center}
-\caption[Dependence of time and memory scalability on the cut size of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the cut size (number of inter-community edges) of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Cut values that yielded an optimal balance between scalability and performance for each dataset are annotated via black vertical lines. Gray vertical lines denote the cut size values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
+\caption[Dependence of time and memory scalability on the cut size of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparameterization factors) on the cut size (number of inter-community edges) of community partitions obtained by varying the resolution hyperparameter of the Leiden community detection algorithm. Left to right: different datasets. Cut values that yielded an optimal balance between scalability and performance for each dataset are annotated via black vertical lines. Gray vertical lines denote the cut size values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
 \label{fig:scalability_cut_size}
 \end{figure}
 
 Figure~\ref{fig:scalability_modularity} illustrates yet another alternative method to optimize the scalability factors, through optimization of the modularity heuristic utilized by the Leiden algorithm. 
 
-In general, for Leiden, one observes both more acceleration and less overparametrization as modularity increases; however, as the plots display, we found this method to be more unstable than simply traversing the resolution hyperparameter space as before in Figure~\ref{fig:scalability_resolution}. We also note that the METIS algorithm produced slightly higher modularity only for the WN18RR dataset. Random community assignments again, naturally, yield extremal values.
+In general, for Leiden, one observes both more acceleration and less overparameterization as modularity increases; however, as the plots display, we found this method to be more unstable than simply traversing the resolution hyperparameter space as before in Figure~\ref{fig:scalability_resolution}. We also note that the METIS algorithm produced slightly higher modularity only for the WN18RR dataset. Random community assignments again, naturally, yield extremal values.
 
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=\textwidth]{figures/coins/scalability_leiden_modularity}
 \end{center}
-\caption[Dependence of time and memory scalability on the value of the modularity heuristic of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparametrization factors) on the value of the modularity heuristic of the Leiden community detection algorithm. Left to right: different datasets. Modularity values that yielded an optimal balance between scalability and performance for each dataset annotated via black vertical lines. Gray vertical lines denote the modularity values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
+\caption[Dependence of time and memory scalability on the value of the modularity heuristic of the Leiden community detection algorithm.]{Dependence of time and memory scalability (acceleration and overparameterization factors) on the value of the modularity heuristic of the Leiden community detection algorithm. Left to right: different datasets. Modularity values that yielded an optimal balance between scalability and performance for each dataset annotated via black vertical lines. Gray vertical lines denote the modularity values obtained by the METIS algorithm, while the boxes with error bars denote the results from a batch of 100 random uniform community assignments.}
 \label{fig:scalability_modularity}
 \end{figure}
 
 \subsection{Performance \& Feasibility}
 
-Table~\ref{tab:performance_query_answering} contains our full query answering metric comparison with the baselines, while Table~\ref{tab:performance_query_answering_2} provides further insight into our query answering performance, after analyzing separately the metrics for each of the two prediction steps. 
+Table~\ref{tab:performance_query_answering} contains our full query answering metric comparison with the baselines, while Table~\ref{tab:performance_query_answering_2} provides further insight into our query answering performance, after analysing separately the metrics for each of the two prediction steps. 
 
 We can observe how well the community Hits@1 score captures the influence of the accuracy in the community prediction on the overall performance. Namely, with some quick calculations, one can interestingly note that the overall COINs metric values can be closely approximated as the product of the community Hits@1 and respective scores for the within-community node prediction.
 
@@ -449,9 +449,9 @@ However, as shown in the right plot, where we remove the impact of the community
 
 % \newpage
 
-Figure~\ref{fig:feasibility_trajectories} aims to integrate community assignment validation with model feasibility analysis to explore the tradeoff between achieved community quality (measured by cut size, the count of inter-community edges affecting overparametrization), and the Proposition~\ref{proposition:condition_applicability} statistic (influenced by relative performance error and acceleration). 
+Figure~\ref{fig:feasibility_trajectories} aims to integrate community assignment validation with model feasibility analysis to explore the trade-off between achieved community quality (measured by cut size, the count of inter-community edges affecting overparameterization), and the Proposition~\ref{proposition:condition_applicability} statistic (influenced by relative performance error and acceleration). 
 
-To facilitate this tradeoff analysis, we conducted end-to-end training and evaluation for the COINs-RotatE combination on each dataset using various sources of community assignments. Specifically, we varied the Leiden resolution hyperparameter value, considered METIS for another case, and finally, compared against communities that were assigned uniformly at random.
+To facilitate this trade-off analysis, we conducted end-to-end training and evaluation for the COINs-RotatE combination on each dataset using various sources of community assignments. Specifically, we varied the Leiden resolution hyperparameter value, considered METIS for another case, and finally, compared against communities that were assigned uniformly at random.
 
 \begin{figure}[ht!]
 \begin{center}
@@ -688,7 +688,7 @@ Let $\mathbf{X}_0 \sim p_0$. Let $t>0$ be a fixed noise level. We define $m$, co
 \mathbf{Y}_i = e^{-t} \mathbf{X} + \sqrt{1 - e^{-2t}} Z_i
 \label{eq:multimeasure}
 \end{equation}
-where $Z_1, \dots, Z_m$ are independent $N\of{\mathbf{0}, \mathbf{I}_F}$ variables. These $m$ measurements are correlated through $\mathbf{X}$. Our method builds on the observation from \cite{saremi_multimeasurement_2022} that denoising from an entire set of correlated noisy measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ is easier than denoising from a single noisy measurement. The multimeasurement sampling framework we analyze in this section consists of generating $\mathbf{X}_0$ by denoising from the $m$ fixed-noise level measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. Unlike DDPMs, this framework does not progressively denoise following an annealing schedule. It consists of two components: a denoising component that produces a sample $\mathbf{X}_0$ from the noisy measurements and an initialization component that generates the noisy measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ to denoise from. We summarize the framework in Algorithm \ref{alg:pipeline} and explain its soundness in detail in what follows.
+where $Z_1, \dots, Z_m$ are independent $N\of{\mathbf{0}, \mathbf{I}_F}$ variables. These $m$ measurements are correlated through $\mathbf{X}$. Our method builds on the observation from \cite{saremi_multimeasurement_2022} that denoising from an entire set of correlated noisy measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ is easier than denoising from a single noisy measurement. The multi-measurement sampling framework we analyse in this section consists of generating $\mathbf{X}_0$ by denoising from the $m$ fixed-noise level measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$. Unlike DDPMs, this framework does not progressively denoise following an annealing schedule. It consists of two components: a denoising component that produces a sample $\mathbf{X}_0$ from the noisy measurements and an initialization component that generates the noisy measurements $\of{\mathbf{Y}_1, \dots, \mathbf{Y}_m}$ to denoise from. We summarize the framework in Algorithm \ref{alg:pipeline} and explain its soundness in detail in what follows.
 
 \begin{algorithm}[H]
 \caption{Gibbs Multi-measurement Sampling Framework}
