@@ -139,9 +139,7 @@ On the other hand, the METIS algorithm for graph partitioning~\cite{karypis_fast
 
 \subsubsection{Community detection}
 
-Given a knowledge graph $\of{V, E_R, R, \mathbf{X}}$, the first step we employ is to execute the Leiden community detection algorithm to obtain a good node-to-community mapping $c: V \to \mathcal{C}$. 
-
-For our COINs technique, based on the obtained community assignment map $c$, we extract further discrete information of great utility for efficient training and evaluation. $c$ coarsens $\of{V, E_R}$ into a \emph{community-level interaction graph}: 
+Given a knowledge graph $\of{V, E_R, R, \mathbf{X}}$, the first step we employ is to execute the Leiden community detection algorithm to obtain a good node-to-community mapping $c: V \to \mathcal{C}$. For our COINs technique, based on the obtained community assignment map $c$, we extract further discrete information of great utility for efficient training and evaluation. $c$ coarsens $\of{V, E_R}$ into a \emph{community-level interaction graph}: 
 \begin{equation}
 V^{\of{C}} = \mathcal{C}, E^{\of{C}}_R = \offf{\of{c\of{u},r,c\of{v}} \mid \of{u,r,v} \in E_R}.    
 \end{equation}
@@ -219,7 +217,7 @@ Observe that the total number of COINs node embeddings for a graph is
 \begin{equation}
     \abs{\boldsymbol{\theta}} = K + \sum_{k=1}^{K}{\abs{C_k}} + \abs{V^*} + 1 = K + \abs{V} + \abs{V^*} + 1,
 \end{equation}
-compared to just $\abs{V}$ node embeddings in the baseline. Thus, using a partitioning that keeps $\abs{V^*} \ll \abs{V}$ has benefits in limiting model size as well. 
+compared to just $\abs{V}$ node embeddings in the baseline. Thus, using a partitioning that keeps $K, \abs{V^*} \ll \abs{V}$ has benefits in limiting model size as well. 
 
 Let now $S_C$ denote a learned scoring model for community-level query-answer pairs, obtained after extending the community-level COINs sub-models into a classifier, with $S_V$ the analogue for the final node-level query answer scoring. Then, one can implement the proposed novel scalable query answering procedure via Algorithm~\ref{algorithm:scalable_query_answering}.
 
@@ -260,7 +258,7 @@ The distributed COINs architecture is proposed to be as follows. Let $U$ be a fi
 \begin{equation}
 u\of{g_{V,R,P,I}^{\of{C}}}=u\of{g_{R,P,I}}=u\of{\mathbf{W}}=u\of{\mathbf{w}}=u\of{\mathbf{w}_R}=u^*.
 \end{equation}
-Then, with this setup, Algorithm~\ref{algorithm:coins_distributed} details the distributed version of Algorithms~\ref{algorithm:coins}. For easier comparison, I colour-highlight the required changes for the distributed extension.
+Then, with this setup, Algorithm~\ref{algorithm:coins_distributed} details the distributed version of Algorithm~\ref{algorithm:coins}. For easier comparison, I colour-highlight the required changes for the distributed extension.
 
 \begin{algorithm}[ht!]
 \caption{Distributed COINs knowledge graph representation}
@@ -301,7 +299,7 @@ The choice of which machine to assign to $g^*_V$ and each intra-community model 
 \frac{3}{2} N \sqrt[\textcolor{blue}{3}]{2\abs{V}} \leq KN+\textcolor{blue}{\max_{l=1}^{\abs{U}}}{\of{\sum_{k=1}^{K}{\abs{C_k}\off{N_{k,k}\textcolor{blue}{\delta_{k,l}} + \of{N_k-N_{k,k}}\textcolor{blue}{\delta_{*,l}}}}}} \leq N \of{\abs{V} + 1} 
 \end{equation}
 \end{proposition}
-The proof of the previous results explains that to achieve the best possible cost after parallelization of COINs, we must distribute equally the amount of work each machine will do for Step 2. With integer packet sizes, however, this is called the \emph{balanced partition} problem, a known NP-hard variant of the 0-1 Knapsack problem. 
+The proof of the previous result explains that to achieve the best possible cost after parallelization of COINs, we must distribute equally the amount of work each machine will do for Step 2. With integer packet sizes, however, this is called the \emph{balanced partition} problem, a known NP-hard variant of the 0-1 Knapsack problem. 
 
 In our case, we have an array of costs $\offf{p_k}_{k=1}^{K+1}=\offf{\abs{C_k}N_{k,k}}_{k=1}^{K}\cup\offf{\sum_{k=1}^{K}{\abs{C_k}\of{N_{k}-N_{k,k}}}}$ that have to be assigned to $\abs{U}$ knapsacks, such that the maximal total amount in one knapsack is minimal. A brute-force algorithm checking all possible assignments would have a worst-case cost of $O\of{\abs{U}^{K+1}}$, which is infeasible. 
 
@@ -398,7 +396,7 @@ We note the inability to bring down $K$ and $\abs{V^*}$ further for the FB15k-23
 
 Tables~\ref{tab:performance_query_answering_mrr} and~\ref{tab:performance_query_answering_q2b} contain our MRR metric query answering results and the comparison with the baselines, where KBGAT baselines were retrieved from~\cite{nathani_learning_2019}, Query2Box metrics were obtained by integrating the base algorithm with our experiment code that has COINs integration deactivated, while for all other models, metrics were calculated by running the implementation provided with~\cite{sun_rotate_2019}\footnote{Available at \url{https://github.com/DeepGraphLearning/KnowledgeGraphEmbedding}}. 
 
-One can observe that, on average, the relative error of the metric to the baseline decreases with the model complexity. This is to be expected, as more representation power means better embedding of the complicated community-node interactions. In a third of the single-hop cases and the majority of multi-hop ones, we even improve upon the baseline results. Refer to Tables~\ref{tab:performance_query_answering} and~\ref{tab:performance_query_answering_2} in Appendix~\ref{sec:appendix_results} for the full details on the query answering metrics. Here, we also provide a decomposition of the ranking scores separately for Step I and II of COINs.
+One can observe that, on average, the relative error of the metric to the baseline decreases with the model complexity. This is to be expected, as more representation power means better embedding of the complicated community-node interactions. In a third of the single-hop cases and the majority of multi-hop ones, we even improve upon the baseline results. Refer to Tables~\ref{tab:performance_query_answering} and~\ref{tab:performance_query_answering_2} in Appendix~\ref{sec:appendix_results} for the full details on the query answering metrics. There, we also provide a decomposition of the ranking scores separately for Steps I and II of COINs.
 
 \begin{table}[ht!]
   \caption[Computed MRR metric of single-hop query answering experiments.]{Computed MRR metric (higher is better) of single-hop query answering experiments for comparison of COINs results to baselines with equal hyperparameters. Values in bold indicate the superiority of COINs, while underlined values have a relative error lower than 10\%.}

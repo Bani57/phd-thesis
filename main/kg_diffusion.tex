@@ -21,7 +21,7 @@ Since we are in the possession of powerful knowledge graph reasoning models envi
     \item Since this data is now assumed to be ready for training, update the link prediction and query answering models with an optimization algorithm until convergence for these blocks. But the models are now different, so go back to step 1 to re-evaluate the noise probabilities.
 \end{enumerate}
 
-It is very easy to deduce the huge computational cost of this approach, even with one candidate noisy block. If $\abs{V}$ is the total number of nodes in the knowledge graph, $n < \emph{V}$ is the number of nodes in each block, $m$ is the number of negative samples to compute the contrastive loss (\ref{eq:contrastive_loss}), and $n_e$ is the maximum number of training epochs required, from knowledge graph representation theory we know the worst case complexity of each of the three steps is: $O\of{n^2}$, $O\of{n^2|V|}$ and $O\of{n^2 \of{m+1}n_e}$, respectively. However, the biggest issue is the outer loop cost, where in the worst case, in each iteration of the three steps, the likelihood of only one adjacency entry flipped, and the algorithm looped $O\of{n^2}$ times. Altogether, this would amount to $O\of{n^4\of{1+|V|+\of{m+1}n_e}}$ cost. 
+It is very easy to deduce the huge computational cost of this approach, even with one candidate noisy block. If $\abs{V}$ is the total number of nodes in the knowledge graph, $n < \abs{V}$ is the number of nodes in each block, $m$ is the number of negative samples to compute the contrastive loss (\ref{eq:contrastive_loss}), and $n_e$ is the maximum number of training epochs required, from knowledge graph representation theory we know the worst case complexity of each of the three steps is: $O\of{n^2}$, $O\of{n^2\abs{V}}$ and $O\of{n^2 \of{m+1}n_e}$, respectively. However, the biggest issue is the outer loop cost, where in the worst case, in each iteration of the three steps, the likelihood of only one adjacency entry flipped, and the algorithm looped $O\of{n^2}$ times. Altogether, this would amount to $O\of{n^4\of{1+\abs{V}+\of{m+1}n_e}}$ cost. 
 
 The cause of the high-degree polynomial computational complexity of this \emph{exact} knowledge graph anomaly correction algorithm is the model's lack of likelihood estimation power \emph{beyond the range of a single edge} and the lack of \emph{intrinsic estimates of the noise level} in the data. Without these properties, for this difficult application, simple transductive classification models have to behave exactly like the deterministic algorithms they emulate.
 
@@ -43,7 +43,7 @@ The description of the data sampling and model design of the experiments we perf
 
 \subsubsection{Data}
 
-Given a large knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$ and $n<|V|$, from it we sample a dataset $\mathcal{D}=\offf{\of{\mathbf{x}_i,A_i,\mathbf{v}_i}}_{i=1}^{N}$ of $n \times n$ dense representations of subgraphs from it to use as candidate noisy blocks, by first assigning a subgraph ID to each node. 
+Given a large knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$ and $n<\abs{V}$, from it we sample a dataset $\mathcal{D}=\offf{\of{\mathbf{x}_i,A_i,\mathbf{v}_i}}_{i=1}^{N}$ of $n \times n$ dense representations of subgraphs from it to use as candidate noisy blocks, by first assigning a subgraph ID to each node. 
 
 $\mathbf{x}_i \in \mathbb{R}^{n \times F}$ (or $\mathbb{R}^{2n \times F}$ when the subgraph is bipartite) are the node features, $A_i \in \offf{0,1,\dots,|R|}^{n \times n}$ are the relation-labelled adjacencies, and $\mathbf{v}_i \in V^{n}$ (or $V^{2n}$ when the subgraph is bipartite) are the knowledge graph entities which are part of the subgraph.
 
@@ -53,7 +53,7 @@ Due to the node permutation group symmetry of graphs \cite{bronstein_geometric_2
     \caption{Knowledge correction dataset sampling}
     \label{alg:knowledge_correction_dataset}
     \begin{algorithmic}
-        \STATE{\textbf{input}: knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$, maximal subgraph size $n<|V|$}
+        \STATE{\textbf{input}: knowledge graph $G=\of{V, E_R, R, \mathbf{X}}$, maximal subgraph size $n<\abs{V}$}
         \STATE{$\of{k, l} \gets \of{1, 0}$}
         \STATE{$s:V \to \mathbb{N} \gets$ Map$\of{}$}
         \FOR{$v \in V$}
@@ -117,7 +117,7 @@ Formally, in this setting:
 
 \subsubsection{Metrics}
 
-As this section of the work lies in the intersection between knowledge graph reasoning and graph generations, when measuring evaluation performance, we consider both MMD distribution distances to quantify the quality of the learnt subgraph distributions, and edge classification metrics in addition to the contrastive loss for knowledge graphs, in the form for single-hop query answering. Pre-trained TransE \cite{bordes_translating_2013} reasoning models were used to estimate the knowledge graph validity metrics.
+As this section of the work lies in the intersection between knowledge graph reasoning and graph generation, when measuring evaluation performance, we consider both MMD distribution distances to quantify the quality of the learnt subgraph distributions, and edge classification metrics in addition to the contrastive loss for knowledge graphs, in the form for single-hop query answering. Pre-trained TransE \cite{bordes_translating_2013} reasoning models were used to estimate the knowledge graph validity metrics.
 
 \subsection{Results}
 
@@ -128,7 +128,7 @@ Table \ref{tab:kg_diffusion_metrics} presents our numerical results from each ex
     \caption{Graph generation and knowledge graph link prediction metrics for the anomaly correction experiments.}
     \label{tab:kg_diffusion_metrics}
     \begin{adjustbox}{width=\textwidth}
-    \begin{tabular}{lllrrrrrrrr}
+    \begin{tabular}{lll|rrrr|rrrr}
     \toprule
          Dataset & Masked & Split & Degree & Cluster & Orbit & Spectral & Acc. & Pr. & Rec. & F1  \\
     \midrule

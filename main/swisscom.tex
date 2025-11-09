@@ -16,7 +16,7 @@ As we introduced in Chapter~\ref{chp: background}, the field of \emph{network sc
 
 The book by~\cite{barabasi_network_2016} is a very good introduction to this scientific field, and we adopt the definitions of most graph-related concepts and metrics from this source. Though more dedicated to a random graph theory view of networks,~\cite{lewis_network_2011} also details classical tools.
 
-In~\cite{pinheiro_social_2011}, one can find recommended network science methods for the application of telecom graphs, viewed from the perspective of social networks between customers. On the other hand, we distinguish the experiments by~\cite{kostic_social_2020} as the only recent work found directly applying empirically estimated features from an (again customer-level) telecom network for the churn prediction problem. Though our data structure and task differ, the authors, alike~\cite{pinheiro_social_2011}, support the utility of network connectivity, network clustering, and node importance metrics for the telecom use case, techniques we also employ. We thus hope our study will also similarly empirically motivate and validate similar future work.
+In~\cite{pinheiro_social_2011}, one can find recommended network science methods for the application to telecom graphs, viewed from the perspective of social networks between customers. On the other hand, we distinguish the experiments by~\cite{kostic_social_2020} as the only recent work found directly applying empirically estimated features from an (again customer-level) telecom network for the churn prediction problem. Though our data structure and task differ, the authors, alike~\cite{pinheiro_social_2011}, support the utility of network connectivity, network clustering, and node importance metrics for the telecom use case, techniques we also employ. We thus hope our study will also similarly empirically motivate and validate similar future work.
 
 \subsection{Methodology}
 \label{sec:methodology_swisscom}
@@ -145,7 +145,7 @@ We move on to presenting the results of our hypothesis testing. Table~\ref{tab:p
 
 \begin{table}[hb!]
     \centering
-\caption[Pareto goodness of fit tests with p-values above a 0.05 significance threshold for knowledge graph datasets.]{Pareto goodness of fit tests with p-values (4th column) above a 0.05 significance threshold for knowledge graph datasets. For these metric distributions, we also report the estimated value of the polynomial degree parameter of the Pareto distribution (3rd column). For the 25 transport graphs, only the city with the highest p-value w.r.t. a metric is included for brevity.}
+\caption[Pareto goodness of fit tests with p-values above a 0.01 significance threshold for knowledge graph datasets.]{Pareto goodness of fit tests with p-values (4th column) above a 0.01 significance threshold for knowledge graph datasets. For these metric distributions, we also report the estimated value of the polynomial degree parameter of the Pareto distribution (3rd column). For the 25 transport graphs, only the city with the highest p-value w.r.t. a metric is included for brevity.}
 \label{tab:pareto}
 \begin{adjustbox}{width=0.75\columnwidth}
 \begin{tabular}{llrr}
@@ -279,7 +279,7 @@ We observe how the Swisscom metrics are in about the same range as those achieve
     \caption[Link prediction and query answering metrics after applying COINs models to the Swisscom dataset.]{Link prediction and query answering metrics after applying COINs models to the Swisscom dataset (higher is better), with a comparison to top results of the same models on the academic knowledge graphs. The best value per metric is highlighted in bold.}
     \label{tab:swisscom_coins}
     % \begin{adjustbox}{width=0.75\columnwidth}
-    \begin{tabular}{llrrrrrr}
+    \begin{tabular}{ll|rr|rrrr}
     \toprule
          Dataset & Model & F1 & AP & Hits@1 & Hits@3 & Hits@10 & MRR \\
     \midrule

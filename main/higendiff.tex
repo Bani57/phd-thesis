@@ -79,10 +79,10 @@ Figure~\ref{fig:higendiff} provides a visual representation of an example hierar
     \includegraphics[width=0.45\linewidth]{figures/higendiff/hierarchical_graph.png}
     \hfill
     \includegraphics[width=0.45\linewidth]{figures/higendiff/hierarchical_adj.png}
-    \caption[Node-edge drawing and adjacency block visualization of a hierarchical graph structure.]{Node-edge drawing and adjacency block visualization of a hierarchical graph structure, with labelled aggregate node and edge counts, the additional features that HiGenDiff employs. Color-shaded areas denote the community subgraphs, gray shaded areas are the bipartites (mirrored on the lower triangular), and unshaded areas are skipped during diffusion of the current level, according to the result of the previous level. Credit to~\cite{karami_multi-resolution_2024}.}
+    \caption[Node-edge drawing and adjacency block visualization of a hierarchical graph structure.]{Node-edge drawing and adjacency block visualization of a hierarchical graph structure, with labelled aggregate node and edge counts, the additional features that HiGenDiff employs. Colour-shaded areas denote the community subgraphs, grey shaded areas are the bipartites (mirrored on the lower triangular), and unshaded areas are skipped during diffusion of the current level, according to the result of the previous level. Credit to~\cite{karami_multi-resolution_2024}.}
     \label{fig:higendiff}
 \end{figure}
-Given a dataset $\mathcal{D}=\offf{G_i}_{i=1}^{N}$ of such hierarchical graph structures, HiGenDiff employs MRGrad's model architecture~\cite{karami_multi-resolution_2024} to learn that distribution. Namely, HiGenDiff is comprised of $2L-1$ diffusion models: $\mathcal{M}=\of{\mathcal{M}_P,\off{\of{\mathcal{M}^{\of{l}}_C,\mathcal{M}^{\of{l}}_B}}_{l=1}^{L-1}}$, where $\mathcal{M}_P$ learns to sample from the distribution of root graphs, while $\mathcal{M}^{\of{l}}_C$ and $\mathcal{M}^{\of{l}}_B$ learn the $l$-th level's community and bipartite distributions, respectively, $\forall l<L$. 
+Given a dataset $\mathcal{D}=\offf{G_i}_{i=1}^{N}$ of such hierarchical graph structures, HiGenDiff employs MRGrad's model architecture~\cite{karami_multi-resolution_2024} to learn that distribution. Namely, HiGenDiff is comprised of $2L-1$ diffusion models: $\mathcal{M}=\of{\mathcal{M}_R,\off{\of{\mathcal{M}^{\of{l}}_C,\mathcal{M}^{\of{l}}_B}}_{l=1}^{L-1}}$, where $\mathcal{M}_R$ learns to sample from the distribution of root graphs, while $\mathcal{M}^{\of{l}}_C$ and $\mathcal{M}^{\of{l}}_B$ learn the $l$-th level's community and bipartite distributions, respectively, $\forall l<L$. 
 
 For the likelihood modelling, we employ the independence property between community and bipartite graphs when conditioning on a given upper-level coarsening, yielding:
 \begin{equation}
@@ -91,7 +91,7 @@ For the likelihood modelling, we employ the independence property between commun
 
 For the sampling models, similar to MRGrad:
 \begin{itemize}
-    \item $\mathcal{M}_P$ is a DiGress diffusion model~\cite{vignac_digress_2022}, modified to support generation of general weighted graphs. Root graphs are sampled with such an architecture independently, as the first step of HiGenDiff. We will present the different methods for modelling and diffusing edge weights in the next subsection, as this was found to be a very important ablation dimension. 
+    \item $\mathcal{M}_R$ is a DiGress diffusion model~\cite{vignac_digress_2022}, modified to support generation of general weighted graphs. Root graphs are sampled with such an architecture independently, as the first step of HiGenDiff. We will present the different methods for modelling and diffusing edge weights in the next subsection, as this was found to be a very important ablation dimension. 
     \item Each $\mathcal{M}^{\of{l}}_C$ community generator is a graph transformer model with the architecture of~\cite{dwivedi_generalization_2021}, modified to support conditioning on the features of a parent graph. For each level, community graphs are sampled independently before the bipartites.
     \item Each $\mathcal{M}^{\of{l}}_B$ bipartite generator is a GraphGPS model~\cite{rampasek_recipe_2022}, customized to have a linear complexity of adjacency matrix generation w.r.t. the number of input nodes and to support conditioning on the features of a parent graph. Bipartites are generated jointly after the communities for each level, in order to align the inter-community edges more accurately.
 \end{itemize}
@@ -206,7 +206,7 @@ LFR & 181.92 $\pm$ 44.33 & 30.71 $\pm$ 7.51 & 0.38 $\pm$ 0.15 & 1.7 $\pm$ 0.31 &
 \end{tabular}
 \end{table}
 
-We move on to present the best MMD metrics achieved by HiGenDiff for each dataset in Table~\ref{tab:higendiff_best}. We can observe that the performance is exceptional overall, though it was evidently the hardest to model the clustering coefficients of the rings of cliques. The reason for this is that these graphs have the strict condition that exactly one \emph{edge} of each clique must form the ring, while we discovered that it was common for our model to connect a clique to the ring just via a single node. These types of strict conditions for graph structures are still are challenge for generative models, but such conditioning is highly relevant to drug design.
+We move on to present the best MMD metrics achieved by HiGenDiff for each dataset in Table~\ref{tab:higendiff_best}. We can observe that the performance is exceptional overall, though it was evidently the hardest to model the clustering coefficients of the rings of cliques. The reason for this is that these graphs have the strict condition that exactly one \emph{edge} of each clique must form the ring, while we discovered that it was common for our model to connect a clique to the ring just via a single node. These types of strict conditions for graph structures are still a challenge for generative models, but such conditioning is highly relevant to drug design.
 
 \begin{table}[!ht]
     \centering
@@ -232,7 +232,7 @@ We did observe, however, that choosing the best diffusion configuration across d
     \centering
     \includegraphics[width=0.475\linewidth]{figures/higendiff/ablation_model.pdf}
     \includegraphics[width=0.475\linewidth]{figures/higendiff/ablation_bucketized.pdf}
-    \caption[MMD metric values vs. different HiGenDiff model configurations.]{MMD metric values average across datasets vs. different HiGenDiff model configurations. Left vs right: ablation of the root weight diffusion model vs the effect of bucketization.}
+    \caption[MMD metric values vs. different HiGenDiff model configurations.]{MMD metric values averaged across datasets vs. different HiGenDiff model configurations. Left vs right: ablation of the root weight diffusion model vs the effect of bucketization.}
     \label{fig:higendiff_ablation}
 \end{figure}
 
@@ -296,7 +296,7 @@ Before concluding, we provide visual examples from the graph datasets in Figure~
     \includegraphics[width=0.15\linewidth]{figures/higendiff/roc_gen.png}
         \hfill
     \includegraphics[width=0.15\linewidth]{figures/higendiff/lfr_gen.png}
-    \caption[Visual examples of hierarchical graph structures from each HiGeDiff dataset.]{Visual examples of hierarchical graph structures from each dataset. Top vs bottom: real vs sampled graphs. Left to right: different datasets.}
+    \caption[Visual examples of hierarchical graph structures from each HiGenDiff dataset.]{Visual examples of hierarchical graph structures from each dataset. Top vs bottom: real vs sampled graphs. Left to right: different datasets.}
     \label{fig:higendiff_examples}
 \end{figure}
 

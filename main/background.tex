@@ -142,10 +142,12 @@ This inhomogeneity of connections would suggest that the network has certain nat
 
 \emph{Communities} are classically defined as a disjoint partition of the node set; however, in some contexts, allowing overlapping communities can also be relevant.
 \begin{definition}
-Given a graph with a set of nodes $V$, \emph{communities} are node sets $C_1, \dots, C_K$ that form a \emph{covering} of $V$: $C_1, \dots, C_K \subseteq V$, $\bigcup_{j=1}^{K}{C_j} = V$. In the more common \emph{disjoint} case, the communities form a disjoint partitioning of $V$: $\bigcap_{j=1}^{K}{C_j}=\emptyset$. However, this is not true in general, where \emph{overlapping regions} might exist between communities: $\exists j,k \in \offf{1,\dots,K}$, $j \neq k$, such that $O_{j,k} = C_j \cap C_k \neq \emptyset$.
+Given a graph with a set of nodes $V$, \emph{communities} are node sets $C_1, \dots, C_K$ that form a \emph{covering} of $V$: $C_1, \dots, C_K \subseteq V$, $\bigcup_{j=1}^{K}{C_j} = V$. In the more common \emph{disjoint} case, the communities form a disjoint partitioning of $V$: $\forall j,k \in \offf{1,\dots,K}$, $j \neq k$, $C_j \cap C_k =\emptyset$. However, this is not true in general, where \emph{overlapping regions} might exist between communities: $\exists j,k \in \offf{1,\dots,K}$, $j \neq k$, such that $O_{j,k} = C_j \cap C_k \neq \emptyset$.
 \end{definition} 
 
-For the models presented in this thesis, finding an underlying community structure in the input network is vital for several reasons. Communities allow our model to create a large-scale map of the network, as individual communities can be viewed as meta-nodes linked with meta-edges according to the inter-community connectivity of the data. In addition, in real-world networks, such as the Swisscom knowledge graph, community structure is often strongly present.
+For the models presented in this thesis, finding an underlying community structure in the input network is vital for several reasons. 
+
+Communities allow our model to create a large-scale map of the network, as individual communities can be viewed as meta-nodes linked with meta-edges according to the inter-community connectivity of the data. In addition, in real-world networks, community structure is often strongly present.
 
 \begin{definition}
     Given a graph $G=\of{V,E}$ with community sets $C_1, \dots, C_K$, \emph{graph coarsening} involves constructing a new community-level interaction graph according to the node-to-community memberships and original edges. Formally, we output $G^C=\of{V^C,E^C}$, where $V^C=\offf{C_1,\dots,C_K}$ and $E^C=\offf{\of{C_k,C_l} \mid \exists \of{v,u} \in E,v \in C_k \wedge u \in C_l}$.
@@ -261,7 +263,7 @@ The starting point for all developed loss optimization algorithms is the Gradien
 
 
 \subsection{Neural networks}
-The power of a model to fit any observed data depends on the complexity and generality of its definition, as well as the number of possible parameter values that can be optimized. With the linear model in the example presented above, we can only represent linear dependence relations between observed input and target data. As such, to model a general \emph{non-linear} relation, one introduces a non-linear component to the definition.
+The power of a model to fit any observed data depends on the complexity and generality of its definition, as well as the number of possible parameter values that can be optimized. With the linear model in the example presented above, we can only represent linear dependence relations between observed input and target data. As such, to model a general \emph{non-linear} relation, one introduces a non-linear component to the model definition.
 
 In the machine learning theory of Artificial Neural Networks, one builds more complex models starting from the most elementary building block, the artificial neuron.
 \begin{definition}
